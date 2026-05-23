@@ -1,0 +1,11 @@
+id,category,human_score,openl3_sim,mert_sim,muq_sim,clap_sim,essentia_sim,note
+p001,same_genre_different_artist,5.0,0.991748,0.793449,0.841927,0.951845,0.317015,"Very high: French/filter/disco house, similar era, groove, feel, vocal-forward dance production."
+p002,cross_genre_similar_vibe,4.0,0.982291,0.828538,0.071178,0.940277,0.430731,"High: funky disco-pop basslines, clean pop-dance production, similar bounce."
+p003,same_genre_different_artist,4.0,0.990396,0.865133,0.873843,0.973332,0.626434,"High: UK dance-pop, warm chords, vocal-centric house/pop crossover."
+p004,same_genre_different_artist,4.0,0.994125,0.761248,0.934284,0.934140,0.465472,"Medium-high: modern vocal house, steady club groove, similar mix brightness and vocal treatment."
+p005,cross_genre_similar_vibe,4.0,0.992164,0.901781,0.788417,0.985844,0.569484,"Medium-high: emotional dance-pop, vocal chops, euphoric electronic build/drop structure."
+p006,adjacent_subgenre,3.0,0.983066,0.727720,0.579574,0.980733,0.695706,"Medium: both club/techno-adjacent and repetitive, but different sound design, groove, and intensity."
+p007,cross_genre_similar_vibe,3.0,0.994309,0.791411,0.783750,0.954506,0.239140,"Medium: similar synth-pop DNA and bright 80s-style production, but different era and structure."
+p008,distant_within_music,1.0,0.982446,0.837475,0.503987,0.807334,0.477580,"Very low: sparse intimate ballad vs aggressive electronic/dubstep."
+p009,distant_within_music,1.0,0.984637,0.827240,0.147036,0.947266,0.638189,"Very low: smooth R&B/soul-pop vs thrash metal, totally different timbre, rhythm, density."
+p010,distant_within_music,1.0,0.975161,0.751163,0.197415,0.984896,0.470174,"Extremely low: bebop jazz harmony/improv vs trap/rap minimalism; far-apart sanity check."

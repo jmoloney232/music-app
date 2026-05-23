@@ -1,0 +1,82 @@
+[
+  {
+    "id": "p001",
+    "track_a": {"artist": "Daft Punk", "title": "One More Time"},
+    "track_b": {"artist": "Modjo", "title": "Lady (Hear Me Tonight)"},
+    "human_score": 5,
+    "category": "same_genre_different_artist",
+    "note": "Very high: French/filter/disco house, similar era, groove, feel, vocal-forward dance production."
+  },
+  {
+    "id": "p002",
+    "track_a": {"artist": "Calvin Harris", "title": "Slide"},
+    "track_b": {"artist": "Dua Lipa", "title": "Levitating"},
+    "human_score": 4,
+    "category": "cross_genre_similar_vibe",
+    "note": "High: funky disco-pop basslines, clean pop-dance production, similar bounce."
+  },
+  {
+    "id": "p003",
+    "track_a": {"artist": "Disclosure", "title": "Latch"},
+    "track_b": {"artist": "Duke Dumont", "title": "I Got U"},
+    "human_score": 4,
+    "category": "same_genre_different_artist",
+    "note": "High: UK dance-pop, warm chords, vocal-centric house/pop crossover."
+  },
+  {
+    "id": "p004",
+    "track_a": {"artist": "Dom Dolla", "title": "Saving Up"},
+    "track_b": {"artist": "MK", "title": "17"},
+    "human_score": 4,
+    "category": "same_genre_different_artist",
+    "note": "Medium-high: modern vocal house, steady club groove, similar mix brightness and vocal treatment."
+  },
+  {
+    "id": "p005",
+    "track_a": {"artist": "Fred again..", "title": "Delilah (pull me out of this)"},
+    "track_b": {"artist": "Romy", "title": "Strong"},
+    "human_score": 4,
+    "category": "cross_genre_similar_vibe",
+    "note": "Medium-high: emotional dance-pop, vocal chops, euphoric electronic build/drop structure."
+  },
+  {
+    "id": "p006",
+    "track_a": {"artist": "FISHER", "title": "Losing It"},
+    "track_b": {"artist": "Charlotte de Witte", "title": "Sgadi Li Mi"},
+    "human_score": 3,
+    "category": "adjacent_subgenre",
+    "note": "Medium: both club/techno-adjacent and repetitive, but different sound design, groove, and intensity."
+  },
+  {
+    "id": "p007",
+    "track_a": {"artist": "The Weeknd", "title": "Blinding Lights"},
+    "track_b": {"artist": "a-ha", "title": "Take On Me"},
+    "human_score": 3,
+    "category": "cross_genre_similar_vibe",
+    "note": "Medium: similar synth-pop DNA and bright 80s-style production, but different era and structure."
+  },
+  {
+    "id": "p008",
+    "track_a": {"artist": "Billie Eilish", "title": "when the party's over"},
+    "track_b": {"artist": "Skrillex", "title": "Bangarang"},
+    "human_score": 1,
+    "category": "distant_within_music",
+    "note": "Very low: sparse intimate ballad vs aggressive electronic/dubstep."
+  },
+  {
+    "id": "p009",
+    "track_a": {"artist": "Frank Ocean", "title": "Pink + White"},
+    "track_b": {"artist": "Metallica", "title": "Master of Puppets"},
+    "human_score": 1,
+    "category": "distant_within_music",
+    "note": "Very low: smooth R&B/soul-pop vs thrash metal, totally different timbre, rhythm, density."
+  },
+  {
+    "id": "p010",
+    "track_a": {"artist": "John Coltrane", "title": "Giant Steps"},
+    "track_b": {"artist": "Chief Keef", "title": "Love Sosa"},
+    "human_score": 1,
+    "category": "distant_within_music",
+    "note": "Extremely low: bebop jazz harmony/improv vs trap/rap minimalism; far-apart sanity check."
+  }
+]

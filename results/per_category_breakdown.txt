@@ -1,0 +1,34 @@
+extremely_low
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+high
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+medium_high
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+very_high
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+very_low
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=

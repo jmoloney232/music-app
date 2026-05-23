@@ -1,0 +1,202 @@
+[
+  {
+    "id": "p001",
+    "track_a": {"artist": "Tame Impala", "title": "The Less I Know the Better"},
+    "track_b": {"artist": "Dua Lipa", "title": "Don't Start Now"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Funk/disco bass guitar, tight dry drums, clean pop mix, danceable pocket."
+  },
+  {
+    "id": "p002",
+    "track_a": {"artist": "Purple Disco Machine", "title": "Hypnotized"},
+    "track_b": {"artist": "Dua Lipa", "title": "Hallucinate"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Glossy disco-house drums, bright synth bass, pop vocal hooks, 4-on-the-floor bounce."
+  },
+  {
+    "id": "p003",
+    "track_a": {"artist": "MK", "title": "17"},
+    "track_b": {"artist": "Dom Dolla", "title": "Saving Up"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Modern vocal house groove, chopped vocal hooks, warm bassline, clean club drums."
+  },
+  {
+    "id": "p004",
+    "track_a": {"artist": "Disclosure", "title": "White Noise"},
+    "track_b": {"artist": "Gorgon City", "title": "Ready for Your Love"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: UK house chords, swung percussion, strong female vocal, similar bass/chord relationship."
+  },
+  {
+    "id": "p005",
+    "track_a": {"artist": "Duke Dumont", "title": "Ocean Drive"},
+    "track_b": {"artist": "Kavinsky", "title": "Nightcall"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Slow synthwave pulse, dark neon atmosphere, retro synth bass, late-night driving vibe."
+  },
+  {
+    "id": "p006",
+    "track_a": {"artist": "The Weeknd", "title": "Blinding Lights"},
+    "track_b": {"artist": "M83", "title": "Midnight City"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Big 80s synth leads, bright drums, euphoric night-drive atmosphere."
+  },
+  {
+    "id": "p007",
+    "track_a": {"artist": "Calvin Harris", "title": "Slide"},
+    "track_b": {"artist": "SG Lewis", "title": "Chemicals"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Smooth disco-pop bass, soft drums, airy vocals, warm summer groove."
+  },
+  {
+    "id": "p008",
+    "track_a": {"artist": "Fred again..", "title": "Delilah (pull me out of this)"},
+    "track_b": {"artist": "Romy", "title": "Strong"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Emotional dance-pop, vocal chops, soft piano/synth layers, euphoric build energy."
+  },
+  {
+    "id": "p009",
+    "track_a": {"artist": "Jamie xx", "title": "Loud Places"},
+    "track_b": {"artist": "Caribou", "title": "Can't Do Without You"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Repetitive vocal loops, warm pads, gradual dance build, emotional electronic texture."
+  },
+  {
+    "id": "p010",
+    "track_a": {"artist": "Bicep", "title": "Glue"},
+    "track_b": {"artist": "Overmono", "title": "So U Kno"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Breakbeat drums, nostalgic rave pads, chopped vocal fragments, atmospheric club feel."
+  },
+  {
+    "id": "p011",
+    "track_a": {"artist": "Interplanetary Criminal", "title": "B.O.T.A."},
+    "track_b": {"artist": "Sammy Virji", "title": "If U Need It"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: UKG bounce, skippy drums, chopped vocal hooks, warm club bass."
+  },
+  {
+    "id": "p012",
+    "track_a": {"artist": "Conducta", "title": "Vitamin C"},
+    "track_b": {"artist": "Oppidan", "title": "Mr. Sandman"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Bright UKG percussion, playful vocal chops, swung drums, bubbly bass movement."
+  },
+  {
+    "id": "p013",
+    "track_a": {"artist": "PinkPantheress", "title": "Just for me"},
+    "track_b": {"artist": "NewJeans", "title": "Super Shy"},
+    "human_score": 4,
+    "category": "medium_high",
+    "note": "Medium-high: Light UKG/pop drums, soft vocals, airy mix, cute rhythmic bounce."
+  },
+  {
+    "id": "p014",
+    "track_a": {"artist": "Charli XCX", "title": "Vroom Vroom"},
+    "track_b": {"artist": "SOPHIE", "title": "Faceshopping"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Metallic synths, aggressive hyperpop sound design, sharp transients, plastic percussion."
+  },
+  {
+    "id": "p015",
+    "track_a": {"artist": "COBRAH", "title": "BRAND NEW BITCH"},
+    "track_b": {"artist": "Shygirl", "title": "SLIME"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Dark club-pop, minimal drums, spoken/sung attitude vocals, industrial bass texture."
+  },
+  {
+    "id": "p016",
+    "track_a": {"artist": "FISHER", "title": "Losing It"},
+    "track_b": {"artist": "Chris Lake", "title": "Turn Off The Lights"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Repetitive tech-house groove, punchy kick, minimal bass hook, big club tension."
+  },
+  {
+    "id": "p017",
+    "track_a": {"artist": "John Summit", "title": "Where You Are"},
+    "track_b": {"artist": "Anyma & Chris Avantgarde", "title": "Eternity"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Melodic techno/pop crossover, wide synth leads, emotional vocal, festival-scale drops."
+  },
+  {
+    "id": "p018",
+    "track_a": {"artist": "ARTBAT", "title": "Horizon"},
+    "track_b": {"artist": "Tale Of Us", "title": "Nova"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Dark melodic techno, long synth builds, pulsing bass, cinematic tension."
+  },
+  {
+    "id": "p019",
+    "track_a": {"artist": "KETTAMA", "title": "B O D Y"},
+    "track_b": {"artist": "X CLUB.", "title": "New World Expression"},
+    "human_score": 5,
+    "category": "very_high",
+    "note": "Very high: Fast rave/techno energy, hard drums, raw synth stabs, sweaty warehouse vibe."
+  },
+  {
+    "id": "p020",
+    "track_a": {"artist": "Partiboi69", "title": "K On My D + C"},
+    "track_b": {"artist": "DJ Heartstring", "title": "Will You Remember Me When I'm Gone"},
+    "human_score": 4,
+    "category": "high",
+    "note": "High: Playful trance/techno, fast 4x4 drums, euphoric synths, cheeky rave energy."
+  },
+  {
+    "id": "p021",
+    "track_a": {"artist": "Aphex Twin", "title": "Xtal"},
+    "track_b": {"artist": "Morgan Wallen", "title": "Last Night"},
+    "human_score": 1,
+    "category": "very_low",
+    "note": "Very low: Ambient IDM pads/breaks vs modern country pop guitar/vocal structure."
+  },
+  {
+    "id": "p022",
+    "track_a": {"artist": "Burial", "title": "Archangel"},
+    "track_b": {"artist": "Taylor Swift", "title": "Shake It Off"},
+    "human_score": 1,
+    "category": "very_low",
+    "note": "Very low: Dark, swung, ghostly UK garage texture vs bright maximal pop horns/drums."
+  },
+  {
+    "id": "p023",
+    "track_a": {"artist": "Skrillex", "title": "Scary Monsters and Nice Sprites"},
+    "track_b": {"artist": "Norah Jones", "title": "Don't Know Why"},
+    "human_score": 1,
+    "category": "extremely_low",
+    "note": "Extremely low: Aggressive dubstep sound design vs soft acoustic jazz-pop."
+  },
+  {
+    "id": "p024",
+    "track_a": {"artist": "Chief Keef", "title": "Love Sosa"},
+    "track_b": {"artist": "Fleetwood Mac", "title": "Dreams"},
+    "human_score": 1,
+    "category": "very_low",
+    "note": "Very low: Trap 808s/rap vocals vs live soft-rock drums, bass, guitars, harmonies."
+  },
+  {
+    "id": "p025",
+    "track_a": {"artist": "Charlotte de Witte", "title": "Doppler"},
+    "track_b": {"artist": "Billie Eilish", "title": "ocean eyes"},
+    "human_score": 1,
+    "category": "very_low",
+    "note": "Very low: Driving acid/techno percussion vs soft spacious vocal pop ballad."
+  }
+]

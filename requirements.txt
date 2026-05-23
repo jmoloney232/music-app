@@ -1,0 +1,16 @@
+requests
+soundfile
+librosa
+numpy
+scipy
+torch
+transformers
+openl3
+muq
+essentia-tensorflow
+tqdm
+matplotlib
+pandas
+python-dotenv
+psycopg[binary]
+pgvector

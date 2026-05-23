@@ -1,0 +1,9 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+
+audio_cache/
+embedding_cache/
+feature_cache/
+results/

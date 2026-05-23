@@ -1,0 +1,18 @@
+.env
+.venv/
+.claude/
+.DS_Store
+__pycache__/
+*.pyc
+
+# Large cache directories
+audio_cache/
+stems_cache/
+embedding_cache/
+feature_cache/
+
+# Zip archives
+*.zip
+
+# Essentia model binaries — download via ensure_essentia_models()
+essentia_models/*.pb

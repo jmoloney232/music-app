@@ -1,0 +1,937 @@
+2026-05-21 15:24:30,257 INFO using device preference: cpu
+2026-05-21 15:24:30,258 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:24:30,258 INFO loading backend: openl3
+2026-05-21 15:24:39,367 WARNING Matplotlib is building the font cache; this may take a moment.
+2026-05-21 15:24:46,939 INFO Failed to extract font properties from /System/Library/Fonts/Apple Color Emoji.ttc: Could not set the fontsize (invalid pixel size; error code 0x17)
+2026-05-21 15:24:46,972 INFO Failed to extract font properties from /System/Library/Fonts/SFIndia.ttc: Can not load face (SFNT font table missing; error code 0x8e)
+2026-05-21 15:24:46,979 INFO Failed to extract font properties from /System/Library/PrivateFrameworks/FontServices.framework/Resources/Reserved/PingFangUI.ttc: Can not load face (locations (loca) table missing; error code 0x90)
+2026-05-21 15:24:47,036 INFO Failed to extract font properties from /System/Library/Fonts/Supplemental/NISC18030.ttf: Could not set the fontsize (invalid pixel size; error code 0x17)
+2026-05-21 15:24:47,056 INFO Failed to extract font properties from /System/Library/Fonts/LastResort.otf: tuple indices must be integers or slices, not str
+2026-05-21 15:24:47,075 INFO generated new fontManager
+2026-05-21 15:24:49,067 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:24:49,067 INFO fetching audio: The Beatles - Come Together
+2026-05-21 15:25:56,416 INFO using device preference: mps
+2026-05-21 15:25:56,416 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:25:56,416 INFO loading backend: openl3
+2026-05-21 15:26:01,776 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:26:01,776 INFO fetching audio: The Beatles - Come Together
+2026-05-21 15:26:08,266 INFO computing openl3 embedding: The Beatles - Come Together
+2026-05-21 15:26:19,781 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:26:19,781 INFO sanity openl3 cosine: 1.000000
+2026-05-21 15:26:19,797 INFO fetching audio: Daft Punk - One More Time
+2026-05-21 15:26:20,111 INFO fetching audio: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:26:20,479 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:26:20,543 INFO computing openl3 embedding: Daft Punk - One More Time
+2026-05-21 15:26:32,154 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:26:32,205 INFO computing openl3 embedding: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:26:44,177 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:26:44,177 INFO computing Essentia features in subprocess: Daft Punk - One More Time
+2026-05-21 15:26:47,313 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:26:47,313 INFO computing Essentia features in subprocess: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:26:49,788 INFO fetching audio: Calvin Harris - Slide
+2026-05-21 15:26:50,263 INFO fetching audio: Dua Lipa - Levitating
+2026-05-21 15:26:50,635 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:26:50,681 INFO computing openl3 embedding: Calvin Harris - Slide
+2026-05-21 15:27:02,876 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:27:02,923 INFO computing openl3 embedding: Dua Lipa - Levitating
+2026-05-21 15:27:14,602 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:27:14,603 INFO computing Essentia features in subprocess: Calvin Harris - Slide
+2026-05-21 15:27:17,552 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:27:17,553 INFO computing Essentia features in subprocess: Dua Lipa - Levitating
+2026-05-21 15:27:20,005 INFO fetching audio: Disclosure - Latch
+2026-05-21 15:27:20,380 INFO fetching audio: Duke Dumont - I Got U
+2026-05-21 15:27:20,781 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:27:20,828 INFO computing openl3 embedding: Disclosure - Latch
+2026-05-21 15:27:32,801 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:27:32,855 INFO computing openl3 embedding: Duke Dumont - I Got U
+2026-05-21 15:27:44,754 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:27:44,754 INFO computing Essentia features in subprocess: Disclosure - Latch
+2026-05-21 15:27:47,526 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:27:47,526 INFO computing Essentia features in subprocess: Duke Dumont - I Got U
+2026-05-21 15:27:49,975 INFO fetching audio: Dom Dolla - Saving Up
+2026-05-21 15:27:50,394 INFO fetching audio: MK - 17
+2026-05-21 15:27:51,225 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:27:51,271 INFO computing openl3 embedding: Dom Dolla - Saving Up
+2026-05-21 15:28:03,473 INFO audio cache hit: MK - 17
+2026-05-21 15:28:03,528 INFO computing openl3 embedding: MK - 17
+2026-05-21 15:28:15,687 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:28:15,687 INFO computing Essentia features in subprocess: Dom Dolla - Saving Up
+2026-05-21 15:28:18,491 INFO audio cache hit: MK - 17
+2026-05-21 15:28:18,491 INFO computing Essentia features in subprocess: MK - 17
+2026-05-21 15:28:20,846 INFO fetching audio: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:28:21,368 INFO fetching audio: Romy - Strong
+2026-05-21 15:28:21,995 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:28:22,042 INFO computing openl3 embedding: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:28:34,136 INFO audio cache hit: Romy - Strong
+2026-05-21 15:28:34,183 INFO computing openl3 embedding: Romy - Strong
+2026-05-21 15:28:46,724 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:28:46,724 INFO computing Essentia features in subprocess: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:28:49,639 INFO audio cache hit: Romy - Strong
+2026-05-21 15:28:49,639 INFO computing Essentia features in subprocess: Romy - Strong
+2026-05-21 15:28:52,022 INFO fetching audio: FISHER - Losing It
+2026-05-21 15:28:52,475 INFO fetching audio: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:28:53,418 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:28:53,465 INFO computing openl3 embedding: FISHER - Losing It
+2026-05-21 15:29:05,663 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:29:05,718 INFO computing openl3 embedding: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:29:18,145 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:29:18,146 INFO computing Essentia features in subprocess: FISHER - Losing It
+2026-05-21 15:29:20,934 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:29:20,934 INFO computing Essentia features in subprocess: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:29:23,266 INFO fetching audio: The Weeknd - Blinding Lights
+2026-05-21 15:29:23,683 INFO fetching audio: a-ha - Take On Me
+2026-05-21 15:29:24,073 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:29:24,119 INFO computing openl3 embedding: The Weeknd - Blinding Lights
+2026-05-21 15:29:36,632 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:29:36,689 INFO computing openl3 embedding: a-ha - Take On Me
+2026-05-21 15:29:49,359 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:29:49,360 INFO computing Essentia features in subprocess: The Weeknd - Blinding Lights
+2026-05-21 15:29:52,305 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:29:52,305 INFO computing Essentia features in subprocess: a-ha - Take On Me
+2026-05-21 15:29:54,739 INFO fetching audio: Billie Eilish - when the party's over
+2026-05-21 15:29:55,190 INFO fetching audio: Skrillex - Bangarang
+2026-05-21 15:29:55,582 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:29:55,626 INFO computing openl3 embedding: Billie Eilish - when the party's over
+2026-05-21 15:30:08,680 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:30:08,738 INFO computing openl3 embedding: Skrillex - Bangarang
+2026-05-21 15:30:21,530 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:30:21,530 INFO computing Essentia features in subprocess: Billie Eilish - when the party's over
+2026-05-21 15:30:24,433 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:30:24,433 INFO computing Essentia features in subprocess: Skrillex - Bangarang
+2026-05-21 15:30:26,867 INFO fetching audio: Frank Ocean - Pink + White
+2026-05-21 15:30:27,262 INFO fetching audio: Metallica - Master of Puppets
+2026-05-21 15:30:27,833 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:30:27,880 INFO computing openl3 embedding: Frank Ocean - Pink + White
+2026-05-21 15:30:40,854 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:30:40,908 INFO computing openl3 embedding: Metallica - Master of Puppets
+2026-05-21 15:30:53,670 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:30:53,670 INFO computing Essentia features in subprocess: Frank Ocean - Pink + White
+2026-05-21 15:30:56,677 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:30:56,678 INFO computing Essentia features in subprocess: Metallica - Master of Puppets
+2026-05-21 15:30:59,193 INFO fetching audio: John Coltrane - Giant Steps
+2026-05-21 15:30:59,754 INFO fetching audio: Chief Keef - Love Sosa
+2026-05-21 15:31:00,034 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:31:00,107 INFO computing openl3 embedding: John Coltrane - Giant Steps
+2026-05-21 15:31:13,270 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:31:13,318 INFO computing openl3 embedding: Chief Keef - Love Sosa
+2026-05-21 15:31:25,222 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:31:25,222 INFO computing Essentia features in subprocess: John Coltrane - Giant Steps
+2026-05-21 15:31:28,308 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:31:28,308 INFO computing Essentia features in subprocess: Chief Keef - Love Sosa
+2026-05-21 15:31:31,001 INFO wrote outputs to /Users/jackmoloney/Desktop/Music App/results
+2026-05-21 15:31:43,070 INFO using device preference: mps
+2026-05-21 15:31:43,070 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:31:43,070 INFO loading backend: openl3
+2026-05-21 15:31:47,824 INFO loading backend: mert
+2026-05-21 15:31:49,377 INFO loading MERT on mps
+2026-05-21 15:31:49,549 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:31:49,549 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 15:31:49,632 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:31:49,650 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,662 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,752 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:31:49,762 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,773 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,860 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/configuration_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:31:49,869 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/configuration_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,882 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/configuration_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:31:49,982 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/modeling_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:31:49,991 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/modeling_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:31:50,002 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/modeling_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:31:50,672 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:31:50,763 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:31:50,857 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:31:51,215 INFO HTTP Request: GET https://huggingface.co/api/models/m-a-p/MERT-v1-95M/xet-read-token/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5 "HTTP/1.1 200 OK"
+2026-05-21 15:32:01,372 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:32:02,018 INFO loading backend: muq
+2026-05-21 15:32:02,218 INFO loading MuQ-MuLan on mps
+2026-05-21 15:32:02,317 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:32:02,327 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:02,340 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:02,433 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:32:02,448 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:02,462 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:03,525 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:32:03,629 INFO HTTP Request: GET https://huggingface.co/api/models/OpenMuQ/MuQ-large-msd-iter/xet-read-token/0562a57814f6f8bbd9fdea0a25921a2fce1a841a "HTTP/1.1 200 OK"
+2026-05-21 15:32:54,922 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:55,010 INFO HTTP Request: GET https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:32:55,111 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:32:55,195 INFO HTTP Request: GET https://huggingface.co/api/models/FacebookAI/xlm-roberta-base/xet-read-token/e73636d4f797dec63c3081bb6ed5c7b0bb3f2089 "HTTP/1.1 200 OK"
+2026-05-21 15:33:20,387 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:33:20,478 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:33:20,568 INFO HTTP Request: GET https://huggingface.co/api/models/OpenMuQ/MuQ-MuLan-large/xet-read-token/2e01c796b71dca71b45251384c04cd7b237c9020 "HTTP/1.1 200 OK"
+2026-05-21 15:34:40,775 INFO loading backend: clap
+2026-05-21 15:34:40,802 INFO loading CLAP on mps
+2026-05-21 15:34:40,950 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,036 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,124 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,214 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,299 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/audio_tokenizer_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,384 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,472 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:41,483 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,497 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,586 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:41,677 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:41,693 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,785 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:41,795 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,809 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,907 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:41,919 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:41,930 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,029 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:42,122 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,211 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/vocab.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:42,222 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/vocab.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,235 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/vocab.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,542 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/merges.txt "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:42,555 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/merges.txt "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,573 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/merges.txt "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,668 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/tokenizer.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:42,680 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,696 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,803 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/added_tokens.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:42,892 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:42,907 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:42,918 INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:43,084 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:34:43,095 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:34:43,185 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:43,271 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:34:43,361 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:34:43,447 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/xet-read-token/a0b4534a14f58e20944452dff00a22a06ce629d1 "HTTP/1.1 200 OK"
+2026-05-21 15:35:13,098 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:35:13,188 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music "HTTP/1.1 200 OK"
+2026-05-21 15:35:13,290 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/main "HTTP/1.1 200 OK"
+2026-05-21 15:35:13,389 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/discussions?p=0 "HTTP/1.1 200 OK"
+2026-05-21 15:35:13,508 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/refs%2Fpr%2F5 "HTTP/1.1 200 OK"
+2026-05-21 15:35:13,602 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:35:13,694 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:35:13,778 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/xet-read-token/4189a948e5e2aaa5df3e69da506e54513e977191 "HTTP/1.1 200 OK"
+2026-05-21 15:35:14,211 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:35:14,212 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:35:14,213 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:35:14,214 INFO sanity openl3 cosine: 1.000000
+2026-05-21 15:35:14,215 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:35:15,021 INFO computing mert embedding: The Beatles - Come Together
+2026-05-21 15:35:18,626 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:35:18,627 INFO sanity mert cosine: 1.000000
+2026-05-21 15:35:18,627 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:35:18,678 INFO computing muq embedding: The Beatles - Come Together
+2026-05-21 15:35:20,789 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:35:20,789 INFO sanity muq cosine: 1.000000
+2026-05-21 15:35:20,789 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:35:20,846 INFO computing clap embedding: The Beatles - Come Together
+2026-05-21 15:35:54,757 INFO using device preference: mps
+2026-05-21 15:35:54,757 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:35:54,757 INFO loading backend: openl3
+2026-05-21 15:36:00,057 INFO loading backend: mert
+2026-05-21 15:36:01,693 INFO loading MERT on mps
+2026-05-21 15:36:01,868 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:02,582 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:02,583 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 15:36:02,596 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:02,691 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:02,704 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:02,814 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/configuration_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:02,832 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/configuration_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:36:02,933 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/modeling_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:02,945 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/modeling_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:36:03,278 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:03,653 INFO loading backend: muq
+2026-05-21 15:36:03,828 INFO loading MuQ-MuLan on mps
+2026-05-21 15:36:03,916 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:03,927 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:04,016 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:04,027 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:04,981 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:06,176 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:06,274 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:06,574 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:06,670 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:36:10,204 INFO loading backend: clap
+2026-05-21 15:36:10,220 INFO loading CLAP on mps
+2026-05-21 15:36:10,323 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,408 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,497 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,585 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,676 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/audio_tokenizer_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,766 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:10,856 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:10,872 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:10,962 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:11,050 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:11,065 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:11,161 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:11,175 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:11,271 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:11,284 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:11,380 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:11,474 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-21 15:36:11,642 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:11,656 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:11,750 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:11,841 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:11,935 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:36:12,022 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:12,112 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music "HTTP/1.1 200 OK"
+2026-05-21 15:36:12,218 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/main "HTTP/1.1 200 OK"
+2026-05-21 15:36:12,316 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/discussions?p=0 "HTTP/1.1 200 OK"
+2026-05-21 15:36:12,425 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/refs%2Fpr%2F5 "HTTP/1.1 200 OK"
+2026-05-21 15:36:12,519 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:12,604 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:12,774 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:36:12,774 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:36:12,775 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:36:12,775 INFO sanity openl3 cosine: 1.000000
+2026-05-21 15:36:12,775 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:36:12,775 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:36:12,775 INFO sanity mert cosine: 1.000000
+2026-05-21 15:36:12,775 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:36:12,776 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:36:12,776 INFO sanity muq cosine: 1.000000
+2026-05-21 15:36:12,776 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:36:13,288 INFO computing clap embedding: The Beatles - Come Together
+2026-05-21 15:36:29,028 INFO using device preference: mps
+2026-05-21 15:36:29,028 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:36:29,028 INFO loading backend: openl3
+2026-05-21 15:36:33,983 INFO loading backend: mert
+2026-05-21 15:36:35,606 INFO loading MERT on mps
+2026-05-21 15:36:35,743 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:36,330 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:36,343 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:36,432 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:36,432 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 15:36:36,443 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:36,530 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/configuration_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:36,542 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/configuration_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:36:36,637 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/modeling_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:36,649 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/modeling_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:36:36,970 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:37,362 INFO loading backend: muq
+2026-05-21 15:36:37,545 INFO loading MuQ-MuLan on mps
+2026-05-21 15:36:37,633 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:37,645 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:37,734 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:37,747 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:38,768 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:40,273 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:40,379 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:40,669 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:40,759 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:36:44,609 INFO loading backend: clap
+2026-05-21 15:36:44,629 INFO loading CLAP on mps
+2026-05-21 15:36:44,723 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:44,814 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:44,902 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:44,991 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:45,081 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/audio_tokenizer_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:45,173 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:45,266 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:45,279 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:45,371 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:45,460 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:45,472 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:45,565 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:45,578 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:45,676 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:45,688 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:45,789 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:45,879 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,052 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:36:46,066 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,161 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:46,251 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:46,344 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:36:46,432 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:46,521 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,626 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/main "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,726 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/discussions?p=0 "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,824 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/refs%2Fpr%2F5 "HTTP/1.1 200 OK"
+2026-05-21 15:36:46,913 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:36:47,005 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:36:47,251 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:36:47,251 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:36:47,252 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:36:47,252 INFO sanity openl3 cosine: 1.000000
+2026-05-21 15:36:47,252 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:36:47,252 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:36:47,253 INFO sanity mert cosine: 1.000000
+2026-05-21 15:36:47,253 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:36:47,253 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:36:47,253 INFO sanity muq cosine: 1.000000
+2026-05-21 15:36:47,253 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:36:47,785 INFO computing clap embedding: The Beatles - Come Together
+2026-05-21 15:37:01,919 INFO using device preference: mps
+2026-05-21 15:37:01,920 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 15:37:01,920 INFO loading backend: openl3
+2026-05-21 15:37:06,724 INFO loading backend: mert
+2026-05-21 15:37:08,324 INFO loading MERT on mps
+2026-05-21 15:37:08,454 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:08,562 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:08,562 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 15:37:08,573 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:08,660 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:08,671 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:08,761 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/configuration_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:08,772 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/configuration_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:37:08,867 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/modeling_MERT.py "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:08,879 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/m-a-p/MERT-v1-95M/12af15fef9d0ac838c3f475bfbbf26d2060dd4f5/modeling_MERT.py "HTTP/1.1 200 OK"
+2026-05-21 15:37:09,212 INFO HTTP Request: HEAD https://huggingface.co/m-a-p/MERT-v1-95M/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:09,612 INFO loading backend: muq
+2026-05-21 15:37:09,782 INFO loading MuQ-MuLan on mps
+2026-05-21 15:37:09,868 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:09,878 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:09,962 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:09,973 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:10,928 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:37:12,423 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:12,522 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:37:12,815 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:12,925 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:37:16,358 INFO loading backend: clap
+2026-05-21 15:37:16,375 INFO loading CLAP on mps
+2026-05-21 15:37:16,466 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:16,554 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:16,675 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:16,762 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:16,849 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/audio_tokenizer_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:16,938 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:17,025 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:17,037 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,124 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:17,213 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:17,227 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,326 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:17,338 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,436 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:17,448 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,542 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:17,639 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,802 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 15:37:17,814 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/laion/larger_clap_music/a0b4534a14f58e20944452dff00a22a06ce629d1/config.json "HTTP/1.1 200 OK"
+2026-05-21 15:37:17,905 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:17,991 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:18,083 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 15:37:18,169 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:18,261 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music "HTTP/1.1 200 OK"
+2026-05-21 15:37:18,365 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/main "HTTP/1.1 200 OK"
+2026-05-21 15:37:18,460 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/discussions?p=0 "HTTP/1.1 200 OK"
+2026-05-21 15:37:18,561 INFO HTTP Request: GET https://huggingface.co/api/models/laion/larger_clap_music/commits/refs%2Fpr%2F5 "HTTP/1.1 200 OK"
+2026-05-21 15:37:18,645 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-05-21 15:37:18,740 INFO HTTP Request: HEAD https://huggingface.co/laion/larger_clap_music/resolve/refs%2Fpr%2F5/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 15:37:18,902 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 15:37:18,902 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:37:18,903 INFO embedding cache hit: openl3 The Beatles - Come Together
+2026-05-21 15:37:18,903 INFO sanity openl3 cosine: 1.000000
+2026-05-21 15:37:18,903 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:37:18,904 INFO embedding cache hit: mert The Beatles - Come Together
+2026-05-21 15:37:18,904 INFO sanity mert cosine: 1.000000
+2026-05-21 15:37:18,904 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:37:18,904 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 15:37:18,904 INFO sanity muq cosine: 1.000000
+2026-05-21 15:37:18,904 INFO audio cache hit: The Beatles - Come Together
+2026-05-21 15:37:19,401 INFO computing clap embedding: The Beatles - Come Together
+2026-05-21 15:37:19,587 INFO embedding cache hit: clap The Beatles - Come Together
+2026-05-21 15:37:19,587 INFO sanity clap cosine: 1.000000
+2026-05-21 15:37:19,587 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:37:19,587 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:19,587 INFO embedding cache hit: openl3 Daft Punk - One More Time
+2026-05-21 15:37:19,588 INFO embedding cache hit: openl3 Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:19,588 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:37:19,629 INFO computing mert embedding: Daft Punk - One More Time
+2026-05-21 15:37:20,556 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:20,605 INFO computing mert embedding: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:21,247 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:37:21,288 INFO computing muq embedding: Daft Punk - One More Time
+2026-05-21 15:37:22,020 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:22,060 INFO computing muq embedding: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:22,478 INFO audio cache hit: Daft Punk - One More Time
+2026-05-21 15:37:22,518 INFO computing clap embedding: Daft Punk - One More Time
+2026-05-21 15:37:22,562 INFO audio cache hit: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:22,602 INFO computing clap embedding: Modjo - Lady (Hear Me Tonight)
+2026-05-21 15:37:22,634 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:37:22,634 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:37:22,634 INFO embedding cache hit: openl3 Calvin Harris - Slide
+2026-05-21 15:37:22,634 INFO embedding cache hit: openl3 Dua Lipa - Levitating
+2026-05-21 15:37:22,635 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:37:22,674 INFO computing mert embedding: Calvin Harris - Slide
+2026-05-21 15:37:23,062 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:37:23,103 INFO computing mert embedding: Dua Lipa - Levitating
+2026-05-21 15:37:23,480 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:37:23,517 INFO computing muq embedding: Calvin Harris - Slide
+2026-05-21 15:37:23,933 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:37:23,985 INFO computing muq embedding: Dua Lipa - Levitating
+2026-05-21 15:37:24,409 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 15:37:24,454 INFO computing clap embedding: Calvin Harris - Slide
+2026-05-21 15:37:24,490 INFO audio cache hit: Dua Lipa - Levitating
+2026-05-21 15:37:24,531 INFO computing clap embedding: Dua Lipa - Levitating
+2026-05-21 15:37:24,564 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:37:24,564 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:37:24,564 INFO embedding cache hit: openl3 Disclosure - Latch
+2026-05-21 15:37:24,564 INFO embedding cache hit: openl3 Duke Dumont - I Got U
+2026-05-21 15:37:24,565 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:37:24,605 INFO computing mert embedding: Disclosure - Latch
+2026-05-21 15:37:25,207 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:37:25,249 INFO computing mert embedding: Duke Dumont - I Got U
+2026-05-21 15:37:25,838 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:37:25,878 INFO computing muq embedding: Disclosure - Latch
+2026-05-21 15:37:26,358 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:37:26,397 INFO computing muq embedding: Duke Dumont - I Got U
+2026-05-21 15:37:26,713 INFO audio cache hit: Disclosure - Latch
+2026-05-21 15:37:26,755 INFO computing clap embedding: Disclosure - Latch
+2026-05-21 15:37:26,829 INFO audio cache hit: Duke Dumont - I Got U
+2026-05-21 15:37:26,872 INFO computing clap embedding: Duke Dumont - I Got U
+2026-05-21 15:37:26,908 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:37:26,910 INFO audio cache hit: MK - 17
+2026-05-21 15:37:26,910 INFO embedding cache hit: openl3 Dom Dolla - Saving Up
+2026-05-21 15:37:26,911 INFO embedding cache hit: openl3 MK - 17
+2026-05-21 15:37:26,911 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:37:26,952 INFO computing mert embedding: Dom Dolla - Saving Up
+2026-05-21 15:37:27,626 INFO audio cache hit: MK - 17
+2026-05-21 15:37:27,669 INFO computing mert embedding: MK - 17
+2026-05-21 15:37:28,590 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:37:28,632 INFO computing muq embedding: Dom Dolla - Saving Up
+2026-05-21 15:37:29,068 INFO audio cache hit: MK - 17
+2026-05-21 15:37:29,107 INFO computing muq embedding: MK - 17
+2026-05-21 15:37:29,429 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 15:37:29,477 INFO computing clap embedding: Dom Dolla - Saving Up
+2026-05-21 15:37:29,546 INFO audio cache hit: MK - 17
+2026-05-21 15:37:29,592 INFO computing clap embedding: MK - 17
+2026-05-21 15:37:29,630 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:29,631 INFO audio cache hit: Romy - Strong
+2026-05-21 15:37:29,631 INFO embedding cache hit: openl3 Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:29,631 INFO embedding cache hit: openl3 Romy - Strong
+2026-05-21 15:37:29,631 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:29,674 INFO computing mert embedding: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:30,181 INFO audio cache hit: Romy - Strong
+2026-05-21 15:37:30,261 INFO computing mert embedding: Romy - Strong
+2026-05-21 15:37:31,704 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:31,781 INFO computing muq embedding: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:32,686 INFO audio cache hit: Romy - Strong
+2026-05-21 15:37:32,730 INFO computing muq embedding: Romy - Strong
+2026-05-21 15:37:33,161 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:33,202 INFO computing clap embedding: Fred again.. - Delilah (pull me out of this)
+2026-05-21 15:37:33,242 INFO audio cache hit: Romy - Strong
+2026-05-21 15:37:33,281 INFO computing clap embedding: Romy - Strong
+2026-05-21 15:37:33,316 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:37:33,316 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:33,316 INFO embedding cache hit: openl3 FISHER - Losing It
+2026-05-21 15:37:33,316 INFO embedding cache hit: openl3 Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:33,317 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:37:33,358 INFO computing mert embedding: FISHER - Losing It
+2026-05-21 15:37:34,226 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:34,275 INFO computing mert embedding: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:34,789 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:37:34,829 INFO computing muq embedding: FISHER - Losing It
+2026-05-21 15:37:35,475 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:35,514 INFO computing muq embedding: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:35,938 INFO audio cache hit: FISHER - Losing It
+2026-05-21 15:37:36,043 INFO computing clap embedding: FISHER - Losing It
+2026-05-21 15:37:36,091 INFO audio cache hit: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:36,134 INFO computing clap embedding: Charlotte de Witte - Sgadi Li Mi
+2026-05-21 15:37:36,166 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:37:36,166 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:37:36,166 INFO embedding cache hit: openl3 The Weeknd - Blinding Lights
+2026-05-21 15:37:36,167 INFO embedding cache hit: openl3 a-ha - Take On Me
+2026-05-21 15:37:36,167 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:37:36,208 INFO computing mert embedding: The Weeknd - Blinding Lights
+2026-05-21 15:37:36,988 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:37:37,033 INFO computing mert embedding: a-ha - Take On Me
+2026-05-21 15:37:37,472 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:37:37,512 INFO computing muq embedding: The Weeknd - Blinding Lights
+2026-05-21 15:37:38,012 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:37:38,052 INFO computing muq embedding: a-ha - Take On Me
+2026-05-21 15:37:38,473 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 15:37:38,521 INFO computing clap embedding: The Weeknd - Blinding Lights
+2026-05-21 15:37:38,567 INFO audio cache hit: a-ha - Take On Me
+2026-05-21 15:37:38,606 INFO computing clap embedding: a-ha - Take On Me
+2026-05-21 15:37:38,639 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:37:38,640 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:37:38,640 INFO embedding cache hit: openl3 Billie Eilish - when the party's over
+2026-05-21 15:37:38,641 INFO embedding cache hit: openl3 Skrillex - Bangarang
+2026-05-21 15:37:38,643 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:37:38,683 INFO computing mert embedding: Billie Eilish - when the party's over
+2026-05-21 15:37:39,152 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:37:39,195 INFO computing mert embedding: Skrillex - Bangarang
+2026-05-21 15:37:39,622 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:37:39,661 INFO computing muq embedding: Billie Eilish - when the party's over
+2026-05-21 15:37:40,085 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:37:40,125 INFO computing muq embedding: Skrillex - Bangarang
+2026-05-21 15:37:40,443 INFO audio cache hit: Billie Eilish - when the party's over
+2026-05-21 15:37:40,485 INFO computing clap embedding: Billie Eilish - when the party's over
+2026-05-21 15:37:40,520 INFO audio cache hit: Skrillex - Bangarang
+2026-05-21 15:37:40,561 INFO computing clap embedding: Skrillex - Bangarang
+2026-05-21 15:37:40,592 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:37:40,592 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:37:40,593 INFO embedding cache hit: openl3 Frank Ocean - Pink + White
+2026-05-21 15:37:40,593 INFO embedding cache hit: openl3 Metallica - Master of Puppets
+2026-05-21 15:37:40,593 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:37:40,635 INFO computing mert embedding: Frank Ocean - Pink + White
+2026-05-21 15:37:41,363 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:37:41,407 INFO computing mert embedding: Metallica - Master of Puppets
+2026-05-21 15:37:41,859 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:37:41,899 INFO computing muq embedding: Frank Ocean - Pink + White
+2026-05-21 15:37:42,330 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:37:42,369 INFO computing muq embedding: Metallica - Master of Puppets
+2026-05-21 15:37:42,690 INFO audio cache hit: Frank Ocean - Pink + White
+2026-05-21 15:37:42,732 INFO computing clap embedding: Frank Ocean - Pink + White
+2026-05-21 15:37:42,781 INFO audio cache hit: Metallica - Master of Puppets
+2026-05-21 15:37:42,824 INFO computing clap embedding: Metallica - Master of Puppets
+2026-05-21 15:37:42,858 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:37:42,858 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:37:42,859 INFO embedding cache hit: openl3 John Coltrane - Giant Steps
+2026-05-21 15:37:42,860 INFO embedding cache hit: openl3 Chief Keef - Love Sosa
+2026-05-21 15:37:42,861 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:37:42,904 INFO computing mert embedding: John Coltrane - Giant Steps
+2026-05-21 15:37:43,384 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:37:43,427 INFO computing mert embedding: Chief Keef - Love Sosa
+2026-05-21 15:37:43,857 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:37:43,897 INFO computing muq embedding: John Coltrane - Giant Steps
+2026-05-21 15:37:44,327 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:37:44,365 INFO computing muq embedding: Chief Keef - Love Sosa
+2026-05-21 15:37:44,795 INFO audio cache hit: John Coltrane - Giant Steps
+2026-05-21 15:37:44,839 INFO computing clap embedding: John Coltrane - Giant Steps
+2026-05-21 15:37:44,875 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 15:37:44,918 INFO computing clap embedding: Chief Keef - Love Sosa
+2026-05-21 15:37:45,539 INFO wrote outputs to /Users/jackmoloney/Desktop/Music App/results
+2026-05-21 16:03:53,012 INFO using device preference: mps
+2026-05-21 16:03:53,013 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 16:03:53,013 INFO loading backend: muq
+2026-05-21 16:03:56,268 INFO loading MuQ-MuLan on mps
+2026-05-21 16:03:56,522 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 16:03:56,522 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 16:03:56,537 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:03:56,634 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 16:03:56,645 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:03:57,681 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 16:03:59,608 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:03:59,706 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 16:04:00,024 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 16:04:00,117 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 16:04:04,371 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 16:04:04,377 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 16:04:04,383 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 16:04:04,384 INFO sanity muq cosine: 1.000000
+2026-05-21 16:04:04,386 INFO fetching audio: Tame Impala - The Less I Know the Better
+2026-05-21 16:04:04,846 INFO fetching audio: Dua Lipa - Don't Start Now
+2026-05-21 16:04:05,780 INFO audio cache hit: Tame Impala - The Less I Know the Better
+2026-05-21 16:04:06,954 INFO computing muq embedding: Tame Impala - The Less I Know the Better
+2026-05-21 16:04:08,585 INFO audio cache hit: Dua Lipa - Don't Start Now
+2026-05-21 16:04:08,625 INFO computing muq embedding: Dua Lipa - Don't Start Now
+2026-05-21 16:04:09,043 INFO fetching audio: Purple Disco Machine - Hypnotized
+2026-05-21 16:04:09,662 INFO fetching audio: Dua Lipa - Hallucinate
+2026-05-21 16:04:10,153 INFO audio cache hit: Purple Disco Machine - Hypnotized
+2026-05-21 16:04:10,193 INFO computing muq embedding: Purple Disco Machine - Hypnotized
+2026-05-21 16:04:10,632 INFO audio cache hit: Dua Lipa - Hallucinate
+2026-05-21 16:04:10,669 INFO computing muq embedding: Dua Lipa - Hallucinate
+2026-05-21 16:04:11,089 INFO audio cache hit: MK - 17
+2026-05-21 16:04:11,090 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 16:04:11,090 INFO embedding cache hit: muq MK - 17
+2026-05-21 16:04:11,090 INFO embedding cache hit: muq Dom Dolla - Saving Up
+2026-05-21 16:04:11,091 INFO fetching audio: Disclosure - White Noise
+2026-05-21 16:04:11,550 INFO fetching audio: Gorgon City - Ready for Your Love
+2026-05-21 16:04:12,421 INFO audio cache hit: Disclosure - White Noise
+2026-05-21 16:04:12,460 INFO computing muq embedding: Disclosure - White Noise
+2026-05-21 16:04:12,914 INFO audio cache hit: Gorgon City - Ready for Your Love
+2026-05-21 16:04:12,953 INFO computing muq embedding: Gorgon City - Ready for Your Love
+2026-05-21 16:04:13,378 INFO fetching audio: Duke Dumont - Ocean Drive
+2026-05-21 16:04:13,917 INFO fetching audio: Kavinsky - Nightcall
+2026-05-21 16:04:14,282 INFO audio cache hit: Duke Dumont - Ocean Drive
+2026-05-21 16:04:14,320 INFO computing muq embedding: Duke Dumont - Ocean Drive
+2026-05-21 16:04:14,648 INFO audio cache hit: Kavinsky - Nightcall
+2026-05-21 16:04:14,687 INFO computing muq embedding: Kavinsky - Nightcall
+2026-05-21 16:04:15,003 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 16:04:15,003 INFO fetching audio: M83 - Midnight City
+2026-05-21 16:04:15,351 INFO embedding cache hit: muq The Weeknd - Blinding Lights
+2026-05-21 16:04:15,352 INFO audio cache hit: M83 - Midnight City
+2026-05-21 16:04:15,391 INFO computing muq embedding: M83 - Midnight City
+2026-05-21 16:04:15,812 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 16:04:15,812 INFO fetching audio: SG Lewis - Chemicals
+2026-05-21 16:04:16,268 INFO embedding cache hit: muq Calvin Harris - Slide
+2026-05-21 16:04:16,269 INFO audio cache hit: SG Lewis - Chemicals
+2026-05-21 16:04:16,309 INFO computing muq embedding: SG Lewis - Chemicals
+2026-05-21 16:04:16,634 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 16:04:16,636 INFO audio cache hit: Romy - Strong
+2026-05-21 16:04:16,636 INFO embedding cache hit: muq Fred again.. - Delilah (pull me out of this)
+2026-05-21 16:04:16,636 INFO embedding cache hit: muq Romy - Strong
+2026-05-21 16:04:16,636 INFO fetching audio: Jamie xx - Loud Places
+2026-05-21 16:04:17,037 INFO fetching audio: Caribou - Can't Do Without You
+2026-05-21 16:04:17,616 INFO audio cache hit: Jamie xx - Loud Places
+2026-05-21 16:04:17,654 INFO computing muq embedding: Jamie xx - Loud Places
+2026-05-21 16:04:17,977 INFO audio cache hit: Caribou - Can't Do Without You
+2026-05-21 16:04:18,016 INFO computing muq embedding: Caribou - Can't Do Without You
+2026-05-21 16:04:18,437 INFO fetching audio: Bicep - Glue
+2026-05-21 16:04:18,871 INFO fetching audio: Overmono - So U Kno
+2026-05-21 16:04:19,974 INFO audio cache hit: Bicep - Glue
+2026-05-21 16:04:20,012 INFO computing muq embedding: Bicep - Glue
+2026-05-21 16:04:20,463 INFO audio cache hit: Overmono - So U Kno
+2026-05-21 16:04:20,502 INFO computing muq embedding: Overmono - So U Kno
+2026-05-21 16:04:20,928 INFO fetching audio: Interplanetary Criminal - B.O.T.A.
+2026-05-21 16:04:21,667 INFO fetching audio: Sammy Virji - If U Need It
+2026-05-21 16:04:22,359 INFO audio cache hit: Interplanetary Criminal - B.O.T.A.
+2026-05-21 16:04:22,400 INFO computing muq embedding: Interplanetary Criminal - B.O.T.A.
+2026-05-21 16:04:22,858 INFO audio cache hit: Sammy Virji - If U Need It
+2026-05-21 16:04:22,897 INFO computing muq embedding: Sammy Virji - If U Need It
+2026-05-21 16:04:23,317 INFO fetching audio: Conducta - Vitamin C
+2026-05-21 16:04:23,789 INFO fetching audio: Oppidan - Mr. Sandman
+2026-05-21 16:04:24,285 INFO audio cache hit: Conducta - Vitamin C
+2026-05-21 16:04:24,324 INFO computing muq embedding: Conducta - Vitamin C
+2026-05-21 16:04:24,643 INFO audio cache hit: Oppidan - Mr. Sandman
+2026-05-21 16:04:24,684 INFO computing muq embedding: Oppidan - Mr. Sandman
+2026-05-21 16:04:25,109 INFO fetching audio: PinkPantheress - Just for me
+2026-05-21 16:04:25,567 INFO fetching audio: NewJeans - Super Shy
+2026-05-21 16:04:26,004 INFO audio cache hit: PinkPantheress - Just for me
+2026-05-21 16:04:26,043 INFO computing muq embedding: PinkPantheress - Just for me
+2026-05-21 16:04:26,469 INFO audio cache hit: NewJeans - Super Shy
+2026-05-21 16:04:26,506 INFO computing muq embedding: NewJeans - Super Shy
+2026-05-21 16:04:26,928 INFO fetching audio: Charli XCX - Vroom Vroom
+2026-05-21 16:04:27,458 INFO fetching audio: SOPHIE - Faceshopping
+2026-05-21 16:04:28,106 INFO audio cache hit: Charli XCX - Vroom Vroom
+2026-05-21 16:04:28,146 INFO computing muq embedding: Charli XCX - Vroom Vroom
+2026-05-21 16:04:28,494 INFO audio cache hit: SOPHIE - Faceshopping
+2026-05-21 16:04:28,535 INFO computing muq embedding: SOPHIE - Faceshopping
+2026-05-21 16:04:28,964 INFO fetching audio: COBRAH - BRAND NEW BITCH
+2026-05-21 16:04:30,056 INFO fetching audio: Shygirl - SLIME
+2026-05-21 16:04:32,715 INFO audio cache hit: COBRAH - BRAND NEW BITCH
+2026-05-21 16:04:32,757 INFO computing muq embedding: COBRAH - BRAND NEW BITCH
+2026-05-21 16:04:33,238 INFO audio cache hit: Shygirl - SLIME
+2026-05-21 16:04:33,475 INFO computing muq embedding: Shygirl - SLIME
+2026-05-21 16:04:35,374 INFO audio cache hit: FISHER - Losing It
+2026-05-21 16:04:35,374 INFO fetching audio: Chris Lake - Turn Off The Lights
+2026-05-21 16:04:35,913 INFO embedding cache hit: muq FISHER - Losing It
+2026-05-21 16:04:35,915 INFO audio cache hit: Chris Lake - Turn Off The Lights
+2026-05-21 16:04:35,957 INFO computing muq embedding: Chris Lake - Turn Off The Lights
+2026-05-21 16:04:36,386 INFO fetching audio: John Summit - Where You Are
+2026-05-21 16:04:37,385 INFO fetching audio: Anyma & Chris Avantgarde - Eternity
+2026-05-21 16:04:37,825 INFO audio cache hit: John Summit - Where You Are
+2026-05-21 16:04:37,864 INFO computing muq embedding: John Summit - Where You Are
+2026-05-21 16:04:38,214 INFO audio cache hit: Anyma & Chris Avantgarde - Eternity
+2026-05-21 16:04:38,254 INFO computing muq embedding: Anyma & Chris Avantgarde - Eternity
+2026-05-21 16:04:38,672 INFO fetching audio: ARTBAT - Horizon
+2026-05-21 16:04:39,112 INFO fetching audio: Tale Of Us - Nova
+2026-05-21 16:04:39,537 INFO audio cache hit: ARTBAT - Horizon
+2026-05-21 16:04:39,579 INFO computing muq embedding: ARTBAT - Horizon
+2026-05-21 16:04:39,906 INFO audio cache hit: Tale Of Us - Nova
+2026-05-21 16:04:39,947 INFO computing muq embedding: Tale Of Us - Nova
+2026-05-21 16:04:40,373 INFO fetching audio: KETTAMA - B O D Y
+2026-05-21 16:04:40,946 INFO fetching audio: X CLUB. - New World Expression
+2026-05-21 16:04:41,509 INFO audio cache hit: KETTAMA - B O D Y
+2026-05-21 16:04:41,547 INFO computing muq embedding: KETTAMA - B O D Y
+2026-05-21 16:04:41,874 INFO audio cache hit: X CLUB. - New World Expression
+2026-05-21 16:04:41,913 INFO computing muq embedding: X CLUB. - New World Expression
+2026-05-21 16:04:42,333 INFO fetching audio: Partiboi69 - K On My D + C
+2026-05-21 16:04:44,710 INFO fetching audio: DJ Heartstring - Will You Remember Me When I'm Gone
+2026-05-21 16:04:45,380 INFO audio cache hit: Partiboi69 - K On My D + C
+2026-05-21 16:04:45,508 INFO computing muq embedding: Partiboi69 - K On My D + C
+2026-05-21 16:04:46,812 INFO audio cache hit: DJ Heartstring - Will You Remember Me When I'm Gone
+2026-05-21 16:04:46,855 INFO computing muq embedding: DJ Heartstring - Will You Remember Me When I'm Gone
+2026-05-21 16:04:47,170 INFO fetching audio: Aphex Twin - Xtal
+2026-05-21 16:04:47,664 INFO fetching audio: Morgan Wallen - Last Night
+2026-05-21 16:04:48,029 INFO audio cache hit: Aphex Twin - Xtal
+2026-05-21 16:04:48,071 INFO computing muq embedding: Aphex Twin - Xtal
+2026-05-21 16:04:48,401 INFO audio cache hit: Morgan Wallen - Last Night
+2026-05-21 16:04:48,439 INFO computing muq embedding: Morgan Wallen - Last Night
+2026-05-21 16:04:48,866 INFO fetching audio: Burial - Archangel
+2026-05-21 16:04:49,343 INFO fetching audio: Taylor Swift - Shake It Off
+2026-05-21 16:04:49,799 INFO audio cache hit: Burial - Archangel
+2026-05-21 16:04:49,841 INFO computing muq embedding: Burial - Archangel
+2026-05-21 16:04:50,275 INFO audio cache hit: Taylor Swift - Shake It Off
+2026-05-21 16:04:50,315 INFO computing muq embedding: Taylor Swift - Shake It Off
+2026-05-21 16:04:50,742 INFO fetching audio: Skrillex - Scary Monsters and Nice Sprites
+2026-05-21 16:04:51,119 INFO fetching audio: Norah Jones - Don't Know Why
+2026-05-21 16:04:51,472 INFO audio cache hit: Skrillex - Scary Monsters and Nice Sprites
+2026-05-21 16:04:51,511 INFO computing muq embedding: Skrillex - Scary Monsters and Nice Sprites
+2026-05-21 16:04:51,958 INFO audio cache hit: Norah Jones - Don't Know Why
+2026-05-21 16:04:51,998 INFO computing muq embedding: Norah Jones - Don't Know Why
+2026-05-21 16:04:52,429 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 16:04:52,429 INFO fetching audio: Fleetwood Mac - Dreams
+2026-05-21 16:04:52,531 ERROR skipping pair p024 due to audio fetch failure: 429 Client Error: Too Many Requests for url: https://itunes.apple.com/search?term=Fleetwood+Mac+-+Dreams&media=music&entity=song&limit=5
+Traceback (most recent call last):
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 619, in compute_rows
+    fetch_audio(pair.track_b)
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 166, in fetch_audio
+    preview_url = search_itunes_preview(track)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 147, in search_itunes_preview
+    response.raise_for_status()
+  File "/Users/jackmoloney/Desktop/Music App/.venv/lib/python3.11/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://itunes.apple.com/search?term=Fleetwood+Mac+-+Dreams&media=music&entity=song&limit=5
+2026-05-21 16:04:52,535 INFO fetching audio: Charlotte de Witte - Doppler
+2026-05-21 16:04:52,612 ERROR skipping pair p025 due to audio fetch failure: 429 Client Error: Too Many Requests for url: https://itunes.apple.com/search?term=Charlotte+de+Witte+-+Doppler&media=music&entity=song&limit=5
+Traceback (most recent call last):
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 618, in compute_rows
+    fetch_audio(pair.track_a)
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 166, in fetch_audio
+    preview_url = search_itunes_preview(track)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jackmoloney/Desktop/Music App/model_comparison.py", line 147, in search_itunes_preview
+    response.raise_for_status()
+  File "/Users/jackmoloney/Desktop/Music App/.venv/lib/python3.11/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://itunes.apple.com/search?term=Charlotte+de+Witte+-+Doppler&media=music&entity=song&limit=5
+2026-05-21 16:04:53,074 INFO wrote outputs to /Users/jackmoloney/Desktop/Music App/results
+2026-05-21 16:05:11,709 INFO using device preference: mps
+2026-05-21 16:05:11,709 INFO First uncached run may download several large model checkpoints:
+  - MuQ-MuLan-large: roughly 3 GB
+  - CLAP music: roughly 1.5 GB
+  - MERT-v1-95M: roughly 400 MB
+  - OpenL3: roughly 50 MB
+Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
+2026-05-21 16:05:11,709 INFO loading backend: muq
+2026-05-21 16:05:14,609 INFO loading MuQ-MuLan on mps
+2026-05-21 16:05:14,802 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 16:05:14,803 WARNING Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-21 16:05:14,814 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-MuLan-large/2e01c796b71dca71b45251384c04cd7b237c9020/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:05:14,900 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-05-21 16:05:14,913 INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/OpenMuQ/MuQ-large-msd-iter/0562a57814f6f8bbd9fdea0a25921a2fce1a841a/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:05:15,903 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-large-msd-iter/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 16:05:17,248 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-21 16:05:17,351 INFO HTTP Request: HEAD https://huggingface.co/xlm-roberta-base/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-05-21 16:05:17,665 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-05-21 16:05:17,759 INFO HTTP Request: HEAD https://huggingface.co/OpenMuQ/MuQ-MuLan-large/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-05-21 16:05:21,727 INFO running determinism sanity check with The Beatles - Come Together
+2026-05-21 16:05:21,729 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 16:05:21,730 INFO embedding cache hit: muq The Beatles - Come Together
+2026-05-21 16:05:21,730 INFO sanity muq cosine: 1.000000
+2026-05-21 16:05:21,731 INFO audio cache hit: Tame Impala - The Less I Know the Better
+2026-05-21 16:05:21,731 INFO audio cache hit: Dua Lipa - Don't Start Now
+2026-05-21 16:05:21,731 INFO embedding cache hit: muq Tame Impala - The Less I Know the Better
+2026-05-21 16:05:21,732 INFO embedding cache hit: muq Dua Lipa - Don't Start Now
+2026-05-21 16:05:21,732 INFO audio cache hit: Purple Disco Machine - Hypnotized
+2026-05-21 16:05:21,732 INFO audio cache hit: Dua Lipa - Hallucinate
+2026-05-21 16:05:21,732 INFO embedding cache hit: muq Purple Disco Machine - Hypnotized
+2026-05-21 16:05:21,733 INFO embedding cache hit: muq Dua Lipa - Hallucinate
+2026-05-21 16:05:21,733 INFO audio cache hit: MK - 17
+2026-05-21 16:05:21,733 INFO audio cache hit: Dom Dolla - Saving Up
+2026-05-21 16:05:21,733 INFO embedding cache hit: muq MK - 17
+2026-05-21 16:05:21,734 INFO embedding cache hit: muq Dom Dolla - Saving Up
+2026-05-21 16:05:21,734 INFO audio cache hit: Disclosure - White Noise
+2026-05-21 16:05:21,734 INFO audio cache hit: Gorgon City - Ready for Your Love
+2026-05-21 16:05:21,734 INFO embedding cache hit: muq Disclosure - White Noise
+2026-05-21 16:05:21,735 INFO embedding cache hit: muq Gorgon City - Ready for Your Love
+2026-05-21 16:05:21,735 INFO audio cache hit: Duke Dumont - Ocean Drive
+2026-05-21 16:05:21,735 INFO audio cache hit: Kavinsky - Nightcall
+2026-05-21 16:05:21,735 INFO embedding cache hit: muq Duke Dumont - Ocean Drive
+2026-05-21 16:05:21,735 INFO embedding cache hit: muq Kavinsky - Nightcall
+2026-05-21 16:05:21,735 INFO audio cache hit: The Weeknd - Blinding Lights
+2026-05-21 16:05:21,736 INFO audio cache hit: M83 - Midnight City
+2026-05-21 16:05:21,736 INFO embedding cache hit: muq The Weeknd - Blinding Lights
+2026-05-21 16:05:21,736 INFO embedding cache hit: muq M83 - Midnight City
+2026-05-21 16:05:21,736 INFO audio cache hit: Calvin Harris - Slide
+2026-05-21 16:05:21,736 INFO audio cache hit: SG Lewis - Chemicals
+2026-05-21 16:05:21,736 INFO embedding cache hit: muq Calvin Harris - Slide
+2026-05-21 16:05:21,736 INFO embedding cache hit: muq SG Lewis - Chemicals
+2026-05-21 16:05:21,736 INFO audio cache hit: Fred again.. - Delilah (pull me out of this)
+2026-05-21 16:05:21,736 INFO audio cache hit: Romy - Strong
+2026-05-21 16:05:21,737 INFO embedding cache hit: muq Fred again.. - Delilah (pull me out of this)
+2026-05-21 16:05:21,737 INFO embedding cache hit: muq Romy - Strong
+2026-05-21 16:05:21,737 INFO audio cache hit: Jamie xx - Loud Places
+2026-05-21 16:05:21,737 INFO audio cache hit: Caribou - Can't Do Without You
+2026-05-21 16:05:21,737 INFO embedding cache hit: muq Jamie xx - Loud Places
+2026-05-21 16:05:21,737 INFO embedding cache hit: muq Caribou - Can't Do Without You
+2026-05-21 16:05:21,738 INFO audio cache hit: Bicep - Glue
+2026-05-21 16:05:21,738 INFO audio cache hit: Overmono - So U Kno
+2026-05-21 16:05:21,738 INFO embedding cache hit: muq Bicep - Glue
+2026-05-21 16:05:21,738 INFO embedding cache hit: muq Overmono - So U Kno
+2026-05-21 16:05:21,738 INFO audio cache hit: Interplanetary Criminal - B.O.T.A.
+2026-05-21 16:05:21,738 INFO audio cache hit: Sammy Virji - If U Need It
+2026-05-21 16:05:21,738 INFO embedding cache hit: muq Interplanetary Criminal - B.O.T.A.
+2026-05-21 16:05:21,738 INFO embedding cache hit: muq Sammy Virji - If U Need It
+2026-05-21 16:05:21,739 INFO audio cache hit: Conducta - Vitamin C
+2026-05-21 16:05:21,739 INFO audio cache hit: Oppidan - Mr. Sandman
+2026-05-21 16:05:21,739 INFO embedding cache hit: muq Conducta - Vitamin C
+2026-05-21 16:05:21,739 INFO embedding cache hit: muq Oppidan - Mr. Sandman
+2026-05-21 16:05:21,740 INFO audio cache hit: PinkPantheress - Just for me
+2026-05-21 16:05:21,740 INFO audio cache hit: NewJeans - Super Shy
+2026-05-21 16:05:21,740 INFO embedding cache hit: muq PinkPantheress - Just for me
+2026-05-21 16:05:21,740 INFO embedding cache hit: muq NewJeans - Super Shy
+2026-05-21 16:05:21,740 INFO audio cache hit: Charli XCX - Vroom Vroom
+2026-05-21 16:05:21,740 INFO audio cache hit: SOPHIE - Faceshopping
+2026-05-21 16:05:21,740 INFO embedding cache hit: muq Charli XCX - Vroom Vroom
+2026-05-21 16:05:21,740 INFO embedding cache hit: muq SOPHIE - Faceshopping
+2026-05-21 16:05:21,741 INFO audio cache hit: COBRAH - BRAND NEW BITCH
+2026-05-21 16:05:21,741 INFO audio cache hit: Shygirl - SLIME
+2026-05-21 16:05:21,741 INFO embedding cache hit: muq COBRAH - BRAND NEW BITCH
+2026-05-21 16:05:21,741 INFO embedding cache hit: muq Shygirl - SLIME
+2026-05-21 16:05:21,741 INFO audio cache hit: FISHER - Losing It
+2026-05-21 16:05:21,741 INFO audio cache hit: Chris Lake - Turn Off The Lights
+2026-05-21 16:05:21,741 INFO embedding cache hit: muq FISHER - Losing It
+2026-05-21 16:05:21,741 INFO embedding cache hit: muq Chris Lake - Turn Off The Lights
+2026-05-21 16:05:21,741 INFO audio cache hit: John Summit - Where You Are
+2026-05-21 16:05:21,742 INFO audio cache hit: Anyma & Chris Avantgarde - Eternity
+2026-05-21 16:05:21,742 INFO embedding cache hit: muq John Summit - Where You Are
+2026-05-21 16:05:21,742 INFO embedding cache hit: muq Anyma & Chris Avantgarde - Eternity
+2026-05-21 16:05:21,742 INFO audio cache hit: ARTBAT - Horizon
+2026-05-21 16:05:21,742 INFO audio cache hit: Tale Of Us - Nova
+2026-05-21 16:05:21,742 INFO embedding cache hit: muq ARTBAT - Horizon
+2026-05-21 16:05:21,742 INFO embedding cache hit: muq Tale Of Us - Nova
+2026-05-21 16:05:21,742 INFO audio cache hit: KETTAMA - B O D Y
+2026-05-21 16:05:21,742 INFO audio cache hit: X CLUB. - New World Expression
+2026-05-21 16:05:21,743 INFO embedding cache hit: muq KETTAMA - B O D Y
+2026-05-21 16:05:21,743 INFO embedding cache hit: muq X CLUB. - New World Expression
+2026-05-21 16:05:21,743 INFO audio cache hit: Partiboi69 - K On My D + C
+2026-05-21 16:05:21,743 INFO audio cache hit: DJ Heartstring - Will You Remember Me When I'm Gone
+2026-05-21 16:05:21,743 INFO embedding cache hit: muq Partiboi69 - K On My D + C
+2026-05-21 16:05:21,743 INFO embedding cache hit: muq DJ Heartstring - Will You Remember Me When I'm Gone
+2026-05-21 16:05:21,743 INFO audio cache hit: Aphex Twin - Xtal
+2026-05-21 16:05:21,744 INFO audio cache hit: Morgan Wallen - Last Night
+2026-05-21 16:05:21,744 INFO embedding cache hit: muq Aphex Twin - Xtal
+2026-05-21 16:05:21,744 INFO embedding cache hit: muq Morgan Wallen - Last Night
+2026-05-21 16:05:21,744 INFO audio cache hit: Burial - Archangel
+2026-05-21 16:05:21,744 INFO audio cache hit: Taylor Swift - Shake It Off
+2026-05-21 16:05:21,744 INFO embedding cache hit: muq Burial - Archangel
+2026-05-21 16:05:21,744 INFO embedding cache hit: muq Taylor Swift - Shake It Off
+2026-05-21 16:05:21,744 INFO audio cache hit: Skrillex - Scary Monsters and Nice Sprites
+2026-05-21 16:05:21,745 INFO audio cache hit: Norah Jones - Don't Know Why
+2026-05-21 16:05:21,745 INFO embedding cache hit: muq Skrillex - Scary Monsters and Nice Sprites
+2026-05-21 16:05:21,745 INFO embedding cache hit: muq Norah Jones - Don't Know Why
+2026-05-21 16:05:21,745 INFO audio cache hit: Chief Keef - Love Sosa
+2026-05-21 16:05:21,745 INFO fetching audio: Fleetwood Mac - Dreams
+2026-05-21 16:05:22,345 INFO embedding cache hit: muq Chief Keef - Love Sosa
+2026-05-21 16:05:22,347 INFO audio cache hit: Fleetwood Mac - Dreams
+2026-05-21 16:05:23,336 INFO computing muq embedding: Fleetwood Mac - Dreams
+2026-05-21 16:05:23,930 INFO fetching audio: Charlotte de Witte - Doppler
+2026-05-21 16:05:25,060 INFO fetching audio: Billie Eilish - ocean eyes
+2026-05-21 16:05:25,537 INFO audio cache hit: Charlotte de Witte - Doppler
+2026-05-21 16:05:25,600 INFO computing muq embedding: Charlotte de Witte - Doppler
+2026-05-21 16:05:25,949 INFO audio cache hit: Billie Eilish - ocean eyes
+2026-05-21 16:05:26,001 INFO computing muq embedding: Billie Eilish - ocean eyes
+2026-05-21 16:05:26,813 INFO wrote outputs to /Users/jackmoloney/Desktop/Music App/results

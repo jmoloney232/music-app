@@ -1,0 +1,27 @@
+adjacent_subgenre
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+cross_genre_similar_vibe
+  openl3: Spearman=-0.8660, Pearson=-0.6379, Kendall=-0.8165
+  mert: Spearman=0.8660, Pearson=0.7582, Kendall=0.8165
+  muq: Spearman=0.0000, Pearson=-0.4951, Kendall=0.0000
+  clap: Spearman=0.0000, Pearson=0.2119, Kendall=0.0000
+  essentia: Spearman=0.8660, Pearson=0.9083, Kendall=0.8165
+
+distant_within_music
+  openl3: Spearman=, Pearson=, Kendall=
+  mert: Spearman=, Pearson=, Kendall=
+  muq: Spearman=, Pearson=, Kendall=
+  clap: Spearman=, Pearson=, Kendall=
+  essentia: Spearman=, Pearson=, Kendall=
+
+same_genre_different_artist
+  openl3: Spearman=0.0000, Pearson=-0.1567, Kendall=0.0000
+  mert: Spearman=0.0000, Pearson=-0.2143, Kendall=0.0000
+  muq: Spearman=-0.8660, Pearson=-0.7648, Kendall=-0.8165
+  clap: Spearman=0.0000, Pearson=-0.0556, Kendall=0.0000
+  essentia: Spearman=-0.8660, Pearson=-0.8541, Kendall=-0.8165

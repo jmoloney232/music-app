@@ -1,0 +1,7 @@
+Model correlation with human_score
+
+openl3: Spearman=0.4577, Pearson=0.6749, Kendall=0.3276
+mert: Spearman=0.2479, Pearson=0.1549, Kendall=0.1764
+muq: Spearman=0.6039, Pearson=0.6048, Kendall=0.5292
+clap: Spearman=0.0445, Pearson=0.3685, Kendall=0.0252
+essentia: Spearman=-0.3560, Pearson=-0.2307, Kendall=-0.2772
