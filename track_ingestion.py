@@ -17,6 +17,7 @@ Dependencies:
 
 from __future__ import annotations
 
+import difflib
 import hashlib
 import json
 import logging
@@ -128,28 +129,161 @@ def key_to_camelot(key: str | None, scale: str | None) -> str | None:
 # iTunes fetch & audio cache
 # ---------------------------------------------------------------------------
 
+MATCH_CONFIDENCE_THRESHOLD = 0.72
+
+_JUNK_RE = re.compile(
+    r'\s*\[[^\]]{0,80}\]'
+    r'|\s*\(Free\s+(?:DL|Download)[^\)]*\)',
+    re.IGNORECASE,
+)
+_TRAILING_CAPS_RE = re.compile(r'\s+[A-Z]{3,}(?:\s+[A-Z]{3,})*$')
+_MIX_VERSION_RE = re.compile(
+    r'[\s(]*\b(?:extended\s+(?:mix|version)|original\s+mix|'
+    r'radio\s+(?:edit|mix)|club\s+(?:mix|edit)|dub\s+mix|extended)\b[)\s]*$',
+    re.IGNORECASE,
+)
+
+
+def _fix_mojibake(text: str) -> str:
+    try:
+        import ftfy
+        return ftfy.fix_text(text)
+    except ImportError:
+        pass
+    try:
+        return text.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+
+
+def _strip_junk(text: str) -> str:
+    return _JUNK_RE.sub("", text).strip()
+
+
+_MIN_ARTIST_SCORE = 0.45  # prevents title-only coincidences from matching wrong artists
+
+
+def _score_match(result: dict, cand_artist: str, cand_title: str) -> float:
+    def norm(s: str) -> str:
+        return re.sub(r"[^\w\s]", "", s.lower()).strip()
+    a = difflib.SequenceMatcher(None, norm(cand_artist), norm(result.get("artistName") or "")).ratio()
+    if a < _MIN_ARTIST_SCORE:
+        return 0.0
+    t = difflib.SequenceMatcher(None, norm(cand_title), norm(result.get("trackName") or "")).ratio()
+    return 0.35 * a + 0.65 * t
+
+
+def _itunes_candidates(artist: str, title: str) -> list[tuple[str, str]]:
+    """Generate candidate (artist, title) interpretations for fallback matching."""
+    out: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(a: str, t: str) -> None:
+        a, t = a.strip(), t.strip()
+        key = (a.lower(), t.lower())
+        if a and t and key not in seen:
+            seen.add(key)
+            out.append((a, t))
+
+    fa, ft = _fix_mojibake(artist), _fix_mojibake(title)
+
+    # 1. Mojibake-fixed + square-bracket junk stripped
+    add(fa, _strip_junk(ft))
+
+    # 2. Split combined label on " - " to detect prefixed-label layout (SoundCloud/UKF style)
+    #    e.g. "Wakaan - PEEKABOO - Maniac [UKF Premiere]" → parts[1]=PEEKABOO, parts[2]=Maniac
+    parts = [p.strip() for p in f"{fa} - {ft}".split(" - ")]
+    if len(parts) >= 3:
+        add(parts[1], _strip_junk(parts[2]))
+
+    # 3. Layout B: trailing ALL-CAPS label word(s) on the title — strip only when lowercase text remains
+    #    e.g. "Stampedo MONSTER FORCE" → "Stampedo"
+    clean_ft = _strip_junk(ft)
+    stripped = _TRAILING_CAPS_RE.sub("", clean_ft).strip()
+    if stripped and stripped != clean_ft and re.search(r"[a-z]", stripped):
+        add(fa, stripped)
+
+    # 4. Title field contains " - " — treat as embedded "artist - title"
+    if " - " in ft:
+        tp = ft.split(" - ", 1)
+        add(tp[0].strip(), _strip_junk(tp[1].strip()))
+
+    # 5. Strip trailing mix-version suffix so Beatport "Free Your Mind Extended Mix"
+    #    matches iTunes "Free Your Mind" (radio edit / album version)
+    mix_cleaned = _MIX_VERSION_RE.sub("", clean_ft).strip()
+    if mix_cleaned and mix_cleaned != clean_ft:
+        add(fa, mix_cleaned)
+
+    return out
+
+
+def _itunes_query(params: dict) -> list[dict]:
+    for attempt in range(4):
+        resp = requests.get("https://itunes.apple.com/search", params=params, timeout=20)
+        if resp.status_code not in (429, 403):
+            break
+        delay = 5 * (attempt + 1)
+        log.warning("iTunes rate/block (%s); retrying in %ss", resp.status_code, delay)
+        time.sleep(delay)
+    if resp.status_code in (429, 403):
+        log.warning("iTunes search still %s after retries — skipping query", resp.status_code)
+        return []
+    resp.raise_for_status()
+    return resp.json().get("results", [])
+
+
 def search_itunes_preview(artist: str, title: str) -> str:
     label = f"{artist} - {title}"
-    queries = [
+
+    # ---- STRICT FIRST: identical to prior behavior — first previewUrl wins ----
+    for params in [
         {"term": label, "media": "music", "entity": "song", "limit": 5},
         {"term": label, "media": "all", "limit": 10},
-    ]
-    for params in queries:
-        for attempt in range(4):
-            resp = requests.get(
-                "https://itunes.apple.com/search", params=params, timeout=20
-            )
-            if resp.status_code != 429:
-                break
-            delay = 5 * (attempt + 1)
-            log.warning("iTunes rate limited %s; retrying in %ss", label, delay)
-            time.sleep(delay)
-        resp.raise_for_status()
-        for result in resp.json().get("results", []):
+    ]:
+        for result in _itunes_query(params):
             url = result.get("previewUrl")
             if url:
                 return url
-    raise ValueError(f"No iTunes preview URL for {label}")
+
+    # ---- FALLBACK (strict miss only): candidate parsing + fuzzy scoring ----
+    candidates = _itunes_candidates(artist, title)
+    log.info("iTunes strict miss for %r — trying %d fallback candidates", label, len(candidates))
+
+    best_url: str | None = None
+    best_score = 0.0
+    best_info = ""
+
+    for cand_artist, cand_title in candidates:
+        cand_label = f"{cand_artist} - {cand_title}"
+        log.info("  candidate: %r", cand_label)
+        for q_variant, params in [
+            ("combined", {"term": cand_label, "media": "music", "entity": "song", "limit": 25}),
+            ("title-only", {"term": cand_title, "media": "music", "entity": "song", "limit": 25}),
+        ]:
+            for result in _itunes_query(params):
+                url = result.get("previewUrl")
+                if not url:
+                    continue
+                score = _score_match(result, cand_artist, cand_title)
+                if score > best_score:
+                    best_score = score
+                    best_url = url
+                    best_info = (
+                        f"candidate=({cand_artist!r}, {cand_title!r}), "
+                        f"query={q_variant!r}, score={score:.3f}, "
+                        f"match={result.get('artistName')!r} / {result.get('trackName')!r}"
+                    )
+            if best_score >= MATCH_CONFIDENCE_THRESHOLD:
+                break
+        if best_score >= MATCH_CONFIDENCE_THRESHOLD:
+            break
+
+    if best_url and best_score >= MATCH_CONFIDENCE_THRESHOLD:
+        log.info("iTunes fallback matched: %s", best_info)
+        return best_url
+
+    debug = f"; best_candidate={best_info}" if best_info else ""
+    raise ValueError(f"No iTunes preview URL for {label}{debug}")
 
 
 def fetch_audio(artist: str, title: str, track_key: str) -> Path:
@@ -174,22 +308,27 @@ def load_audio_librosa(path: Path, sr: int) -> np.ndarray:
 # Demucs source separation
 # ---------------------------------------------------------------------------
 
-def get_stems(audio_path: Path, track_key: str) -> tuple[Path, Path]:
-    vocals_dst = STEMS_CACHE / f"{track_key}_vocals.wav"
-    backing_dst = STEMS_CACHE / f"{track_key}_no_vocals.wav"
+DEMUCS_MODEL = "htdemucs"
+STEM_NAMES = ("vocals", "drums", "bass", "other")
 
-    if vocals_dst.exists() and vocals_dst.stat().st_size > 0 \
-            and backing_dst.exists() and backing_dst.stat().st_size > 0:
-        log.info("stems cache hit: %s", track_key)
-        return vocals_dst, backing_dst
 
-    log.info("running Demucs htdemucs_ft on: %s", audio_path.name)
+def get_stems(audio_path: Path, track_key: str) -> dict[str, Path]:
+    stem_paths = {
+        stem: STEMS_CACHE / f"{track_key}_{DEMUCS_MODEL}_4stem_{stem}.wav"
+        for stem in STEM_NAMES
+    }
+
+    if all(path.exists() and path.stat().st_size > 0 for path in stem_paths.values()):
+        log.info("4-stem cache hit: %s", track_key)
+        return stem_paths
+
+    log.info("running Demucs %s 4-stem on: %s", DEMUCS_MODEL, audio_path.name)
     with tempfile.TemporaryDirectory() as tmpdir:
         result = subprocess.run(
             [
-                "demucs",
-                "--two-stems=vocals",
-                "-n", "htdemucs_ft",
+                sys.executable,
+                "-m", "demucs",
+                "-n", DEMUCS_MODEL,
                 "--out", tmpdir,
                 str(audio_path),
             ],
@@ -203,12 +342,24 @@ def get_stems(audio_path: Path, track_key: str) -> tuple[Path, Path]:
                 f"Demucs failed for {audio_path.name}:\n{result.stderr}"
             )
 
-        stem_dir = Path(tmpdir) / "htdemucs_ft" / audio_path.stem
-        shutil.move(str(stem_dir / "vocals.wav"), str(vocals_dst))
-        shutil.move(str(stem_dir / "no_vocals.wav"), str(backing_dst))
+        stem_dir = Path(tmpdir) / DEMUCS_MODEL / audio_path.stem
+        for stem, dest in stem_paths.items():
+            src = stem_dir / f"{stem}.wav"
+            if not src.exists():
+                raise RuntimeError(f"Demucs did not produce expected stem: {src}")
+            dest.unlink(missing_ok=True)
+            shutil.move(str(src), str(dest))
 
-    log.info("stems cached: %s", track_key)
-    return vocals_dst, backing_dst
+    log.info("4-stems cached: %s", track_key)
+    return stem_paths
+
+
+def mix_stems(stems: list[np.ndarray]) -> np.ndarray:
+    if not stems:
+        raise ValueError("No stems supplied for mixing")
+    min_len = min(len(stem) for stem in stems)
+    stacked = np.vstack([stem[:min_len] for stem in stems])
+    return stacked.sum(axis=0).astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -303,6 +454,10 @@ def similarity(f_a: dict[str, Any], f_b: dict[str, Any]) -> float:
     full_sim    = cosine_similarity(f_a["emb_full"],    f_b["emb_full"])
     vocal_sim   = cosine_similarity(f_a["emb_vocals"],  f_b["emb_vocals"])
     backing_sim = cosine_similarity(f_a["emb_backing"], f_b["emb_backing"])
+    has_4stem = all(
+        f_a.get(key) is not None and f_b.get(key) is not None
+        for key in ("emb_drums", "emb_bass", "emb_other")
+    )
 
     if f_a.get("discogs_styles_400") and f_b.get("discogs_styles_400"):
         style_sim = cosine_similarity(
@@ -314,6 +469,38 @@ def similarity(f_a: dict[str, Any], f_b: dict[str, Any]) -> float:
 
     ca = vocal_class(f_a["vocal_dominance"])
     cb = vocal_class(f_b["vocal_dominance"])
+
+    if has_4stem:
+        drums_sim = cosine_similarity(f_a["emb_drums"], f_b["emb_drums"])
+        bass_sim = cosine_similarity(f_a["emb_bass"], f_b["emb_bass"])
+        other_sim = cosine_similarity(f_a["emb_other"], f_b["emb_other"])
+
+        if ca == "vocal" and cb == "vocal":
+            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
+                0.35, 0.25, 0.15, 0.10, 0.10, 0.05
+            )
+        elif ca == "instrumental" and cb == "instrumental":
+            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
+                0.45, 0.00, 0.20, 0.15, 0.15, 0.05
+            )
+        else:
+            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
+                0.50, 0.00, 0.15, 0.10, 0.20, 0.05
+            )
+
+        if style_sim is None:
+            w_full += w_style
+            w_style = 0.0
+            style_sim = 0.0
+
+        return (
+            w_full  * full_sim +
+            w_vocal * vocal_sim +
+            w_drums * drums_sim +
+            w_bass  * bass_sim +
+            w_other * other_sim +
+            w_style * style_sim
+        )
 
     if ca == "vocal" and cb == "vocal":
         w_full, w_vocal, w_backing, w_style = 0.40, 0.30, 0.20, 0.10
@@ -616,22 +803,28 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
     duration = len(full_mix_wav) / 44_100
 
     # 3. Demucs separation
-    vocals_path, backing_path = get_stems(audio_path, track_key)
+    stem_paths = get_stems(audio_path, track_key)
 
     # 4. Load stems at 44.1 kHz
     log.info("loading stems")
-    vocals_wav = load_audio_librosa(vocals_path, 44_100)
-    backing_wav = load_audio_librosa(backing_path, 44_100)
+    vocals_wav = load_audio_librosa(stem_paths["vocals"], 44_100)
+    drums_wav = load_audio_librosa(stem_paths["drums"], 44_100)
+    bass_wav = load_audio_librosa(stem_paths["bass"], 44_100)
+    other_wav = load_audio_librosa(stem_paths["other"], 44_100)
+    backing_wav = mix_stems([drums_wav, bass_wav, other_wav])
 
     # 5. Vocal dominance
     log.info("computing vocal dominance")
     vocal_dominance = compute_vocal_dominance(vocals_wav, full_mix_wav, sr=44_100)
 
-    # 6. MuQ-MuLan embeddings (3 versions)
+    # 6. MuQ-MuLan embeddings
     log.info("computing MuQ embeddings")
     emb_full = get_muq_embedding(full_mix_wav, "full", track_key)
-    emb_vocals = get_muq_embedding(vocals_wav, "vocals", track_key)
-    emb_backing = get_muq_embedding(backing_wav, "backing", track_key)
+    emb_vocals = get_muq_embedding(vocals_wav, f"{DEMUCS_MODEL}_4stem_vocals", track_key)
+    emb_drums = get_muq_embedding(drums_wav, f"{DEMUCS_MODEL}_4stem_drums", track_key)
+    emb_bass = get_muq_embedding(bass_wav, f"{DEMUCS_MODEL}_4stem_bass", track_key)
+    emb_other = get_muq_embedding(other_wav, f"{DEMUCS_MODEL}_4stem_other", track_key)
+    emb_backing = get_muq_embedding(backing_wav, f"{DEMUCS_MODEL}_4stem_backing", track_key)
 
     # 7. Essentia core features
     log.info("computing Essentia core features")
@@ -660,6 +853,9 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
         "emb_full": emb_full,
         "emb_vocals": emb_vocals,
         "emb_backing": emb_backing,
+        "emb_drums": emb_drums,
+        "emb_bass": emb_bass,
+        "emb_other": emb_other,
         # TF features (may be None on M-series fallback)
         "mood_happy": tf_feats.get("mood_happy") if tf_feats else None,
         "mood_sad": tf_feats.get("mood_sad") if tf_feats else None,
@@ -725,7 +921,14 @@ def print_track_summary(f: dict[str, Any]) -> None:
     emb_tbl.add_column("MuQ Embedding", style="bold")
     emb_tbl.add_column("Shape")
     emb_tbl.add_column("L2 norm")
-    for variant, key in [("full mix", "emb_full"), ("vocals", "emb_vocals"), ("backing", "emb_backing")]:
+    for variant, key in [
+        ("full mix", "emb_full"),
+        ("vocals", "emb_vocals"),
+        ("drums", "emb_drums"),
+        ("bass", "emb_bass"),
+        ("other", "emb_other"),
+        ("backing mix", "emb_backing"),
+    ]:
         emb = f.get(key)
         if emb is not None:
             emb_tbl.add_row(variant, str(emb.shape), f"{float(np.linalg.norm(emb)):.4f}")
@@ -774,7 +977,10 @@ def print_similarity_table(f_a: dict[str, Any], f_b: dict[str, Any]) -> None:
     for label, key_a, key_b in [
         ("full mix", "emb_full", "emb_full"),
         ("vocals", "emb_vocals", "emb_vocals"),
-        ("backing", "emb_backing", "emb_backing"),
+        ("drums", "emb_drums", "emb_drums"),
+        ("bass", "emb_bass", "emb_bass"),
+        ("other", "emb_other", "emb_other"),
+        ("backing mix", "emb_backing", "emb_backing"),
     ]:
         a_emb = f_a.get(key_a)
         b_emb = f_b.get(key_b)
@@ -845,12 +1051,14 @@ def save_track_features(features: dict[str, Any]) -> int:
                 """
                 INSERT INTO embeddings (
                     track_id, muq_full, muq_vocals, muq_backing,
+                    muq_drums, muq_bass, muq_other,
                     vocal_dominance, bpm, key, camelot, danceability,
                     mood, arousal_valence, mfcc_mean,
                     discogs_styles, top_styles, computed_at
                 )
                 VALUES (
                     %s, %s, %s, %s,
+                    %s, %s, %s,
                     %s, %s, %s, %s, %s,
                     %s, %s, %s,
                     %s, %s, NOW()
@@ -859,6 +1067,9 @@ def save_track_features(features: dict[str, Any]) -> int:
                     muq_full         = EXCLUDED.muq_full,
                     muq_vocals       = EXCLUDED.muq_vocals,
                     muq_backing      = EXCLUDED.muq_backing,
+                    muq_drums        = EXCLUDED.muq_drums,
+                    muq_bass         = EXCLUDED.muq_bass,
+                    muq_other        = EXCLUDED.muq_other,
                     vocal_dominance  = EXCLUDED.vocal_dominance,
                     bpm              = EXCLUDED.bpm,
                     key              = EXCLUDED.key,
@@ -876,6 +1087,9 @@ def save_track_features(features: dict[str, Any]) -> int:
                     features.get("emb_full"),
                     features.get("emb_vocals"),
                     features.get("emb_backing"),
+                    features.get("emb_drums"),
+                    features.get("emb_bass"),
+                    features.get("emb_other"),
                     features.get("vocal_dominance"),
                     features.get("bpm"),
                     features.get("key"),
@@ -899,6 +1113,7 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
             """
             SELECT t.artist, t.title,
                    e.muq_full, e.muq_vocals, e.muq_backing,
+                   e.muq_drums, e.muq_bass, e.muq_other,
                    e.vocal_dominance, e.bpm, e.key, e.camelot, e.danceability,
                    e.mood, e.arousal_valence, e.mfcc_mean,
                    e.discogs_styles, e.top_styles
@@ -914,6 +1129,7 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
     (
         artist, title,
         muq_full, muq_vocals, muq_backing,
+        muq_drums, muq_bass, muq_other,
         vocal_dominance, bpm, key, camelot, danceability,
         mood, av, mfcc, discogs_styles, top_styles,
     ) = row
@@ -925,6 +1141,9 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
         "emb_full":    muq_full,
         "emb_vocals":  muq_vocals,
         "emb_backing": muq_backing,
+        "emb_drums":   muq_drums,
+        "emb_bass":    muq_bass,
+        "emb_other":   muq_other,
         "vocal_dominance": vocal_dominance,
         "bpm":         bpm,
         "key":         key,
