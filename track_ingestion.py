@@ -795,7 +795,9 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
     track_key = stable_track_key(artist, title)
 
     # 1. Fetch audio
+    _t0 = time.perf_counter()
     audio_path = fetch_audio(artist, title, track_key)
+    print(f"[timing] audio_fetch: {time.perf_counter() - _t0:.1f}s")
 
     # 2. Load full mix at 44.1 kHz
     log.info("loading full mix: %s - %s", artist, title)
@@ -803,7 +805,9 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
     duration = len(full_mix_wav) / 44_100
 
     # 3. Demucs separation
+    _t0 = time.perf_counter()
     stem_paths = get_stems(audio_path, track_key)
+    print(f"[timing] demucs: {time.perf_counter() - _t0:.1f}s")
 
     # 4. Load stems at 44.1 kHz
     log.info("loading stems")
@@ -819,20 +823,24 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
 
     # 6. MuQ-MuLan embeddings
     log.info("computing MuQ embeddings")
+    _t0 = time.perf_counter()
     emb_full = get_muq_embedding(full_mix_wav, "full", track_key)
     emb_vocals = get_muq_embedding(vocals_wav, f"{DEMUCS_MODEL}_4stem_vocals", track_key)
     emb_drums = get_muq_embedding(drums_wav, f"{DEMUCS_MODEL}_4stem_drums", track_key)
     emb_bass = get_muq_embedding(bass_wav, f"{DEMUCS_MODEL}_4stem_bass", track_key)
     emb_other = get_muq_embedding(other_wav, f"{DEMUCS_MODEL}_4stem_other", track_key)
     emb_backing = get_muq_embedding(backing_wav, f"{DEMUCS_MODEL}_4stem_backing", track_key)
+    print(f"[timing] muq_embeddings: {time.perf_counter() - _t0:.1f}s")
 
     # 7. Essentia core features
     log.info("computing Essentia core features")
+    _t0 = time.perf_counter()
     core = compute_essentia_core(full_mix_wav, track_key)
 
     # 8. Essentia TF features (graceful fallback)
     log.info("computing Essentia TF features")
     tf_feats = compute_essentia_tf(audio_path, track_key)
+    print(f"[timing] essentia: {time.perf_counter() - _t0:.1f}s")
 
     return {
         "artist": artist,
@@ -1024,6 +1032,7 @@ def get_connection() -> Any:
 
 def save_track_features(features: dict[str, Any]) -> int:
     conn = get_connection()
+    _t0 = time.perf_counter()
     with conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1103,6 +1112,7 @@ def save_track_features(features: dict[str, Any]) -> int:
                 ),
             )
     conn.close()
+    print(f"[timing] db_save: {time.perf_counter() - _t0:.1f}s")
     return track_id
 
 
