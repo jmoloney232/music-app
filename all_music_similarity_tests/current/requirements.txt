@@ -5,9 +5,15 @@ numpy
 scipy
 torch
 transformers
-openl3
 muq
 essentia-tensorflow
 tqdm
 matplotlib
 pandas
+python-dotenv
+ftfy
+psycopg[binary]
+pgvector
+demucs
+playwright  # after pip install: run `playwright install chromium` once
+playwright-stealth  # hides headless indicators from Cloudflare Bot Management

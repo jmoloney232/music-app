@@ -43,12 +43,11 @@ First uncached run may download several large model checkpoints:
   - MuQ-MuLan-large: roughly 3 GB
   - CLAP music: roughly 1.5 GB
   - MERT-v1-95M: roughly 400 MB
-  - OpenL3: roughly 50 MB
 Audio previews are cached in audio_cache/ and embeddings in embedding_cache/.
 """
 
-EMBEDDING_MODELS = ("openl3", "mert", "muq", "clap")
-ALL_SCORE_MODELS = ("openl3", "mert", "muq", "clap", "essentia")
+EMBEDDING_MODELS = ("mert", "muq", "clap")
+ALL_SCORE_MODELS = ("mert", "muq", "clap", "essentia")
 
 
 @dataclass(frozen=True)
@@ -199,31 +198,6 @@ def to_device(batch: dict[str, Any], device: str) -> dict[str, Any]:
     return moved
 
 
-class OpenL3Backend(EmbeddingBackend):
-    name = "openl3"
-    sample_rate = 48_000
-
-    def __init__(self) -> None:
-        configure_matplotlib_cache()
-        try:
-            import openl3
-        except ImportError as exc:
-            raise ModelUnavailable("openl3 is not installed") from exc
-        self.openl3 = openl3
-
-    def embed(self, wav: np.ndarray) -> np.ndarray:
-        emb, _ts = self.openl3.get_audio_embedding(
-            wav,
-            self.sample_rate,
-            content_type="music",
-            embedding_size=512,
-            center=True,
-            hop_size=0.1,
-            verbose=False,
-        )
-        return emb.mean(axis=0).astype(np.float32)
-
-
 class MertBackend(EmbeddingBackend):
     name = "mert"
     sample_rate = 24_000
@@ -311,7 +285,6 @@ class ClapBackend(EmbeddingBackend):
 
 def load_backend(name: str, device: str) -> EmbeddingBackend:
     backends = {
-        "openl3": lambda: OpenL3Backend(),
         "mert": lambda: MertBackend(device),
         "muq": lambda: MuqBackend(device),
         "clap": lambda: ClapBackend(device),
@@ -326,8 +299,6 @@ def load_backend(name: str, device: str) -> EmbeddingBackend:
 
 
 def load_backend_cpu(name: str) -> EmbeddingBackend:
-    if name == "openl3":
-        return OpenL3Backend()
     if name == "mert":
         return MertBackend("cpu")
     if name == "muq":
@@ -709,7 +680,6 @@ def write_raw_scores(rows: list[dict[str, Any]]) -> None:
         "id",
         "category",
         "human_score",
-        "openl3_sim",
         "mert_sim",
         "muq_sim",
         "clap_sim",
@@ -907,7 +877,6 @@ def write_analysis(
             f"- MERT={weights['mert']:.3f}",
             f"- MuQ={weights['muq']:.3f}",
             f"- CLAP={weights['clap']:.3f}",
-            f"- OpenL3={weights['openl3']:.3f}",
             "",
             "## Caveats and Limitations",
             "",
@@ -921,9 +890,6 @@ def write_analysis(
         lines.append("- Some backends were unavailable or failed during this run:")
         for item in unavailable:
             lines.append(f"  - {item}")
-    if sys.version_info >= (3, 12):
-        lines.append("- This interpreter is newer than OpenL3's commonly supported Python range. Use Python 3.10 or 3.11 if OpenL3/TensorFlow installation fails.")
-
     (RESULTS_DIR / "analysis.md").write_text("\n".join(lines) + "\n")
 
 
