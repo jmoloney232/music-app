@@ -54,7 +54,6 @@ MODELS_DIR = ROOT / "essentia_models"
 def ensure_dirs() -> None:
     for d in (AUDIO_CACHE, STEMS_CACHE, EMBEDDING_CACHE, FEATURE_CACHE, MODELS_DIR):
         d.mkdir(exist_ok=True)
-    ensure_essentia_models()
 
 
 # ---------------------------------------------------------------------------
@@ -762,6 +761,7 @@ def compute_essentia_tf(audio_path: Path, track_key: str) -> dict[str, Any] | No
         log.info("essentia TF cache hit: %s", track_key)
         return json.loads(cache.read_text())
 
+    ensure_essentia_models()
     log.info("running Essentia TF worker for: %s", track_key)
     result = subprocess.run(
         [
@@ -837,9 +837,10 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
     _t0 = time.perf_counter()
     core = compute_essentia_core(full_mix_wav, track_key)
 
-    # 8. Essentia TF features (graceful fallback)
-    log.info("computing Essentia TF features")
-    tf_feats = compute_essentia_tf(audio_path, track_key)
+    # 8. Essentia TF features are intentionally disabled for production ingestion.
+    # Keep nullable output fields for DB/schema compatibility.
+    log.info("skipping Essentia TF features")
+    tf_feats = None
     print(f"[timing] essentia: {time.perf_counter() - _t0:.1f}s")
 
     return {
