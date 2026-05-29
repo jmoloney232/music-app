@@ -442,9 +442,9 @@ def compute_vocal_dominance(vocals_wav: np.ndarray, full_mix_wav: np.ndarray, sr
 
 
 def vocal_class(vd: float) -> str:
-    if vd < 0.20:
+    if vd < 0.10:
         return "instrumental"
-    if vd > 0.55:
+    if vd > 0.20:
         return "vocal"
     return "ambiguous"
 
@@ -458,14 +458,6 @@ def similarity(f_a: dict[str, Any], f_b: dict[str, Any]) -> float:
         for key in ("emb_drums", "emb_bass", "emb_other")
     )
 
-    if f_a.get("discogs_styles_400") and f_b.get("discogs_styles_400"):
-        style_sim = cosine_similarity(
-            np.array(f_a["discogs_styles_400"]),
-            np.array(f_b["discogs_styles_400"]),
-        )
-    else:
-        style_sim = None
-
     ca = vocal_class(f_a["vocal_dominance"])
     cb = vocal_class(f_b["vocal_dominance"])
 
@@ -475,49 +467,31 @@ def similarity(f_a: dict[str, Any], f_b: dict[str, Any]) -> float:
         other_sim = cosine_similarity(f_a["emb_other"], f_b["emb_other"])
 
         if ca == "vocal" and cb == "vocal":
-            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
-                0.35, 0.25, 0.15, 0.10, 0.10, 0.05
-            )
+            w_full, w_vocal, w_drums, w_bass, w_other = 0.40, 0.25, 0.15, 0.10, 0.10
         elif ca == "instrumental" and cb == "instrumental":
-            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
-                0.45, 0.00, 0.20, 0.15, 0.15, 0.05
-            )
+            w_full, w_vocal, w_drums, w_bass, w_other = 0.50, 0.00, 0.20, 0.15, 0.15
         else:
-            w_full, w_vocal, w_drums, w_bass, w_other, w_style = (
-                0.50, 0.00, 0.15, 0.10, 0.20, 0.05
-            )
-
-        if style_sim is None:
-            w_full += w_style
-            w_style = 0.0
-            style_sim = 0.0
+            w_full, w_vocal, w_drums, w_bass, w_other = 0.55, 0.00, 0.15, 0.10, 0.20
 
         return (
             w_full  * full_sim +
             w_vocal * vocal_sim +
             w_drums * drums_sim +
             w_bass  * bass_sim +
-            w_other * other_sim +
-            w_style * style_sim
+            w_other * other_sim
         )
 
     if ca == "vocal" and cb == "vocal":
-        w_full, w_vocal, w_backing, w_style = 0.40, 0.30, 0.20, 0.10
+        w_full, w_vocal, w_backing = 0.50, 0.30, 0.20
     elif ca == "instrumental" and cb == "instrumental":
-        w_full, w_vocal, w_backing, w_style = 0.60, 0.00, 0.30, 0.10
+        w_full, w_vocal, w_backing = 0.70, 0.00, 0.30
     else:
-        w_full, w_vocal, w_backing, w_style = 0.65, 0.00, 0.25, 0.10
-
-    if style_sim is None:
-        w_full += w_style
-        w_style = 0.0
-        style_sim = 0.0
+        w_full, w_vocal, w_backing = 0.75, 0.00, 0.25
 
     return (
         w_full    * full_sim +
         w_vocal   * vocal_sim +
-        w_backing * backing_sim +
-        w_style   * style_sim
+        w_backing * backing_sim
     )
 
 
@@ -1126,8 +1100,7 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
                    e.muq_full, e.muq_vocals, e.muq_backing,
                    e.muq_drums, e.muq_bass, e.muq_other,
                    e.vocal_dominance, e.bpm, e.key, e.camelot, e.danceability,
-                   e.mood, e.arousal_valence, e.mfcc_mean,
-                   e.discogs_styles, e.top_styles
+                   e.mfcc_mean, e.top_styles
             FROM tracks t
             JOIN embeddings e ON e.track_id = t.id
             WHERE t.id = %s
@@ -1142,10 +1115,10 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
         muq_full, muq_vocals, muq_backing,
         muq_drums, muq_bass, muq_other,
         vocal_dominance, bpm, key, camelot, danceability,
-        mood, av, mfcc, discogs_styles, top_styles,
+        mfcc, top_styles,
     ) = row
 
-    result: dict[str, Any] = {
+    return {
         "artist": artist,
         "title": title,
         "track_key": stable_track_key(artist, title),
@@ -1161,17 +1134,8 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
         "camelot":     camelot,
         "danceability": danceability,
         "mfcc_mean":   list(mfcc) if mfcc is not None else None,
-        "discogs_styles_400": list(discogs_styles) if discogs_styles is not None else None,
         "discogs_top5": top_styles,
     }
-
-    for i, mk in enumerate(_MOOD_KEYS):
-        result[mk] = float(mood[i]) if mood is not None and i < len(mood) else None
-
-    result["arousal"] = float(av[0]) if av is not None else None
-    result["valence"] = float(av[1]) if av is not None else None
-
-    return result
 
 
 # ---------------------------------------------------------------------------

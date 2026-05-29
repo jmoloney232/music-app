@@ -30,12 +30,6 @@ from track_ingestion import (  # noqa: E402
     vocal_class,
 )
 
-_MOOD_KEYS = [
-    "mood_happy", "mood_sad", "mood_relaxed",
-    "mood_aggressive", "mood_acoustic", "mood_party",
-]
-
-
 # ---------------------------------------------------------------------------
 # DB helpers
 # ---------------------------------------------------------------------------
@@ -84,8 +78,7 @@ def _fetch_all_indexed_except(exclude_id: int) -> list[tuple[int, dict[str, Any]
                    e.muq_full, e.muq_vocals, e.muq_backing,
                    e.muq_drums, e.muq_bass, e.muq_other,
                    e.vocal_dominance, e.bpm, e.key, e.camelot, e.danceability,
-                   e.mood, e.arousal_valence, e.mfcc_mean,
-                   e.discogs_styles, e.top_styles
+                   e.mfcc_mean, e.top_styles
             FROM tracks t
             JOIN embeddings e ON e.track_id = t.id
             WHERE t.status = 'indexed' AND t.id != %s
@@ -103,7 +96,7 @@ def _fetch_all_indexed_except(exclude_id: int) -> list[tuple[int, dict[str, Any]
             muq_full, muq_vocals, muq_backing,
             muq_drums, muq_bass, muq_other,
             vocal_dominance, bpm, key, camelot, danceability,
-            mood, av, mfcc, discogs_styles, top_styles,
+            mfcc, top_styles,
         ) = row
 
         f: dict[str, Any] = {
@@ -122,14 +115,8 @@ def _fetch_all_indexed_except(exclude_id: int) -> list[tuple[int, dict[str, Any]
             "camelot":     camelot,
             "danceability": danceability,
             "mfcc_mean":   list(mfcc) if mfcc is not None else None,
-            "discogs_styles_400": list(discogs_styles) if discogs_styles is not None else None,
             "discogs_top5": top_styles,
         }
-        for i, mk in enumerate(_MOOD_KEYS):
-            f[mk] = float(mood[i]) if mood is not None and i < len(mood) else None
-        f["arousal"] = float(av[0]) if av is not None else None
-        f["valence"] = float(av[1]) if av is not None else None
-
         result.append((int(tid), f))
     return result
 

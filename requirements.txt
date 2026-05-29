@@ -17,3 +17,5 @@ pgvector
 demucs
 playwright  # after pip install: run `playwright install chromium` once
 playwright-stealth  # hides headless indicators from Cloudflare Bot Management
+fastapi
+uvicorn[standard]
