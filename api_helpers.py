@@ -80,6 +80,62 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
     }
 
 
+def fetch_candidates_by_vector(
+    query_embedding: np.ndarray,
+    exclude_id: int,
+    limit: int = 100,
+) -> list[tuple[int, dict[str, Any]]]:
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SET hnsw.ef_search = 100")
+        cur.execute(
+            """
+            SELECT t.id, t.artist, t.title,
+                   e.muq_full, e.muq_vocals, e.muq_backing,
+                   e.muq_drums, e.muq_bass, e.muq_other,
+                   e.vocal_dominance, e.bpm, e.key, e.camelot, e.danceability,
+                   e.mfcc_mean, e.top_styles
+            FROM tracks t
+            JOIN embeddings e ON e.track_id = t.id
+            WHERE t.status = 'indexed' AND t.id != %s
+            ORDER BY e.muq_full <=> %s
+            LIMIT %s
+            """,
+            (exclude_id, query_embedding, limit),
+        )
+        rows = cur.fetchall()
+    conn.close()
+
+    result = []
+    for row in rows:
+        (
+            tid, artist, title,
+            muq_full, muq_vocals, muq_backing,
+            muq_drums, muq_bass, muq_other,
+            vocal_dominance, bpm, key, camelot, danceability,
+            mfcc, top_styles,
+        ) = row
+        f: dict[str, Any] = {
+            "artist": artist,
+            "title": title,
+            "emb_full":    muq_full,
+            "emb_vocals":  muq_vocals,
+            "emb_backing": muq_backing,
+            "emb_drums":   muq_drums,
+            "emb_bass":    muq_bass,
+            "emb_other":   muq_other,
+            "vocal_dominance": vocal_dominance,
+            "bpm":         bpm,
+            "key":         key,
+            "camelot":     camelot,
+            "danceability": danceability,
+            "mfcc_mean":   list(mfcc) if mfcc is not None else None,
+            "discogs_top5": top_styles,
+        }
+        result.append((int(tid), f))
+    return result
+
+
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     denom = float(np.linalg.norm(a) * np.linalg.norm(b))
     if denom == 0.0:
