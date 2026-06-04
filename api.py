@@ -1,5 +1,5 @@
 """
-api.py — FastAPI server for the Strata frontend.
+api.py — FastAPI server for Jack's Similar Song Search.
 
 Endpoints:
     GET /search?q=<text>           Search indexed tracks by artist or title
@@ -27,7 +27,7 @@ from track_ingestion import (  # noqa: E402
     vocal_class,
 )
 
-app = FastAPI(title="Strata API")
+app = FastAPI(title="Jack's Similar Song Search API")
 
 _cors_env = os.getenv("CORS_ORIGINS", "")
 _allowed_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] or [
