@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { formatKey, compatibleKeys } from '../utils/camelot'
 
 const API = '/api'
 
@@ -46,7 +47,6 @@ function TrackCard({ track, rank, onClick }) {
                  hover:border-purple-primary transition-colors group"
     >
       <div className="flex items-start justify-between gap-4">
-        {/* Rank + info */}
         <div className="flex items-start gap-4 min-w-0">
           <span className="font-mono text-xs text-border pt-1 w-5 flex-shrink-0 text-right">
             {rank}
@@ -60,7 +60,7 @@ function TrackCard({ track, rank, onClick }) {
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-              {track.camelot && <Tag>{track.camelot}</Tag>}
+              {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
               {track.vocal_class && (
                 <Tag color={VOCAL_COLOR[track.vocal_class]}>
                   {VOCAL_LABEL[track.vocal_class] ?? track.vocal_class}
@@ -72,8 +72,6 @@ function TrackCard({ track, rank, onClick }) {
             </div>
           </div>
         </div>
-
-        {/* Score bar */}
         <div className="flex-shrink-0 pt-1">
           <ScoreBar score={track.score} />
         </div>
@@ -92,7 +90,7 @@ function QueryCard({ track }) {
       <div className="font-body text-text-secondary mt-1">{track.artist}</div>
       <div className="flex flex-wrap gap-2 mt-3">
         {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-        {track.camelot && <Tag>{track.camelot}</Tag>}
+        {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
         {track.vocal_class && (
           <Tag color={VOCAL_COLOR[track.vocal_class]}>
             {VOCAL_LABEL[track.vocal_class] ?? track.vocal_class}
@@ -106,6 +104,21 @@ function QueryCard({ track }) {
   )
 }
 
+function FilterPill({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-xs px-3 py-1 rounded font-mono transition-colors ${
+        active
+          ? 'bg-purple-primary text-white'
+          : 'bg-surface border border-border text-text-secondary hover:text-text-primary'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function Results() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
@@ -114,6 +127,8 @@ export default function Results() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [keyFilter, setKeyFilter] = useState('all')
+  const [bpmFilter, setBpmFilter] = useState(false)
 
   useEffect(() => {
     if (!trackId) {
@@ -123,6 +138,8 @@ export default function Results() {
     }
     setLoading(true)
     setError(null)
+    setKeyFilter('all')
+    setBpmFilter(false)
     fetch(`${API}/similar/${trackId}?top=15`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -132,6 +149,26 @@ export default function Results() {
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
   }, [trackId])
+
+  const filteredResults = useMemo(() => {
+    if (!data) return []
+    let results = data.results
+
+    if (keyFilter === 'compatible') {
+      const compat = new Set(compatibleKeys(data.query.camelot))
+      results = results.filter(t => compat.has(t.camelot))
+    } else if (keyFilter === 'exact') {
+      results = results.filter(t => t.camelot === data.query.camelot)
+    }
+
+    if (bpmFilter && data.query.bpm) {
+      const lo = data.query.bpm * 0.94
+      const hi = data.query.bpm * 1.06
+      results = results.filter(t => t.bpm != null && t.bpm >= lo && t.bpm <= hi)
+    }
+
+    return results
+  }, [data, keyFilter, bpmFilter])
 
   if (loading) {
     return (
@@ -155,6 +192,8 @@ export default function Results() {
     )
   }
 
+  const filtersActive = keyFilter !== 'all' || bpmFilter
+
   return (
     <div className="min-h-[calc(100vh-80px)] bg-background px-6 py-12 max-w-2xl mx-auto">
       {/* Back link */}
@@ -172,23 +211,61 @@ export default function Results() {
       <QueryCard track={data.query} />
 
       {/* Stats row */}
-      <div className="flex gap-6 mb-6 font-mono text-xs text-text-secondary">
+      <div className="flex gap-6 mb-5 font-mono text-xs text-text-secondary">
         <span>{data.total_compared} tracks compared</span>
         <span>High <span className="text-text-primary">{Math.round(data.highest * 100)}%</span></span>
         <span>Med <span className="text-text-primary">{Math.round(data.median * 100)}%</span></span>
         <span>Low <span className="text-text-primary">{Math.round(data.lowest * 100)}%</span></span>
       </div>
 
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-2 py-3 mb-5 border-t border-b border-border">
+        <span className="text-xs font-mono text-text-secondary uppercase tracking-widest mr-1">
+          Filter
+        </span>
+        <FilterPill active={keyFilter === 'all'} onClick={() => setKeyFilter('all')}>
+          All
+        </FilterPill>
+        <FilterPill active={keyFilter === 'compatible'} onClick={() => setKeyFilter('compatible')}>
+          Compatible Keys
+        </FilterPill>
+        <FilterPill active={keyFilter === 'exact'} onClick={() => setKeyFilter('exact')}>
+          Exact Key
+        </FilterPill>
+        {data.query.bpm && (
+          <FilterPill active={bpmFilter} onClick={() => setBpmFilter(v => !v)}>
+            BPM ±6%
+          </FilterPill>
+        )}
+        {filtersActive && (
+          <span className="text-xs font-mono text-text-secondary ml-auto">
+            {filteredResults.length} of {data.results.length} shown
+          </span>
+        )}
+      </div>
+
       {/* Results */}
       <div className="flex flex-col gap-2">
-        {data.results.map((track, i) => (
-          <TrackCard
-            key={track.id}
-            track={track}
-            rank={i + 1}
-            onClick={() => navigate(`/results?id=${track.id}`)}
-          />
-        ))}
+        {filteredResults.length === 0 ? (
+          <div className="text-center py-10 text-text-secondary font-body text-sm">
+            No results match the current filter.{' '}
+            <button
+              onClick={() => { setKeyFilter('all'); setBpmFilter(false) }}
+              className="text-purple-light hover:text-white transition-colors"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          filteredResults.map((track, i) => (
+            <TrackCard
+              key={track.id}
+              track={track}
+              rank={i + 1}
+              onClick={() => navigate(`/results?id=${track.id}`)}
+            />
+          ))
+        )}
       </div>
     </div>
   )

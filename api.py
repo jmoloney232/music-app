@@ -80,6 +80,42 @@ def _list_tracks() -> list[dict]:
     return [{"id": int(r[0]), "artist": str(r[1]), "title": str(r[2])} for r in rows]
 
 
+def _tracks_by_key(
+    camelot: str,
+    bpm_min: float | None,
+    bpm_max: float | None,
+) -> list[dict]:
+    conn = get_connection()
+    conditions: list[str] = ["t.status = 'indexed'", "e.camelot = %s"]
+    params: list[Any] = [camelot]
+    if bpm_min is not None:
+        conditions.append("e.bpm >= %s")
+        params.append(bpm_min)
+    if bpm_max is not None:
+        conditions.append("e.bpm <= %s")
+        params.append(bpm_max)
+    where = " AND ".join(conditions)
+    with conn.cursor() as cur:
+        cur.execute(
+            f"SELECT t.id, t.artist, t.title, e.bpm, e.camelot "
+            f"FROM tracks t JOIN embeddings e ON e.track_id = t.id "
+            f"WHERE {where} ORDER BY e.bpm",
+            params,
+        )
+        rows = cur.fetchall()
+    conn.close()
+    return [
+        {
+            "id": int(r[0]),
+            "artist": str(r[1]),
+            "title": str(r[2]),
+            "bpm": round(float(r[3]), 1) if r[3] is not None else None,
+            "camelot": str(r[4]) if r[4] is not None else None,
+        }
+        for r in rows
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Serialisation helpers
 # ---------------------------------------------------------------------------
@@ -110,6 +146,15 @@ def search(q: str = Query(..., min_length=1)) -> list[dict]:
 @app.get("/tracks")
 def list_tracks() -> list[dict]:
     return _list_tracks()
+
+
+@app.get("/tracks/by-key")
+def tracks_by_key(
+    camelot: str = Query(..., min_length=2, max_length=3),
+    bpm_min: float | None = Query(default=None, ge=0),
+    bpm_max: float | None = Query(default=None, ge=0),
+) -> list[dict]:
+    return _tracks_by_key(camelot, bpm_min, bpm_max)
 
 
 @app.get("/similar/{track_id}")
