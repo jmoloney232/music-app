@@ -3,6 +3,4 @@ uvicorn[standard]
 psycopg[binary]
 pgvector
 numpy
-librosa
-requests
 python-dotenv

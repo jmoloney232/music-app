@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
-from track_ingestion import (  # noqa: E402
+from api_helpers import (
     get_connection,
     fetch_track_features,
     similarity,
