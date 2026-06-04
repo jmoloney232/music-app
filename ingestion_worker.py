@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 # Import after dotenv so DATABASE_URL is available
+import numpy as np
 from track_ingestion import get_connection, ingest_one_track, save_track_features  # noqa: E402
 
 logging.basicConfig(
@@ -104,6 +105,19 @@ def _mark_status(track_id: int, status: str, error_msg: str | None = None) -> No
     conn.close()
 
 
+def _embedding_duplicate(track_id: int, emb_full: np.ndarray) -> bool:
+    """Return True if another track already has this exact muq_full embedding."""
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM embeddings WHERE muq_full = %s AND track_id != %s LIMIT 1",
+            (emb_full, track_id),
+        )
+        found = cur.fetchone() is not None
+    conn.close()
+    return found
+
+
 def _reset_stuck() -> int:
     """Reset all status='processing' rows back to 'pending'. Returns count reset."""
     conn = get_connection()
@@ -148,8 +162,11 @@ def _run_ingestion(tracks: list[tuple[int, str, str]]) -> None:
 
             try:
                 features = ingest_one_track(artist, title)
-                # save_track_features upserts the embeddings row and sets
-                # status='indexed' on the tracks row in one transaction.
+                if _embedding_duplicate(track_id, features["emb_full"]):
+                    raise ValueError(
+                        "Duplicate embedding detected — iTunes likely matched the wrong audio "
+                        "(remix not on iTunes, fell back to original track). Skipping."
+                    )
                 save_track_features(features)
                 print("OK")
                 indexed_count += 1
