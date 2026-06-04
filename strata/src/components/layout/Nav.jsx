@@ -3,7 +3,7 @@ export default function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-between px-8
                     bg-surface/80 backdrop-blur-md border-b border-border">
       <span className="font-headline font-bold text-xl tracking-widest text-text-primary">
-        STRATA
+        JACK'S SIMILAR SONG SEARCH
       </span>
       <div className="flex items-center gap-6">
         <a href="#" className="text-text-secondary hover:text-text-primary text-sm font-body transition-colors">

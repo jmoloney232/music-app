@@ -7,10 +7,22 @@ export default function Home() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
+  const [slowLoad, setSlowLoad] = useState(false)
   const [searched, setSearched] = useState(false)
   const [fetchError, setFetchError] = useState(null)
   const navigate = useNavigate()
   const debounce = useRef(null)
+  const slowTimer = useRef(null)
+
+  useEffect(() => {
+    if (loading) {
+      slowTimer.current = setTimeout(() => setSlowLoad(true), 4000)
+    } else {
+      clearTimeout(slowTimer.current)
+      setSlowLoad(false)
+    }
+    return () => clearTimeout(slowTimer.current)
+  }, [loading])
 
   useEffect(() => {
     if (!query.trim()) {
@@ -69,6 +81,13 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* Cold-start notice */}
+      {slowLoad && (
+        <p className="text-text-secondary font-body text-sm mb-4 animate-pulse">
+          Waking up the server — first load can take up to 30s…
+        </p>
+      )}
 
       {/* Results list */}
       {fetchError && (

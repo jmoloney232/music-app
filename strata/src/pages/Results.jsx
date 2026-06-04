@@ -53,10 +53,10 @@ function TrackCard({ track, rank, onClick }) {
           </span>
           <div className="min-w-0">
             <div className="font-body font-medium text-text-primary group-hover:text-white transition-colors truncate">
-              {track.artist}
+              {track.title}
             </div>
             <div className="font-body text-text-secondary text-sm truncate mt-0.5">
-              {track.title}
+              {track.artist}
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {track.bpm && <Tag>{track.bpm} BPM</Tag>}
@@ -88,8 +88,8 @@ function QueryCard({ track }) {
       <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
         Query Track
       </div>
-      <div className="font-headline font-bold text-2xl text-text-primary">{track.artist}</div>
-      <div className="font-body text-text-secondary mt-1">{track.title}</div>
+      <div className="font-headline font-bold text-2xl text-text-primary">{track.title}</div>
+      <div className="font-body text-text-secondary mt-1">{track.artist}</div>
       <div className="flex flex-wrap gap-2 mt-3">
         {track.bpm && <Tag>{track.bpm} BPM</Tag>}
         {track.camelot && <Tag>{track.camelot}</Tag>}
