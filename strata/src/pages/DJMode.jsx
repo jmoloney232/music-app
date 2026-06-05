@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CAMELOT_TO_KEY, formatKey } from '../utils/camelot'
+import SpotifyButton from '../components/SpotifyButton'
 
 const API = '/api'
 
@@ -153,9 +154,12 @@ function TrackRow({ track, rank, onClick }) {
         </div>
         <div className="font-body text-xs text-text-secondary truncate mt-0.5">{track.artist}</div>
       </div>
-      <div className="flex gap-1.5 flex-shrink-0">
-        {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-        {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex gap-1.5">
+          {track.bpm && <Tag>{track.bpm} BPM</Tag>}
+          {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
+        </div>
+        <SpotifyButton artist={track.artist} title={track.title} />
       </div>
     </button>
   )

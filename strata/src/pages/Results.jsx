@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { formatKey, compatibleKeys } from '../utils/camelot'
+import SpotifyButton from '../components/SpotifyButton'
 
 const API = '/api'
 
@@ -72,7 +73,8 @@ function TrackCard({ track, rank, onClick }) {
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 pt-1">
+        <div className="flex-shrink-0 pt-1 flex items-center gap-2">
+          <SpotifyButton artist={track.artist} title={track.title} />
           <ScoreBar score={track.score} />
         </div>
       </div>
@@ -83,8 +85,11 @@ function TrackCard({ track, rank, onClick }) {
 function QueryCard({ track }) {
   return (
     <div className="bg-surface border border-purple-primary rounded-lg px-6 py-5 mb-8">
-      <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
-        Query Track
+      <div className="flex items-start justify-between gap-4">
+        <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
+          Query Track
+        </div>
+        <SpotifyButton artist={track.artist} title={track.title} />
       </div>
       <div className="font-headline font-bold text-2xl text-text-primary">{track.title}</div>
       <div className="font-body text-text-secondary mt-1">{track.artist}</div>
