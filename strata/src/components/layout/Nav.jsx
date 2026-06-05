@@ -8,9 +8,9 @@ export default function Nav() {
         JACK'S SIMILAR SONG SEARCH
       </Link>
       <div className="flex items-center gap-6">
-        <a href="#" className="text-text-secondary hover:text-text-primary text-sm font-body transition-colors">
+        <Link to="/explore" className="text-text-secondary hover:text-text-primary text-sm font-body transition-colors">
           Explore
-        </a>
+        </Link>
         <a href="#" className="text-text-secondary hover:text-text-primary text-sm font-body transition-colors">
           Collections
         </a>

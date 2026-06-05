@@ -8,6 +8,7 @@ Endpoints:
 """
 from __future__ import annotations
 
+import json
 import os
 import statistics
 from pathlib import Path
@@ -80,6 +81,96 @@ def _list_tracks() -> list[dict]:
     return [{"id": int(r[0]), "artist": str(r[1]), "title": str(r[2])} for r in rows]
 
 
+def _explore_styles() -> list[dict]:
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT style_tag, COUNT(*) AS cnt
+            FROM tracks t
+            JOIN embeddings e ON e.track_id = t.id,
+            LATERAL jsonb_array_elements_text(e.top_styles) AS style_tag
+            WHERE t.status = 'indexed' AND e.top_styles IS NOT NULL
+            GROUP BY style_tag
+            ORDER BY cnt DESC
+            LIMIT 40
+            """
+        )
+        rows = cur.fetchall()
+    conn.close()
+    return [{"style": str(r[0]), "count": int(r[1])} for r in rows]
+
+
+def _explore_tracks(
+    style: str | None,
+    bpm_min: float | None,
+    bpm_max: float | None,
+    camelot_filter: str | None,
+    vocal: str | None,
+    limit: int,
+    offset: int,
+) -> dict:
+    conn = get_connection()
+    conditions: list[str] = ["t.status = 'indexed'"]
+    params: list[Any] = []
+
+    if style:
+        conditions.append("e.top_styles @> %s::jsonb")
+        params.append(json.dumps([style]))
+    if bpm_min is not None:
+        conditions.append("e.bpm >= %s")
+        params.append(bpm_min)
+    if bpm_max is not None:
+        conditions.append("e.bpm <= %s")
+        params.append(bpm_max)
+    if camelot_filter:
+        conditions.append("e.camelot = %s")
+        params.append(camelot_filter)
+    if vocal == "instrumental":
+        conditions.append("e.vocal_dominance < 0.10")
+    elif vocal == "ambiguous":
+        conditions.append("e.vocal_dominance >= 0.10 AND e.vocal_dominance <= 0.20")
+    elif vocal == "vocal":
+        conditions.append("e.vocal_dominance > 0.20")
+
+    where = " AND ".join(conditions)
+
+    with conn.cursor() as cur:
+        cur.execute(
+            f"SELECT COUNT(*) FROM tracks t JOIN embeddings e ON e.track_id = t.id WHERE {where}",
+            params,
+        )
+        total = int(cur.fetchone()[0])
+
+        cur.execute(
+            f"""
+            SELECT t.id, t.artist, t.title, e.bpm, e.camelot, e.vocal_dominance, e.top_styles
+            FROM tracks t JOIN embeddings e ON e.track_id = t.id
+            WHERE {where}
+            ORDER BY t.artist, t.title
+            LIMIT %s OFFSET %s
+            """,
+            params + [limit, offset],
+        )
+        rows = cur.fetchall()
+    conn.close()
+
+    tracks = []
+    for r in rows:
+        tid, artist, title, bpm, cam, vd, styles = r
+        tracks.append({
+            "id": int(tid),
+            "artist": str(artist),
+            "title": str(title),
+            "bpm": round(float(bpm), 1) if bpm is not None else None,
+            "camelot": str(cam) if cam is not None else None,
+            "vocal_class": vocal_class(float(vd)) if vd is not None else None,
+            "styles": list(styles) if styles else [],
+        })
+
+    return {"tracks": tracks, "total": total}
+
+
 def _tracks_by_key(
     camelot: str,
     bpm_min: float | None,
@@ -146,6 +237,24 @@ def search(q: str = Query(..., min_length=1)) -> list[dict]:
 @app.get("/tracks")
 def list_tracks() -> list[dict]:
     return _list_tracks()
+
+
+@app.get("/explore/styles")
+def explore_styles() -> list[dict]:
+    return _explore_styles()
+
+
+@app.get("/explore/tracks")
+def explore_tracks(
+    style: str | None = Query(default=None),
+    bpm_min: float | None = Query(default=None, ge=0),
+    bpm_max: float | None = Query(default=None, ge=0),
+    camelot: str | None = Query(default=None),
+    vocal: str | None = Query(default=None),
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+) -> dict:
+    return _explore_tracks(style, bpm_min, bpm_max, camelot, vocal, limit, offset)
 
 
 @app.get("/tracks/by-key")

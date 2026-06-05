@@ -4,6 +4,7 @@ import Footer from './components/layout/Footer'
 import Home from './pages/Home'
 import Results from './pages/Results'
 import DJMode from './pages/DJMode'
+import Explore from './pages/Explore'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/results" element={<Results />} />
           <Route path="/dj" element={<DJMode />} />
+          <Route path="/explore" element={<Explore />} />
         </Routes>
       </main>
       <Footer />
