@@ -59,21 +59,21 @@ function TrackRow({ track, rank, onClick }) {
   )
 }
 
-function buildParams(selectedStyle, fetchBpm, camelot, vocalType, offset) {
+function buildParams(selectedCluster, fetchBpm, camelot, vocalType, offset) {
   const p = new URLSearchParams({ limit: PAGE_SIZE, offset })
-  if (selectedStyle)      p.set('style', selectedStyle)
-  if (fetchBpm.enabled)   { p.set('bpm_min', fetchBpm.min); p.set('bpm_max', fetchBpm.max) }
-  if (camelot)            p.set('camelot', camelot)
-  if (vocalType)          p.set('vocal', vocalType)
+  if (selectedCluster !== null) p.set('cluster_id', selectedCluster)
+  if (fetchBpm.enabled)         { p.set('bpm_min', fetchBpm.min); p.set('bpm_max', fetchBpm.max) }
+  if (camelot)                  p.set('camelot', camelot)
+  if (vocalType)                p.set('vocal', vocalType)
   return p.toString()
 }
 
 export default function Explore() {
   const navigate = useNavigate()
 
-  // Style chips
-  const [styles, setStyles] = useState([])
-  const [selectedStyle, setSelectedStyle] = useState(null)
+  // Cluster chips
+  const [clusters, setClusters] = useState([])
+  const [selectedCluster, setSelectedCluster] = useState(null)
 
   // Filters
   const [bpmEnabled, setBpmEnabled] = useState(false)
@@ -107,11 +107,11 @@ export default function Explore() {
     return () => clearTimeout(slowTimer.current)
   }, [loading])
 
-  // Load style chips once
+  // Load cluster chips once
   useEffect(() => {
-    fetch(`${API}/explore/styles`)
+    fetch(`${API}/explore/clusters`)
       .then(r => r.json())
-      .then(setStyles)
+      .then(setClusters)
       .catch(() => {})
   }, [])
 
@@ -120,16 +120,16 @@ export default function Explore() {
     setTracks([])
     setTotal(0)
     setLoading(true)
-    fetch(`${API}/explore/tracks?${buildParams(selectedStyle, fetchBpm, camelot, vocalType, 0)}`)
+    fetch(`${API}/explore/tracks?${buildParams(selectedCluster, fetchBpm, camelot, vocalType, 0)}`)
       .then(r => r.json())
       .then(d => { setTracks(d.tracks); setTotal(d.total) })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [selectedStyle, fetchBpm, camelot, vocalType])
+  }, [selectedCluster, fetchBpm, camelot, vocalType])
 
   const handleShowMore = () => {
     setLoadingMore(true)
-    fetch(`${API}/explore/tracks?${buildParams(selectedStyle, fetchBpm, camelot, vocalType, tracks.length)}`)
+    fetch(`${API}/explore/tracks?${buildParams(selectedCluster, fetchBpm, camelot, vocalType, tracks.length)}`)
       .then(r => r.json())
       .then(d => { setTracks(prev => [...prev, ...d.tracks]); setTotal(d.total) })
       .catch(() => {})
@@ -137,7 +137,7 @@ export default function Explore() {
   }
 
   const clearFilters = () => {
-    setSelectedStyle(null)
+    setSelectedCluster(null)
     setBpmEnabled(false)
     setBpmMin(60)
     setBpmMax(220)
@@ -145,7 +145,7 @@ export default function Explore() {
     setVocalType('')
   }
 
-  const hasFilters = selectedStyle || bpmEnabled || camelot || vocalType
+  const hasFilters = selectedCluster !== null || bpmEnabled || camelot || vocalType
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-background px-6 py-10">
@@ -161,24 +161,27 @@ export default function Explore() {
           </p>
         </div>
 
-        {/* Style chips */}
-        {styles.length > 0 && (
+        {/* Sound clusters */}
+        {clusters.length > 0 && (
           <div className="mb-8">
             <div className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-3">
-              Genres &amp; Styles
+              Sound Clusters
             </div>
+            <p className="text-xs font-body text-text-secondary mb-3 opacity-70">
+              Grouped by audio similarity — tracks in each cluster genuinely sound alike.
+            </p>
             <div className="flex flex-wrap gap-2">
-              {styles.map(({ style, count }) => (
+              {clusters.map(({ id, name, count }) => (
                 <button
-                  key={style}
-                  onClick={() => setSelectedStyle(selectedStyle === style ? null : style)}
+                  key={id}
+                  onClick={() => setSelectedCluster(selectedCluster === id ? null : id)}
                   className={`text-sm px-3 py-1.5 rounded-full border font-body transition-colors ${
-                    selectedStyle === style
+                    selectedCluster === id
                       ? 'bg-purple-primary border-purple-primary text-white'
                       : 'border-border text-text-secondary hover:border-purple-primary hover:text-text-primary'
                   }`}
                 >
-                  {style}
+                  {name}
                   <span className="ml-1.5 font-mono text-xs opacity-60">{count}</span>
                 </button>
               ))}

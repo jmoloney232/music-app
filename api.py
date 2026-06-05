@@ -101,8 +101,17 @@ def _explore_styles() -> list[dict]:
     return [{"style": str(r[0]), "count": int(r[1])} for r in rows]
 
 
+def _explore_clusters() -> list[dict]:
+    conn = get_connection()
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, name, track_count FROM clusters ORDER BY track_count DESC")
+        rows = cur.fetchall()
+    conn.close()
+    return [{"id": int(r[0]), "name": str(r[1]), "count": int(r[2])} for r in rows]
+
+
 def _explore_tracks(
-    style: str | None,
+    cluster_id: int | None,
     bpm_min: float | None,
     bpm_max: float | None,
     camelot_filter: str | None,
@@ -114,9 +123,9 @@ def _explore_tracks(
     conditions: list[str] = ["t.status = 'indexed'"]
     params: list[Any] = []
 
-    if style:
-        conditions.append("e.top_styles @> %s::jsonb")
-        params.append(json.dumps([style]))
+    if cluster_id is not None:
+        conditions.append("e.cluster_id = %s")
+        params.append(cluster_id)
     if bpm_min is not None:
         conditions.append("e.bpm >= %s")
         params.append(bpm_min)
@@ -244,9 +253,14 @@ def explore_styles() -> list[dict]:
     return _explore_styles()
 
 
+@app.get("/explore/clusters")
+def explore_clusters() -> list[dict]:
+    return _explore_clusters()
+
+
 @app.get("/explore/tracks")
 def explore_tracks(
-    style: str | None = Query(default=None),
+    cluster_id: int | None = Query(default=None),
     bpm_min: float | None = Query(default=None, ge=0),
     bpm_max: float | None = Query(default=None, ge=0),
     camelot: str | None = Query(default=None),
@@ -254,7 +268,7 @@ def explore_tracks(
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
 ) -> dict:
-    return _explore_tracks(style, bpm_min, bpm_max, camelot, vocal, limit, offset)
+    return _explore_tracks(cluster_id, bpm_min, bpm_max, camelot, vocal, limit, offset)
 
 
 @app.get("/tracks/by-key")
