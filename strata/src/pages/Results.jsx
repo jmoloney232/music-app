@@ -129,6 +129,7 @@ export default function Results() {
   const [error, setError] = useState(null)
   const [keyFilter, setKeyFilter] = useState('all')
   const [bpmFilter, setBpmFilter] = useState(false)
+  const [displayLimit, setDisplayLimit] = useState(15)
 
   useEffect(() => {
     if (!trackId) {
@@ -140,6 +141,7 @@ export default function Results() {
     setError(null)
     setKeyFilter('all')
     setBpmFilter(false)
+    setDisplayLimit(15)
     fetch(`${API}/similar/${trackId}?top=100`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -167,11 +169,11 @@ export default function Results() {
       results = results.filter(t => t.bpm != null && t.bpm >= lo && t.bpm <= hi)
     }
 
-    // Cap at 15 when no filter is active so the default view stays concise
-    if (keyFilter === 'all' && !bpmFilter) return results.slice(0, 15)
+    // Cap at displayLimit when no filter is active so the default view stays concise
+    if (keyFilter === 'all' && !bpmFilter) return results.slice(0, displayLimit)
 
     return results
-  }, [data, keyFilter, bpmFilter])
+  }, [data, keyFilter, bpmFilter, displayLimit])
 
   if (loading) {
     return (
@@ -270,6 +272,17 @@ export default function Results() {
           ))
         )}
       </div>
+
+      {/* Show more — only when unfiltered and there are more results to show */}
+      {keyFilter === 'all' && !bpmFilter && data && displayLimit < data.results.length && (
+        <button
+          onClick={() => setDisplayLimit(n => n + 15)}
+          className="w-full mt-4 py-3 border border-border rounded-lg text-text-secondary
+                     hover:border-purple-primary hover:text-text-primary font-body text-sm transition-colors"
+        >
+          Show more ({data.results.length - displayLimit} remaining)
+        </button>
+      )}
     </div>
   )
 }
