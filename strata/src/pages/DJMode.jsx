@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CAMELOT_TO_KEY, formatKey } from '../utils/camelot'
 
@@ -169,6 +169,18 @@ export default function DJMode() {
   const [bpmEnabled, setBpmEnabled] = useState(false)
   const [tracks, setTracks] = useState([])
   const [loading, setLoading] = useState(false)
+  const [slowLoad, setSlowLoad] = useState(false)
+  const slowTimer = useRef(null)
+
+  useEffect(() => {
+    if (loading) {
+      slowTimer.current = setTimeout(() => setSlowLoad(true), 4000)
+    } else {
+      clearTimeout(slowTimer.current)
+      setSlowLoad(false)
+    }
+    return () => clearTimeout(slowTimer.current)
+  }, [loading])
 
   // Debounce BPM slider changes so we don't fire on every tick
   const [fetchParams, setFetchParams] = useState({ min: 80, max: 160, enabled: false })
@@ -275,8 +287,13 @@ export default function DJMode() {
                 ← Click a key on the wheel to see matching tracks
               </div>
             ) : loading ? (
-              <div className="flex justify-center py-24">
+              <div className="flex flex-col items-center gap-3 py-24">
                 <div className="w-6 h-6 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
+                {slowLoad && (
+                  <p className="text-text-secondary font-body text-sm animate-pulse">
+                    Waking up the server — first load can take up to 30s…
+                  </p>
+                )}
               </div>
             ) : tracks.length === 0 ? (
               <div className="text-center py-24 text-text-secondary font-body text-sm">
