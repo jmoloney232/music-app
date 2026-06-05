@@ -87,7 +87,7 @@ def fetch_candidates_by_vector(
 ) -> list[tuple[int, dict[str, Any]]]:
     conn = get_connection()
     with conn.cursor() as cur:
-        cur.execute("SET hnsw.ef_search = 100")
+        cur.execute(f"SET hnsw.ef_search = {max(int(limit), 200)}")
         cur.execute(
             """
             SELECT t.id, t.artist, t.title,

@@ -158,13 +158,13 @@ def tracks_by_key(
 
 
 @app.get("/similar/{track_id}")
-def get_similar(track_id: int, top: int = Query(default=15, ge=1, le=100)) -> dict:
+def get_similar(track_id: int, top: int = Query(default=15, ge=1, le=400)) -> dict:
     try:
         query = fetch_track_features(track_id)
     except Exception:
         raise HTTPException(status_code=404, detail=f"Track {track_id} not found or not indexed.")
 
-    candidates = fetch_candidates_by_vector(query["emb_full"], track_id, limit=100)
+    candidates = fetch_candidates_by_vector(query["emb_full"], track_id, limit=400)
     if not candidates:
         raise HTTPException(status_code=404, detail="No other indexed tracks to compare against.")
 

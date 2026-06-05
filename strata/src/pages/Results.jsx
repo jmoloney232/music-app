@@ -140,7 +140,7 @@ export default function Results() {
     setError(null)
     setKeyFilter('all')
     setBpmFilter(false)
-    fetch(`${API}/similar/${trackId}?top=15`)
+    fetch(`${API}/similar/${trackId}?top=100`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json()
@@ -166,6 +166,9 @@ export default function Results() {
       const hi = data.query.bpm * 1.06
       results = results.filter(t => t.bpm != null && t.bpm >= lo && t.bpm <= hi)
     }
+
+    // Cap at 15 when no filter is active so the default view stays concise
+    if (keyFilter === 'all' && !bpmFilter) return results.slice(0, 15)
 
     return results
   }, [data, keyFilter, bpmFilter])
