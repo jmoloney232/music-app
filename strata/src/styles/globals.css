@@ -36,3 +36,9 @@ body {
 
 .animate-fade-up { animation: fadeUp 0.35s ease-out both; }
 .animate-fade-in { animation: fadeIn 0.25s ease-out both; }
+
+.skeleton {
+  background: linear-gradient(90deg, #1E1E1E 25%, #2A2A2A 50%, #1E1E1E 75%);
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
