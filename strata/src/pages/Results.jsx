@@ -12,40 +12,60 @@ const VOCAL_LABEL = {
 }
 
 const VOCAL_COLOR = {
-  instrumental: 'text-sky-400',
-  vocal:        'text-pink-400',
-  ambiguous:    'text-yellow-400',
+  instrumental: 'text-sky-400 border-sky-400/30',
+  vocal:        'text-pink-400 border-pink-400/30',
+  ambiguous:    'text-yellow-400 border-yellow-400/30',
 }
 
 function ScoreBar({ score }) {
   const pct = Math.round(score * 100)
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    setWidth(0)
+    const t = setTimeout(() => setWidth(pct), 60)
+    return () => clearTimeout(t)
+  }, [pct])
+
+  // Color: purple → pink gradient, shifts warmer for higher scores
+  const barColor =
+    pct >= 80 ? 'linear-gradient(90deg,#7B2FBE,#ec4899)' :
+    pct >= 60 ? 'linear-gradient(90deg,#7B2FBE,#A855F7)' :
+                'linear-gradient(90deg,#4c1d95,#7B2FBE)'
+
   return (
     <div className="flex items-center gap-2 min-w-[96px]">
       <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full bg-purple-primary"
-          style={{ width: `${pct}%` }}
+          className="h-full rounded-full"
+          style={{
+            width: `${width}%`,
+            transition: 'width 0.55s cubic-bezier(0.4,0,0.2,1)',
+            background: barColor,
+          }}
         />
       </div>
-      <span className="font-mono text-xs text-purple-light w-10 text-right">{pct}%</span>
+      <span className="font-mono text-xs text-purple-light w-10 text-right tabular-nums">{pct}%</span>
     </div>
   )
 }
 
-function Tag({ children, color = 'text-text-secondary' }) {
+function Tag({ children, color = 'text-text-secondary border-border' }) {
   return (
-    <span className={`text-xs font-mono border border-border rounded px-1.5 py-0.5 ${color}`}>
+    <span className={`text-xs font-mono border rounded px-1.5 py-0.5 ${color}`}>
       {children}
     </span>
   )
 }
 
-function TrackCard({ track, rank, onClick }) {
+function TrackCard({ track, rank, index = 0, onClick }) {
   return (
     <button
       onClick={onClick}
       className="w-full text-left bg-surface border border-border rounded-lg px-5 py-4
-                 hover:border-purple-primary transition-colors group"
+                 hover:border-purple-primary hover:shadow-[0_0_0_1px_rgba(123,47,190,0.3),0_4px_24px_rgba(123,47,190,0.12)]
+                 transition-all duration-200 group animate-fade-up"
+      style={{ animationDelay: `${Math.min(index * 35, 350)}ms` }}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 min-w-0">
@@ -60,8 +80,12 @@ function TrackCard({ track, rank, onClick }) {
               {track.artist}
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-              {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
+              {track.bpm && (
+                <Tag color="text-sky-400 border-sky-400/30">{track.bpm} BPM</Tag>
+              )}
+              {track.camelot && (
+                <Tag color="text-emerald-400 border-emerald-400/30">{formatKey(track.camelot)}</Tag>
+              )}
               {track.vocal_class && (
                 <Tag color={VOCAL_COLOR[track.vocal_class]}>
                   {VOCAL_LABEL[track.vocal_class] ?? track.vocal_class}
@@ -84,26 +108,37 @@ function TrackCard({ track, rank, onClick }) {
 
 function QueryCard({ track }) {
   return (
-    <div className="bg-surface border border-purple-primary rounded-lg px-6 py-5 mb-8">
-      <div className="flex items-start justify-between gap-4">
-        <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
-          Query Track
+    <div className="relative bg-surface border border-purple-primary rounded-xl px-6 py-5 mb-8 overflow-hidden">
+      {/* Subtle purple tint in the background */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-20"
+        style={{ background: 'radial-gradient(ellipse at top left, rgba(123,47,190,0.6) 0%, transparent 60%)' }}
+      />
+      <div className="relative">
+        <div className="flex items-start justify-between gap-4">
+          <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
+            Query Track
+          </div>
+          <SpotifyButton artist={track.artist} title={track.title} />
         </div>
-        <SpotifyButton artist={track.artist} title={track.title} />
-      </div>
-      <div className="font-headline font-bold text-2xl text-text-primary">{track.title}</div>
-      <div className="font-body text-text-secondary mt-1">{track.artist}</div>
-      <div className="flex flex-wrap gap-2 mt-3">
-        {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-        {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
-        {track.vocal_class && (
-          <Tag color={VOCAL_COLOR[track.vocal_class]}>
-            {VOCAL_LABEL[track.vocal_class] ?? track.vocal_class}
-          </Tag>
-        )}
-        {(track.styles ?? []).slice(0, 3).map(s => (
-          <Tag key={s}>{s}</Tag>
-        ))}
+        <div className="font-headline font-bold text-2xl text-text-primary">{track.title}</div>
+        <div className="font-body text-text-secondary mt-1">{track.artist}</div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {track.bpm && (
+            <Tag color="text-sky-400 border-sky-400/30">{track.bpm} BPM</Tag>
+          )}
+          {track.camelot && (
+            <Tag color="text-emerald-400 border-emerald-400/30">{formatKey(track.camelot)}</Tag>
+          )}
+          {track.vocal_class && (
+            <Tag color={VOCAL_COLOR[track.vocal_class]}>
+              {VOCAL_LABEL[track.vocal_class] ?? track.vocal_class}
+            </Tag>
+          )}
+          {(track.styles ?? []).slice(0, 3).map(s => (
+            <Tag key={s}>{s}</Tag>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -113,10 +148,10 @@ function FilterPill({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`text-xs px-3 py-1 rounded font-mono transition-colors ${
+      className={`text-xs px-3 py-1 rounded font-mono transition-all duration-150 ${
         active
-          ? 'bg-purple-primary text-white'
-          : 'bg-surface border border-border text-text-secondary hover:text-text-primary'
+          ? 'bg-purple-primary text-white shadow-[0_0_12px_rgba(123,47,190,0.4)]'
+          : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:border-[#404040]'
       }`}
     >
       {children}
@@ -174,7 +209,6 @@ export default function Results() {
       results = results.filter(t => t.bpm != null && t.bpm >= lo && t.bpm <= hi)
     }
 
-    // Cap at displayLimit when no filter is active so the default view stays concise
     if (keyFilter === 'all' && !bpmFilter) return results.slice(0, displayLimit)
 
     return results
@@ -182,8 +216,12 @@ export default function Results() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-background">
-        <div className="w-8 h-8 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-background gap-4">
+        <div className="relative w-10 h-10">
+          <div className="absolute inset-0 border-2 border-purple-primary/20 rounded-full" />
+          <div className="absolute inset-0 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+        <p className="text-text-secondary font-body text-sm animate-pulse">Finding similar tracks…</p>
       </div>
     )
   }
@@ -209,9 +247,12 @@ export default function Results() {
       {/* Back link */}
       <button
         onClick={() => navigate('/')}
-        className="text-text-secondary hover:text-text-primary font-body text-sm mb-8 flex items-center gap-1.5 transition-colors"
+        className="text-text-secondary hover:text-text-primary font-body text-sm mb-8 flex items-center gap-1.5 transition-colors group"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="w-4 h-4 transition-transform duration-150 group-hover:-translate-x-0.5"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
         Back to search
@@ -272,18 +313,20 @@ export default function Results() {
               key={track.id}
               track={track}
               rank={i + 1}
+              index={i}
               onClick={() => navigate(`/results?id=${track.id}`)}
             />
           ))
         )}
       </div>
 
-      {/* Show more — only when unfiltered and there are more results to show */}
+      {/* Show more */}
       {keyFilter === 'all' && !bpmFilter && data && displayLimit < data.results.length && (
         <button
           onClick={() => setDisplayLimit(n => n + 15)}
           className="w-full mt-4 py-3 border border-border rounded-lg text-text-secondary
-                     hover:border-purple-primary hover:text-text-primary font-body text-sm transition-colors"
+                     hover:border-purple-primary hover:text-text-primary hover:shadow-[0_0_16px_rgba(123,47,190,0.1)]
+                     font-body text-sm transition-all duration-200"
         >
           Show more ({data.results.length - displayLimit} remaining)
         </button>
