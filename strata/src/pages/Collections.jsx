@@ -31,7 +31,7 @@ function PlaylistCard({ playlist, onClick, index = 0 }) {
       </div>
 
       {/* Info */}
-      <div className="px-5 pb-5 -mt-2">
+      <div className="px-5 pb-5 pt-3 bg-surface">
         <div className="font-headline font-bold text-lg text-text-primary group-hover:text-white transition-colors leading-tight mb-1.5">
           {playlist.name}
         </div>
