@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CAMELOT_TO_KEY, formatKey } from '../utils/camelot'
-import SpotifyButton from '../components/SpotifyButton'
+import { CAMELOT_TO_KEY } from '../utils/camelot'
+import TrackRow from '../components/TrackRow'
 
 const API = '/api'
 
@@ -28,6 +28,13 @@ function ringSegPath(innerR, outerR, startDeg, endDeg) {
     `L${x2i} ${y2i} ` +
     `A${innerR} ${innerR} 0 0 0 ${x1i} ${y1i}Z`
   )
+}
+
+function shortKey(camelot) {
+  const full = CAMELOT_TO_KEY[camelot]
+  if (!full) return ''
+  const [note, type] = full.split(' ')
+  return type === 'minor' ? `${note}m` : note
 }
 
 function segFill(pos, ring, active) {
@@ -57,14 +64,23 @@ function CamelotWheel({ selected, onSelect }) {
           strokeWidth="1.5"
         />
         <text
-          x={axL} y={ayL}
+          x={axL} y={ayL - 5}
           textAnchor="middle" dominantBaseline="central"
-          fontSize="9.5" fontFamily="JetBrains Mono, monospace"
+          fontSize="9" fontFamily="JetBrains Mono, monospace"
           fontWeight={aActive ? 'bold' : 'normal'}
           fill={aActive ? 'white' : 'rgba(255,255,255,0.72)'}
           style={{ pointerEvents: 'none', userSelect: 'none' }}
         >
           {aKey}
+        </text>
+        <text
+          x={axL} y={ayL + 7}
+          textAnchor="middle" dominantBaseline="central"
+          fontSize="7" fontFamily="JetBrains Mono, monospace"
+          fill={aActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)'}
+          style={{ pointerEvents: 'none', userSelect: 'none' }}
+        >
+          {shortKey(aKey)}
         </text>
       </g>
     )
@@ -82,14 +98,23 @@ function CamelotWheel({ selected, onSelect }) {
           strokeWidth="1.5"
         />
         <text
-          x={bxL} y={byL}
+          x={bxL} y={byL - 5}
           textAnchor="middle" dominantBaseline="central"
-          fontSize="9.5" fontFamily="JetBrains Mono, monospace"
+          fontSize="9" fontFamily="JetBrains Mono, monospace"
           fontWeight={bActive ? 'bold' : 'normal'}
           fill={bActive ? 'white' : 'rgba(255,255,255,0.72)'}
           style={{ pointerEvents: 'none', userSelect: 'none' }}
         >
           {bKey}
+        </text>
+        <text
+          x={bxL} y={byL + 7}
+          textAnchor="middle" dominantBaseline="central"
+          fontSize="7" fontFamily="JetBrains Mono, monospace"
+          fill={bActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)'}
+          style={{ pointerEvents: 'none', userSelect: 'none' }}
+        >
+          {shortKey(bKey)}
         </text>
       </g>
     )
@@ -132,38 +157,6 @@ function CamelotWheel({ selected, onSelect }) {
   )
 }
 
-function Tag({ children }) {
-  return (
-    <span className="text-xs font-mono border border-border rounded px-1.5 py-0.5 text-text-secondary whitespace-nowrap">
-      {children}
-    </span>
-  )
-}
-
-function TrackRow({ track, rank, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left bg-surface border border-border rounded-lg px-4 py-3
-                 hover:border-purple-primary transition-colors group flex items-center gap-3"
-    >
-      <span className="font-mono text-xs text-border w-5 text-right flex-shrink-0">{rank}</span>
-      <div className="flex-1 min-w-0">
-        <div className="font-body text-sm font-medium text-text-primary group-hover:text-white transition-colors truncate">
-          {track.title}
-        </div>
-        <div className="font-body text-xs text-text-secondary truncate mt-0.5">{track.artist}</div>
-      </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <div className="flex gap-1.5">
-          {track.bpm && <Tag>{track.bpm} BPM</Tag>}
-          {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
-        </div>
-        <SpotifyButton artist={track.artist} title={track.title} />
-      </div>
-    </button>
-  )
-}
 
 export default function DJMode() {
   const navigate = useNavigate()
@@ -236,11 +229,17 @@ export default function DJMode() {
         <div className="flex gap-10 items-start">
 
           {/* Left: Camelot wheel */}
-          <div className="flex-shrink-0 w-[380px]">
-            <CamelotWheel selected={selectedKey} onSelect={setSelectedKey} />
-            <div className="flex justify-center gap-6 mt-2">
-              <span className="text-xs font-mono text-text-secondary">Inner (A) = minor</span>
-              <span className="text-xs font-mono text-text-secondary">Outer (B) = major</span>
+          <div className="flex-shrink-0 w-[400px]">
+            <div className={`rounded-2xl p-2 transition-all duration-300 ${
+              selectedKey
+                ? 'border border-purple-primary/25 shadow-[0_0_40px_rgba(123,47,190,0.08)]'
+                : 'border border-transparent'
+            }`}>
+              <CamelotWheel selected={selectedKey} onSelect={setSelectedKey} />
+            </div>
+            <div className="flex justify-center gap-6 mt-3">
+              <span className="text-xs font-body text-text-secondary">Inner (A) = minor</span>
+              <span className="text-xs font-body text-text-secondary">Outer (B) = major</span>
             </div>
           </div>
 
@@ -250,7 +249,7 @@ export default function DJMode() {
             {/* BPM filter */}
             <div className="bg-surface border border-border rounded-lg px-5 py-4 mb-6">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-mono text-text-secondary uppercase tracking-widest">
+                <span className="text-xs font-body text-text-secondary uppercase tracking-widest">
                   BPM Range
                 </span>
                 <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -261,7 +260,7 @@ export default function DJMode() {
                     style={{ accentColor: '#7B2FBE' }}
                     className="w-3.5 h-3.5"
                   />
-                  <span className="text-xs font-mono text-text-secondary">Enable filter</span>
+                  <span className="text-xs font-body text-text-secondary">Enable filter</span>
                 </label>
               </div>
               <div className={`flex items-center gap-3 transition-opacity ${bpmEnabled ? 'opacity-100' : 'opacity-35 pointer-events-none'}`}>
@@ -287,8 +286,18 @@ export default function DJMode() {
 
             {/* Track list */}
             {!selectedKey ? (
-              <div className="text-center py-24 text-text-secondary font-body text-sm">
-                ← Click a key on the wheel to see matching tracks
+              <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+                <div className="w-14 h-14 rounded-full border border-border flex items-center justify-center">
+                  <svg className="w-6 h-6 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-text-primary font-body text-sm font-medium mb-1">Select a key</p>
+                  <p className="text-text-secondary font-body text-xs leading-relaxed max-w-[220px]">
+                    Click any segment on the wheel to browse your catalog by harmonic key
+                  </p>
+                </div>
               </div>
             ) : loading ? (
               <div className="flex flex-col items-center gap-3 py-24">

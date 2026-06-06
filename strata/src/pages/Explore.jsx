@@ -1,67 +1,36 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CAMELOT_TO_KEY, formatKey } from '../utils/camelot'
-import SpotifyButton from '../components/SpotifyButton'
+import { CAMELOT_TO_KEY } from '../utils/camelot'
+import TrackRow from '../components/TrackRow'
+
+function SkeletonRow({ delay = 0 }) {
+  return (
+    <div
+      className="bg-surface border border-border rounded-lg px-4 py-3 flex items-center gap-3"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="w-6 h-3 skeleton rounded flex-shrink-0" />
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="h-3 skeleton rounded w-2/5" />
+        <div className="h-2.5 skeleton rounded w-1/4" />
+      </div>
+      <div className="flex gap-1.5 flex-shrink-0">
+        <div className="h-5 w-16 skeleton rounded" />
+        <div className="h-5 w-20 skeleton rounded" />
+        <div className="h-5 w-4 skeleton rounded" />
+      </div>
+    </div>
+  )
+}
 
 const API = '/api'
 const PAGE_SIZE = 50
-
-const VOCAL_LABEL = {
-  instrumental: 'Instrumental',
-  vocal:        'Vocal',
-  ambiguous:    'Mixed',
-}
-
-const VOCAL_COLOR = {
-  instrumental: 'text-sky-400',
-  vocal:        'text-pink-400',
-  ambiguous:    'text-yellow-400',
-}
 
 // 1A, 1B, 2A, 2B, ..., 12A, 12B
 const KEY_OPTIONS = Object.entries(CAMELOT_TO_KEY).sort(([a], [b]) => {
   const na = parseInt(a), nb = parseInt(b)
   return na !== nb ? na - nb : a.slice(-1).localeCompare(b.slice(-1))
 })
-
-function Tag({ children, color = 'text-text-secondary' }) {
-  return (
-    <span className={`text-xs font-mono border border-border rounded px-1.5 py-0.5 whitespace-nowrap ${color}`}>
-      {children}
-    </span>
-  )
-}
-
-function TrackRow({ track, rank, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left bg-surface border border-border rounded-lg px-4 py-3
-                 hover:border-purple-primary transition-colors group flex items-center gap-3"
-    >
-      <span className="font-mono text-xs text-border w-6 text-right flex-shrink-0">{rank}</span>
-      <div className="flex-1 min-w-0">
-        <div className="font-body text-sm font-medium text-text-primary group-hover:text-white transition-colors truncate">
-          {track.title}
-        </div>
-        <div className="font-body text-xs text-text-secondary truncate mt-0.5">{track.artist}</div>
-      </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <div className="flex gap-1.5 flex-wrap justify-end max-w-[260px]">
-          {track.bpm    && <Tag>{track.bpm} BPM</Tag>}
-          {track.camelot && <Tag>{formatKey(track.camelot)}</Tag>}
-          {track.vocal_class && (
-            <Tag color={VOCAL_COLOR[track.vocal_class]}>
-              {VOCAL_LABEL[track.vocal_class]}
-            </Tag>
-          )}
-          {(track.styles ?? []).slice(0, 2).map(s => <Tag key={s}>{s}</Tag>)}
-        </div>
-        <SpotifyButton artist={track.artist} title={track.title} />
-      </div>
-    </button>
-  )
-}
 
 function buildParams(selectedCluster, fetchBpm, camelot, vocalType, offset) {
   const p = new URLSearchParams({ limit: PAGE_SIZE, offset })
@@ -168,7 +137,7 @@ export default function Explore() {
         {/* Sound clusters */}
         {clusters.length > 0 && (
           <div className="mb-8">
-            <div className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-3">
+            <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-3">
               Sound Clusters
             </div>
             <p className="text-xs font-body text-text-secondary mb-3 opacity-70">
@@ -200,7 +169,7 @@ export default function Explore() {
             {/* BPM */}
             <div className="flex-1 min-w-[200px]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-text-secondary uppercase tracking-widest">BPM</span>
+                <span className="text-xs font-body text-text-secondary uppercase tracking-widest">BPM</span>
                 <label className="flex items-center gap-1.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -209,7 +178,7 @@ export default function Explore() {
                     style={{ accentColor: '#7B2FBE' }}
                     className="w-3 h-3"
                   />
-                  <span className="text-xs font-mono text-text-secondary">Enable</span>
+                  <span className="text-xs font-body text-text-secondary">Enable</span>
                 </label>
               </div>
               <div className={`flex items-center gap-2 transition-opacity ${bpmEnabled ? 'opacity-100' : 'opacity-35 pointer-events-none'}`}>
@@ -231,7 +200,7 @@ export default function Explore() {
 
             {/* Key */}
             <div>
-              <div className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-2">Key</div>
+              <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-2">Key</div>
               <select
                 value={camelot}
                 onChange={e => setCamelot(e.target.value)}
@@ -247,13 +216,13 @@ export default function Explore() {
 
             {/* Vocal type */}
             <div>
-              <div className="text-xs font-mono text-text-secondary uppercase tracking-widest mb-2">Type</div>
+              <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-2">Type</div>
               <div className="flex gap-1">
                 {[['', 'All'], ['vocal', 'Vocal'], ['instrumental', 'Instrumental'], ['ambiguous', 'Mixed']].map(([val, label]) => (
                   <button
                     key={val}
                     onClick={() => setVocalType(val)}
-                    className={`text-xs px-3 py-1 rounded font-mono transition-colors ${
+                    className={`text-xs px-3 py-1 rounded font-body transition-colors ${
                       vocalType === val
                         ? 'bg-purple-primary text-white'
                         : 'border border-border text-text-secondary hover:text-text-primary'
@@ -275,7 +244,7 @@ export default function Explore() {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs font-mono text-text-secondary hover:text-purple-light transition-colors"
+              className="text-xs font-body text-text-secondary hover:text-purple-light transition-colors"
             >
               Clear all filters
             </button>
@@ -284,10 +253,12 @@ export default function Explore() {
 
         {/* Track list */}
         {loading ? (
-          <div className="flex flex-col items-center gap-3 py-20">
-            <div className="w-6 h-6 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <SkeletonRow key={i} delay={i * 35} />
+            ))}
             {slowLoad && (
-              <p className="text-text-secondary font-body text-sm animate-pulse">
+              <p className="text-center text-text-secondary font-body text-sm mt-4 animate-pulse">
                 Waking up the server — first load can take up to 30s…
               </p>
             )}
@@ -305,6 +276,7 @@ export default function Explore() {
                   track={track}
                   rank={i + 1}
                   onClick={() => navigate(`/results?id=${track.id}`)}
+                  showStyles
                 />
               ))}
             </div>

@@ -2,6 +2,12 @@ import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { formatKey, compatibleKeys } from '../utils/camelot'
 import SpotifyButton from '../components/SpotifyButton'
+import Tag from '../components/Tag'
+
+function cleanStyle(s) {
+  const parts = s.split('---')
+  return parts[parts.length - 1].trim()
+}
 
 const API = '/api'
 
@@ -27,11 +33,15 @@ function ScoreBar({ score }) {
     return () => clearTimeout(t)
   }, [pct])
 
-  // Color: purple → pink gradient, shifts warmer for higher scores
   const barColor =
-    pct >= 80 ? 'linear-gradient(90deg,#7B2FBE,#ec4899)' :
-    pct >= 60 ? 'linear-gradient(90deg,#7B2FBE,#A855F7)' :
-                'linear-gradient(90deg,#4c1d95,#7B2FBE)'
+    pct >= 80 ? 'linear-gradient(90deg,#16a34a,#22c55e)' :
+    pct >= 60 ? 'linear-gradient(90deg,#d97706,#f59e0b)' :
+                'linear-gradient(90deg,#404040,#606060)'
+
+  const pctColor =
+    pct >= 80 ? 'text-success' :
+    pct >= 60 ? 'text-warning' :
+                'text-text-subtle'
 
   return (
     <div className="flex items-center gap-2 min-w-[96px]">
@@ -45,18 +55,11 @@ function ScoreBar({ score }) {
           }}
         />
       </div>
-      <span className="font-mono text-xs text-purple-light w-10 text-right tabular-nums">{pct}%</span>
+      <span className={`font-mono text-xs w-10 text-right tabular-nums ${pctColor}`}>{pct}%</span>
     </div>
   )
 }
 
-function Tag({ children, color = 'text-text-secondary border-border' }) {
-  return (
-    <span className={`text-xs font-mono border rounded px-1.5 py-0.5 ${color}`}>
-      {children}
-    </span>
-  )
-}
 
 function TrackCard({ track, rank, index = 0, onClick }) {
   return (
@@ -92,7 +95,7 @@ function TrackCard({ track, rank, index = 0, onClick }) {
                 </Tag>
               )}
               {(track.styles ?? []).slice(0, 2).map(s => (
-                <Tag key={s}>{s}</Tag>
+                <Tag key={s}>{cleanStyle(s)}</Tag>
               ))}
             </div>
           </div>
@@ -116,7 +119,7 @@ function QueryCard({ track }) {
       />
       <div className="relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="text-xs font-mono text-purple-light uppercase tracking-widest mb-2">
+          <div className="text-xs font-body text-purple-light uppercase tracking-widest mb-2">
             Query Track
           </div>
           <SpotifyButton artist={track.artist} title={track.title} />
@@ -136,7 +139,7 @@ function QueryCard({ track }) {
             </Tag>
           )}
           {(track.styles ?? []).slice(0, 3).map(s => (
-            <Tag key={s}>{s}</Tag>
+            <Tag key={s}>{cleanStyle(s)}</Tag>
           ))}
         </div>
       </div>
@@ -148,7 +151,7 @@ function FilterPill({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`text-xs px-3 py-1 rounded font-mono transition-all duration-150 ${
+      className={`text-xs px-3 py-1 rounded font-body transition-all duration-150 ${
         active
           ? 'bg-purple-primary text-white shadow-[0_0_12px_rgba(123,47,190,0.4)]'
           : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:border-[#404040]'
@@ -271,7 +274,7 @@ export default function Results() {
 
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2 py-3 mb-5 border-t border-b border-border">
-        <span className="text-xs font-mono text-text-secondary uppercase tracking-widest mr-1">
+        <span className="text-xs font-body text-text-secondary uppercase tracking-widest mr-1">
           Filter
         </span>
         <FilterPill active={keyFilter === 'all'} onClick={() => setKeyFilter('all')}>
