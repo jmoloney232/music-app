@@ -23,9 +23,16 @@ export default function Nav() {
         >
           Explore
         </Link>
-        <a href="#" className="text-text-secondary hover:text-text-primary text-sm font-body transition-colors">
+        <Link
+          to="/collections"
+          className={`text-sm font-body transition-colors ${
+            pathname.startsWith('/collections')
+              ? 'text-purple-light'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
           Collections
-        </a>
+        </Link>
         <Link
           to="/dj"
           className={`px-4 py-2 rounded text-sm font-headline font-semibold transition-all duration-200 ${

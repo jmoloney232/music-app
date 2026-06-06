@@ -5,6 +5,8 @@ import Home from './pages/Home'
 import Results from './pages/Results'
 import DJMode from './pages/DJMode'
 import Explore from './pages/Explore'
+import Collections from './pages/Collections'
+import CollectionDetail from './pages/CollectionDetail'
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/dj" element={<DJMode />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/collections/:id" element={<CollectionDetail />} />
         </Routes>
       </main>
       <Footer />
