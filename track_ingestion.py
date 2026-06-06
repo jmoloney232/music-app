@@ -35,6 +35,7 @@ import librosa
 import numpy as np
 import requests
 from dotenv import load_dotenv
+from muq import MuQMuLan
 
 
 # ---------------------------------------------------------------------------
@@ -371,7 +372,6 @@ _muq_model_cache: dict[str, Any] = {}
 def get_muq_model(device: str) -> Any:
     if device not in _muq_model_cache:
         import torch
-        from muq import MuQMuLan
         log.info("loading MuQ-MuLan-large on %s", device)
         model = MuQMuLan.from_pretrained("OpenMuQ/MuQ-MuLan-large")
         # MPS can be unreliable for some ops; fall back to CPU
@@ -414,10 +414,13 @@ def get_muq_embedding(wav_44k: np.ndarray, variant: str, track_key: str) -> np.n
         return np.load(cache)
 
     device = torch_device()
+    log.info("muq %s: loading model on %s", variant, device)
     model, device = get_muq_model(device)
+    log.info("muq %s: model loaded, resampling audio", variant)
     wav_24k = librosa.resample(wav_44k, orig_sr=44_100, target_sr=24_000)
-    log.info("computing muq %s embedding: %s", variant, track_key)
+    log.info("muq %s: running inference (audio length %.1fs)", variant, len(wav_24k) / 24_000)
     emb = embed_muq(wav_24k, model, device)
+    log.info("muq %s: done", variant)
     np.save(cache, emb)
     return emb
 
@@ -1008,84 +1011,84 @@ def get_connection() -> Any:
 def save_track_features(features: dict[str, Any]) -> int:
     conn = get_connection()
     _t0 = time.perf_counter()
-    with conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO tracks (artist, title, status)
-                VALUES (%s, %s, 'indexed')
-                ON CONFLICT (artist, title) DO UPDATE
-                    SET status = EXCLUDED.status
-                RETURNING id
-                """,
-                (features["artist"], features["title"]),
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO tracks (artist, title, status)
+            VALUES (%s, %s, 'indexed')
+            ON CONFLICT (artist, title) DO UPDATE
+                SET status = EXCLUDED.status
+            RETURNING id
+            """,
+            (features["artist"], features["title"]),
+        )
+        track_id: int = cur.fetchone()[0]
+
+        mood_vals = [features.get(k) for k in _MOOD_KEYS]
+        mood = mood_vals if any(v is not None for v in mood_vals) else None
+
+        av_vals = [features.get("arousal"), features.get("valence")]
+        av = av_vals if any(v is not None for v in av_vals) else None
+
+        ds = features.get("discogs_styles_400")
+        ds_vec = np.array(ds, dtype=np.float32) if ds is not None else None
+
+        cur.execute(
+            """
+            INSERT INTO embeddings (
+                track_id, muq_full, muq_vocals, muq_backing,
+                muq_drums, muq_bass, muq_other,
+                vocal_dominance, bpm, key, camelot, danceability,
+                mood, arousal_valence, mfcc_mean,
+                discogs_styles, top_styles, computed_at
             )
-            track_id: int = cur.fetchone()[0]
-
-            mood_vals = [features.get(k) for k in _MOOD_KEYS]
-            mood = mood_vals if any(v is not None for v in mood_vals) else None
-
-            av_vals = [features.get("arousal"), features.get("valence")]
-            av = av_vals if any(v is not None for v in av_vals) else None
-
-            ds = features.get("discogs_styles_400")
-            ds_vec = np.array(ds, dtype=np.float32) if ds is not None else None
-
-            cur.execute(
-                """
-                INSERT INTO embeddings (
-                    track_id, muq_full, muq_vocals, muq_backing,
-                    muq_drums, muq_bass, muq_other,
-                    vocal_dominance, bpm, key, camelot, danceability,
-                    mood, arousal_valence, mfcc_mean,
-                    discogs_styles, top_styles, computed_at
-                )
-                VALUES (
-                    %s, %s, %s, %s,
-                    %s, %s, %s,
-                    %s, %s, %s, %s, %s,
-                    %s, %s, %s,
-                    %s, %s, NOW()
-                )
-                ON CONFLICT (track_id) DO UPDATE SET
-                    muq_full         = EXCLUDED.muq_full,
-                    muq_vocals       = EXCLUDED.muq_vocals,
-                    muq_backing      = EXCLUDED.muq_backing,
-                    muq_drums        = EXCLUDED.muq_drums,
-                    muq_bass         = EXCLUDED.muq_bass,
-                    muq_other        = EXCLUDED.muq_other,
-                    vocal_dominance  = EXCLUDED.vocal_dominance,
-                    bpm              = EXCLUDED.bpm,
-                    key              = EXCLUDED.key,
-                    camelot          = EXCLUDED.camelot,
-                    danceability     = EXCLUDED.danceability,
-                    mood             = EXCLUDED.mood,
-                    arousal_valence  = EXCLUDED.arousal_valence,
-                    mfcc_mean        = EXCLUDED.mfcc_mean,
-                    discogs_styles   = EXCLUDED.discogs_styles,
-                    top_styles       = EXCLUDED.top_styles,
-                    computed_at      = EXCLUDED.computed_at
-                """,
-                (
-                    track_id,
-                    features.get("emb_full"),
-                    features.get("emb_vocals"),
-                    features.get("emb_backing"),
-                    features.get("emb_drums"),
-                    features.get("emb_bass"),
-                    features.get("emb_other"),
-                    features.get("vocal_dominance"),
-                    features.get("bpm"),
-                    features.get("key"),
-                    features.get("camelot"),
-                    features.get("danceability"),
-                    mood,
-                    av,
-                    features.get("mfcc_mean"),
-                    ds_vec,
-                    json.dumps(features.get("discogs_top5")) if features.get("discogs_top5") else None,
-                ),
+            VALUES (
+                %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s, NOW()
             )
+            ON CONFLICT (track_id) DO UPDATE SET
+                muq_full         = EXCLUDED.muq_full,
+                muq_vocals       = EXCLUDED.muq_vocals,
+                muq_backing      = EXCLUDED.muq_backing,
+                muq_drums        = EXCLUDED.muq_drums,
+                muq_bass         = EXCLUDED.muq_bass,
+                muq_other        = EXCLUDED.muq_other,
+                vocal_dominance  = EXCLUDED.vocal_dominance,
+                bpm              = EXCLUDED.bpm,
+                key              = EXCLUDED.key,
+                camelot          = EXCLUDED.camelot,
+                danceability     = EXCLUDED.danceability,
+                mood             = EXCLUDED.mood,
+                arousal_valence  = EXCLUDED.arousal_valence,
+                mfcc_mean        = EXCLUDED.mfcc_mean,
+                discogs_styles   = EXCLUDED.discogs_styles,
+                top_styles       = EXCLUDED.top_styles,
+                computed_at      = EXCLUDED.computed_at
+            """,
+            (
+                track_id,
+                features.get("emb_full"),
+                features.get("emb_vocals"),
+                features.get("emb_backing"),
+                features.get("emb_drums"),
+                features.get("emb_bass"),
+                features.get("emb_other"),
+                features.get("vocal_dominance"),
+                features.get("bpm"),
+                features.get("key"),
+                features.get("camelot"),
+                features.get("danceability"),
+                mood,
+                av,
+                features.get("mfcc_mean"),
+                ds_vec,
+                json.dumps(features.get("discogs_top5")) if features.get("discogs_top5") else None,
+            ),
+        )
+    conn.commit()
     conn.close()
     print(f"[timing] db_save: {time.perf_counter() - _t0:.1f}s")
     return track_id

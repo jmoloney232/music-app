@@ -90,18 +90,18 @@ def _count_tracks_from(from_id: int) -> int:
 
 def _mark_status(track_id: int, status: str, error_msg: str | None = None) -> None:
     conn = get_connection()
-    with conn:
-        with conn.cursor() as cur:
-            if error_msg is not None:
-                cur.execute(
-                    "UPDATE tracks SET status=%s, error_msg=%s WHERE id=%s",
-                    (status, error_msg[:500], track_id),
-                )
-            else:
-                cur.execute(
-                    "UPDATE tracks SET status=%s WHERE id=%s",
-                    (status, track_id),
-                )
+    with conn.cursor() as cur:
+        if error_msg is not None:
+            cur.execute(
+                "UPDATE tracks SET status=%s, error_msg=%s WHERE id=%s",
+                (status, error_msg[:500], track_id),
+            )
+        else:
+            cur.execute(
+                "UPDATE tracks SET status=%s WHERE id=%s",
+                (status, track_id),
+            )
+    conn.commit()
     conn.close()
 
 
@@ -121,13 +121,13 @@ def _embedding_duplicate(track_id: int, emb_full: np.ndarray) -> bool:
 def _reset_stuck() -> int:
     """Reset all status='processing' rows back to 'pending'. Returns count reset."""
     conn = get_connection()
-    with conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE tracks SET status='pending', error_msg=NULL "
-                "WHERE status='processing' RETURNING id"
-            )
-            count = len(cur.fetchall())
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE tracks SET status='pending', error_msg=NULL "
+            "WHERE status='processing' RETURNING id"
+        )
+        count = len(cur.fetchall())
+    conn.commit()
     conn.close()
     return count
 
@@ -280,7 +280,14 @@ def main() -> None:
         _run_dry(tracks)
         return
 
-    print()
+    # Pre-warm the MuQ model before processing starts so the first track
+    # doesn't pay the 20-30s model load cost silently.
+    print("Loading MuQ model into memory...", flush=True)
+    t0 = time.time()
+    from track_ingestion import get_muq_model, torch_device
+    get_muq_model(torch_device())
+    print(f"MuQ model ready ({time.time() - t0:.0f}s)\n")
+
     _run_ingestion(tracks)
 
 
