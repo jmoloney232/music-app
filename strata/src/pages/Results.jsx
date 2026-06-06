@@ -45,7 +45,7 @@ function ScoreBar({ score }) {
 
   return (
     <div className="flex items-center gap-2 min-w-[96px]">
-      <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-border rounded-full overflow-hidden">
         <div
           className="h-full rounded-full"
           style={{
@@ -62,14 +62,21 @@ function ScoreBar({ score }) {
 
 
 function TrackCard({ track, rank, index = 0, onClick }) {
+  const pct = Math.round(track.score * 100)
+  const accent =
+    pct >= 80 ? 'bg-success' :
+    pct >= 60 ? 'bg-warning' :
+    'bg-border'
+
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-surface border border-border rounded-lg px-5 py-4
+      className="relative w-full text-left bg-surface border border-border rounded-lg px-5 py-4
                  hover:border-purple-primary hover:shadow-[0_0_0_1px_rgba(123,47,190,0.3),0_4px_24px_rgba(123,47,190,0.12)]
-                 transition-all duration-200 group animate-fade-up"
+                 transition-all duration-200 group animate-fade-up overflow-hidden"
       style={{ animationDelay: `${Math.min(index * 35, 350)}ms` }}
     >
+      <div className={`absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-full ${accent}`} />
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 min-w-0">
           <span className="font-mono text-xs text-border pt-1 w-5 flex-shrink-0 text-right">
@@ -111,21 +118,20 @@ function TrackCard({ track, rank, index = 0, onClick }) {
 
 function QueryCard({ track }) {
   return (
-    <div className="relative bg-surface border border-purple-primary rounded-xl px-6 py-5 mb-8 overflow-hidden">
-      {/* Subtle purple tint in the background */}
+    <div className="relative bg-surface border border-purple-primary/60 rounded-xl px-7 py-6 mb-8 overflow-hidden">
       <div
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{ background: 'radial-gradient(ellipse at top left, rgba(123,47,190,0.6) 0%, transparent 60%)' }}
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse at top left, rgba(123,47,190,0.25) 0%, transparent 65%)' }}
       />
       <div className="relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="text-xs font-body text-purple-light uppercase tracking-widest mb-2">
+          <div className="text-xs font-body text-purple-light uppercase tracking-widest mb-3">
             Query Track
           </div>
           <SpotifyButton artist={track.artist} title={track.title} />
         </div>
-        <div className="font-headline font-bold text-2xl text-text-primary">{track.title}</div>
-        <div className="font-body text-text-secondary mt-1">{track.artist}</div>
+        <div className="font-headline font-bold text-3xl text-text-primary leading-tight">{track.title}</div>
+        <div className="font-body text-text-secondary text-lg mt-1">{track.artist}</div>
         <div className="flex flex-wrap gap-2 mt-3">
           {track.bpm && (
             <Tag color="text-sky-400 border-sky-400/30">{track.bpm} BPM</Tag>

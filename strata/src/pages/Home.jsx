@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom'
 
 const API = '/api'
 
+// Update with real artists/titles from your catalog
+const EXAMPLE_SEARCHES = [
+  'Aphex Twin', 'Four Tet', 'Burial', 'Daft Punk', 'Boards of Canada', 'Jamie xx',
+]
+
 export default function Home() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
@@ -55,18 +60,21 @@ export default function Home() {
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="absolute left-1/2 top-[-80px] -translate-x-1/2 w-[700px] h-[500px] rounded-full opacity-30"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(123,47,190,0.5) 0%, rgba(123,47,190,0.15) 40%, transparent 70%)' }}
+          className="absolute left-1/2 top-[-140px] -translate-x-1/2 w-[1000px] h-[750px] rounded-full opacity-55"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(123,47,190,0.45) 0%, rgba(123,47,190,0.15) 45%, transparent 70%)' }}
         />
       </div>
 
       {/* Hero */}
-      <div className="relative text-center mb-12 max-w-2xl animate-fade-up">
-        <h1 className="font-headline font-bold text-5xl text-text-primary tracking-tight mb-4">
-          Find Your Next Record
+      <div className="relative text-center mb-10 max-w-3xl animate-fade-up">
+        <h1 className="font-headline font-bold text-7xl text-text-primary tracking-tight mb-5 leading-[1.05]">
+          Find Your{' '}
+          <span className="bg-gradient-to-r from-purple-light to-purple-primary bg-clip-text text-transparent">
+            Next Record
+          </span>
         </h1>
-        <p className="font-body text-text-secondary text-lg">
-          Search any track in the catalog. Pick one. See what sounds like it.
+        <p className="font-body text-text-secondary text-xl">
+          Search any track in the catalog and find sonically similar songs.
         </p>
       </div>
 
@@ -77,11 +85,11 @@ export default function Home() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search artist or title…"
-          className="w-full bg-surface border border-border rounded-xl px-5 py-4
-                     font-body text-text-primary placeholder-text-secondary text-base
+          className="w-full bg-surface border border-border rounded-2xl px-6 py-5
+                     font-body text-text-primary placeholder-text-secondary text-lg
                      focus:outline-none focus:border-purple-primary
                      transition-all duration-200
-                     focus:shadow-[0_0_0_3px_rgba(123,47,190,0.2),0_0_24px_rgba(123,47,190,0.1)]"
+                     focus:shadow-[0_0_0_3px_rgba(123,47,190,0.25)]"
           autoFocus
         />
         {loading && (
@@ -90,6 +98,25 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Example searches — shown before the user types */}
+      {!query && (
+        <div className="w-full max-w-2xl animate-fade-in" style={{ animationDelay: '160ms' }}>
+          <p className="text-sm font-body text-text-secondary mb-4 text-center">Try searching for</p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {EXAMPLE_SEARCHES.map(q => (
+              <button
+                key={q}
+                onClick={() => setQuery(q)}
+                className="text-sm font-body text-text-secondary border border-border rounded-full px-4 py-2
+                           hover:border-purple-primary hover:text-text-primary transition-colors"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cold-start notice */}
       {slowLoad && (
