@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CAMELOT_TO_KEY } from '../utils/camelot'
+import { CAMELOT_TO_KEY, formatKey, keyColor } from '../utils/camelot'
 import TrackRow from '../components/TrackRow'
 
 const API = '/api'
@@ -37,10 +37,54 @@ function shortKey(camelot) {
   return type === 'minor' ? `${note}m` : note
 }
 
-function segFill(pos, ring, active) {
-  const h = ((pos - 1) * 30) % 360
-  if (active) return `hsl(${h},82%,60%)`
-  return ring === 'B' ? `hsl(${h},60%,36%)` : `hsl(${h},54%,27%)`
+function Segment({ camelot, active, onSelect, innerR, outerR, startDeg, endDeg }) {
+  const [lx, ly] = polar((innerR + outerR) / 2, startDeg + 15)
+  const label = active ? '#FFFFFF' : '#1B1815'
+  const standard = CAMELOT_TO_KEY[camelot]
+
+  return (
+    <g
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
+      aria-label={`${camelot}, ${standard}`}
+      onClick={() => onSelect(active ? null : camelot)}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect(active ? null : camelot)
+        }
+      }}
+      style={{ cursor: 'pointer' }}
+    >
+      <path
+        d={ringSegPath(innerR + 1, outerR - 1, startDeg, endDeg)}
+        fill={keyColor(camelot, active ? 'selected' : undefined)}
+        stroke={active ? '#1B1815' : 'rgba(27,24,21,0.10)'}
+        strokeWidth={active ? 1.5 : 0.75}
+      />
+      <text
+        x={lx} y={ly - 5}
+        textAnchor="middle" dominantBaseline="central"
+        fontSize="9" fontFamily="'IBM Plex Mono', monospace"
+        fontWeight={active ? 600 : 500}
+        fill={label}
+        style={{ pointerEvents: 'none', userSelect: 'none' }}
+      >
+        {camelot}
+      </text>
+      <text
+        x={lx} y={ly + 7}
+        textAnchor="middle" dominantBaseline="central"
+        fontSize="7" fontFamily="'IBM Plex Mono', monospace"
+        fill={label}
+        opacity={active ? 0.9 : 0.7}
+        style={{ pointerEvents: 'none', userSelect: 'none' }}
+      >
+        {shortKey(camelot)}
+      </text>
+    </g>
+  )
 }
 
 function CamelotWheel({ selected, onSelect }) {
@@ -49,97 +93,40 @@ function CamelotWheel({ selected, onSelect }) {
   for (let pos = 1; pos <= 12; pos++) {
     const startDeg = (pos - 1) * 30
     const endDeg = pos * 30
-    const midDeg = startDeg + 15
 
-    // Inner A ring (minor)
-    const aKey = `${pos}A`
-    const aActive = selected === aKey
-    const [axL, ayL] = polar((A_INNER + A_OUTER) / 2, midDeg)
     segs.push(
-      <g key={aKey} onClick={() => onSelect(aActive ? null : aKey)} style={{ cursor: 'pointer' }}>
-        <path
-          d={ringSegPath(A_INNER + 1, A_OUTER - 1, startDeg, endDeg)}
-          fill={segFill(pos, 'A', aActive)}
-          stroke={aActive ? 'rgba(255,255,255,0.9)' : 'none'}
-          strokeWidth="1.5"
-        />
-        <text
-          x={axL} y={ayL - 5}
-          textAnchor="middle" dominantBaseline="central"
-          fontSize="9" fontFamily="JetBrains Mono, monospace"
-          fontWeight={aActive ? 'bold' : 'normal'}
-          fill={aActive ? 'white' : 'rgba(255,255,255,0.72)'}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {aKey}
-        </text>
-        <text
-          x={axL} y={ayL + 7}
-          textAnchor="middle" dominantBaseline="central"
-          fontSize="7" fontFamily="JetBrains Mono, monospace"
-          fill={aActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)'}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {shortKey(aKey)}
-        </text>
-      </g>
-    )
-
-    // Outer B ring (major)
-    const bKey = `${pos}B`
-    const bActive = selected === bKey
-    const [bxL, byL] = polar((B_INNER + B_OUTER) / 2, midDeg)
-    segs.push(
-      <g key={bKey} onClick={() => onSelect(bActive ? null : bKey)} style={{ cursor: 'pointer' }}>
-        <path
-          d={ringSegPath(B_INNER + 1, B_OUTER - 1, startDeg, endDeg)}
-          fill={segFill(pos, 'B', bActive)}
-          stroke={bActive ? 'rgba(255,255,255,0.9)' : 'none'}
-          strokeWidth="1.5"
-        />
-        <text
-          x={bxL} y={byL - 5}
-          textAnchor="middle" dominantBaseline="central"
-          fontSize="9" fontFamily="JetBrains Mono, monospace"
-          fontWeight={bActive ? 'bold' : 'normal'}
-          fill={bActive ? 'white' : 'rgba(255,255,255,0.72)'}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {bKey}
-        </text>
-        <text
-          x={bxL} y={byL + 7}
-          textAnchor="middle" dominantBaseline="central"
-          fontSize="7" fontFamily="JetBrains Mono, monospace"
-          fill={bActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)'}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {shortKey(bKey)}
-        </text>
-      </g>
+      <Segment
+        key={`${pos}A`} camelot={`${pos}A`} active={selected === `${pos}A`}
+        onSelect={onSelect} innerR={A_INNER} outerR={A_OUTER}
+        startDeg={startDeg} endDeg={endDeg}
+      />,
+      <Segment
+        key={`${pos}B`} camelot={`${pos}B`} active={selected === `${pos}B`}
+        onSelect={onSelect} innerR={B_INNER} outerR={B_OUTER}
+        startDeg={startDeg} endDeg={endDeg}
+      />,
     )
   }
 
   return (
-    <svg viewBox="0 0 400 400" className="w-full max-w-[380px]">
-      <circle cx={CX} cy={CY} r={B_OUTER + 10} fill="#141414" />
+    <svg viewBox="0 0 400 400" className="w-full" role="group" aria-label="Camelot wheel">
+      <circle cx={CX} cy={CY} r={B_OUTER + 10} fill="#FFFFFF" stroke="#E0CDB4" />
       {segs}
-      {/* Center hole */}
-      <circle cx={CX} cy={CY} r={A_INNER - 1} fill="#0A0A0A" />
+      <circle cx={CX} cy={CY} r={A_INNER - 1} fill="#FFFFFF" stroke="#E0CDB4" />
       {selected ? (
         <>
           <text
             x={CX} y={CY - 9}
             textAnchor="middle" dominantBaseline="central"
-            fontSize="20" fontWeight="bold"
-            fontFamily="JetBrains Mono, monospace" fill="white"
+            fontSize="20" fontWeight="600"
+            fontFamily="'IBM Plex Mono', monospace" fill="#1B1815"
           >
             {selected}
           </text>
           <text
             x={CX} y={CY + 13}
             textAnchor="middle" dominantBaseline="central"
-            fontSize="9" fontFamily="Inter, sans-serif" fill="#A0A0A0"
+            fontSize="9" fontFamily="'IBM Plex Sans', sans-serif" fill="#5C544B"
           >
             {CAMELOT_TO_KEY[selected]}
           </text>
@@ -148,7 +135,7 @@ function CamelotWheel({ selected, onSelect }) {
         <text
           x={CX} y={CY}
           textAnchor="middle" dominantBaseline="central"
-          fontSize="9" fontFamily="Inter, sans-serif" fill="#444"
+          fontSize="9" fontFamily="'IBM Plex Sans', sans-serif" fill="#695F55"
         >
           select a key
         </text>
@@ -156,7 +143,6 @@ function CamelotWheel({ selected, onSelect }) {
     </svg>
   )
 }
-
 
 export default function DJMode() {
   const navigate = useNavigate()
@@ -168,6 +154,7 @@ export default function DJMode() {
   const [loading, setLoading] = useState(false)
   const [slowLoad, setSlowLoad] = useState(false)
   const slowTimer = useRef(null)
+  const latestRequest = useRef(0)
 
   useEffect(() => {
     if (loading) {
@@ -191,150 +178,126 @@ export default function DJMode() {
 
   useEffect(() => {
     if (!selectedKey) { setTracks([]); return }
+    // The timer is debounced but the responses are not ordered — without this
+    // a slow early request can land after a newer one and show the wrong key.
+    const requestId = ++latestRequest.current
     setLoading(true)
     let url = `${API}/tracks/by-key?camelot=${selectedKey}`
     if (fetchParams.enabled) url += `&bpm_min=${fetchParams.min}&bpm_max=${fetchParams.max}`
     fetch(url)
       .then(r => r.json())
-      .then(setTracks)
-      .catch(() => setTracks([]))
-      .finally(() => setLoading(false))
+      .then(d => { if (requestId === latestRequest.current) setTracks(d) })
+      .catch(() => { if (requestId === latestRequest.current) setTracks([]) })
+      .finally(() => { if (requestId === latestRequest.current) setLoading(false) })
   }, [selectedKey, fetchParams])
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-background px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+    <div className="mx-auto max-w-dense px-s4 py-s5">
+      <div className="mb-s5 flex flex-wrap items-start justify-between gap-s3">
+        <div>
+          <h1 className="text-xl font-semibold text-ink">Browse by key</h1>
+          <p className="mt-1 text-sm text-ink-quiet">
+            Pick a key to see everything in your catalogue that sits in it.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/')}
+          className="rounded text-sm text-ink-quiet transition-colors hover:text-accent"
+        >
+          ← Back to search
+        </button>
+      </div>
 
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="font-headline font-bold text-3xl text-text-primary tracking-wide">
-              DJ MODE
-            </h1>
-            <p className="text-text-secondary font-body text-sm mt-1">
-              Click a key to browse your catalog by harmonic key
-            </p>
+      <div className="flex flex-col gap-s5 lg:flex-row lg:items-start lg:gap-s5">
+        <div className="mx-auto w-full max-w-[380px] flex-shrink-0 lg:mx-0 lg:w-[380px]">
+          <CamelotWheel selected={selectedKey} onSelect={setSelectedKey} />
+          <div className="mt-s3 flex justify-center gap-s4 text-xs text-ink-quiet">
+            <span>Inner ring = minor (A)</span>
+            <span>Outer ring = major (B)</span>
           </div>
-          <button
-            onClick={() => navigate('/')}
-            className="text-text-secondary hover:text-text-primary font-body text-sm flex items-center gap-1.5 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to search
-          </button>
         </div>
 
-        <div className="flex gap-10 items-start">
-
-          {/* Left: Camelot wheel */}
-          <div className="flex-shrink-0 w-[400px]">
-            <div className={`rounded-2xl p-2 transition-all duration-300 ${
-              selectedKey
-                ? 'border border-purple-primary/25 shadow-[0_0_40px_rgba(123,47,190,0.08)]'
-                : 'border border-transparent'
-            }`}>
-              <CamelotWheel selected={selectedKey} onSelect={setSelectedKey} />
+        <div className="min-w-0 flex-1">
+          <div className="mb-s4 border-y border-hairline bg-sunken px-s3 py-s3">
+            <div className="mb-s3 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-[0.16em] text-ink-quiet">BPM range</span>
+              <label className="flex cursor-pointer select-none items-center gap-s2">
+                <input
+                  type="checkbox"
+                  checked={bpmEnabled}
+                  onChange={e => setBpmEnabled(e.target.checked)}
+                  className="h-3.5 w-3.5"
+                />
+                <span className="text-xs text-ink-quiet">Enable filter</span>
+              </label>
             </div>
-            <div className="flex justify-center gap-6 mt-3">
-              <span className="text-xs font-body text-text-secondary">Inner (A) = minor</span>
-              <span className="text-xs font-body text-text-secondary">Outer (B) = major</span>
+            <div
+              className={`flex items-center gap-s3 transition-opacity ${
+                bpmEnabled ? 'opacity-100' : 'pointer-events-none opacity-40'
+              }`}
+            >
+              <span className="w-8 text-right font-mono text-sm tabular-nums text-ink">{bpmMin}</span>
+              <input
+                type="range" min={60} max={215} value={bpmMin}
+                aria-label="Minimum BPM"
+                onChange={e => setBpmMin(Math.min(+e.target.value, bpmMax - 5))}
+                className="flex-1"
+              />
+              <span className="text-xs text-ink-quiet">–</span>
+              <input
+                type="range" min={65} max={220} value={bpmMax}
+                aria-label="Maximum BPM"
+                onChange={e => setBpmMax(Math.max(+e.target.value, bpmMin + 5))}
+                className="flex-1"
+              />
+              <span className="w-8 font-mono text-sm tabular-nums text-ink">{bpmMax}</span>
             </div>
           </div>
 
-          {/* Right: BPM filter + track list */}
-          <div className="flex-1 min-w-0">
-
-            {/* BPM filter */}
-            <div className="bg-surface border border-border rounded-lg px-5 py-4 mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-body text-text-secondary uppercase tracking-widest">
-                  BPM Range
-                </span>
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={bpmEnabled}
-                    onChange={e => setBpmEnabled(e.target.checked)}
-                    style={{ accentColor: '#7B2FBE' }}
-                    className="w-3.5 h-3.5"
+          {!selectedKey ? (
+            <div className="rounded border border-dashed border-line-strong px-s4 py-s6 text-center">
+              <p className="text-sm font-medium text-ink">No key selected</p>
+              <p className="mx-auto mt-1 max-w-[260px] text-xs leading-relaxed text-ink-quiet">
+                Click any segment on the wheel to browse your catalogue by harmonic key.
+              </p>
+            </div>
+          ) : loading ? (
+            <div className="flex flex-col items-center gap-s3 py-s6">
+              <div
+                role="status"
+                className="h-6 w-6 animate-spin rounded-full border-2 border-line-strong border-t-accent"
+              />
+              {slowLoad && (
+                <p className="text-sm text-ink-quiet">
+                  Waking up the server — first load can take up to 30s…
+                </p>
+              )}
+            </div>
+          ) : tracks.length === 0 ? (
+            <div className="py-s6 text-center text-sm text-ink-quiet">
+              No tracks in {formatKey(selectedKey)}
+              {bpmEnabled ? ` between ${bpmMin}–${bpmMax} BPM` : ''}.
+            </div>
+          ) : (
+            <>
+              <div className="mb-s3 font-mono text-xs tabular-nums text-ink-quiet">
+                {tracks.length} {tracks.length === 1 ? 'track' : 'tracks'} in{' '}
+                <span className="text-ink">{formatKey(selectedKey)}</span>
+                {bpmEnabled && <span> · {bpmMin}–{bpmMax} BPM</span>}
+              </div>
+              <div className="flex flex-col gap-s2">
+                {tracks.map((track, i) => (
+                  <TrackRow
+                    key={track.id}
+                    track={track}
+                    rank={i + 1}
+                    showStyles
+                    onClick={() => navigate(`/results?id=${track.id}`)}
                   />
-                  <span className="text-xs font-body text-text-secondary">Enable filter</span>
-                </label>
+                ))}
               </div>
-              <div className={`flex items-center gap-3 transition-opacity ${bpmEnabled ? 'opacity-100' : 'opacity-35 pointer-events-none'}`}>
-                <span className="font-mono text-sm text-text-primary w-8 text-right tabular-nums">
-                  {bpmMin}
-                </span>
-                <input
-                  type="range" min={60} max={215} value={bpmMin}
-                  onChange={e => setBpmMin(Math.min(+e.target.value, bpmMax - 5))}
-                  className="flex-1" style={{ accentColor: '#7B2FBE' }}
-                />
-                <span className="text-xs text-text-secondary">–</span>
-                <input
-                  type="range" min={65} max={220} value={bpmMax}
-                  onChange={e => setBpmMax(Math.max(+e.target.value, bpmMin + 5))}
-                  className="flex-1" style={{ accentColor: '#7B2FBE' }}
-                />
-                <span className="font-mono text-sm text-text-primary w-8 tabular-nums">
-                  {bpmMax}
-                </span>
-              </div>
-            </div>
-
-            {/* Track list */}
-            {!selectedKey ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-                <div className="w-14 h-14 rounded-full border border-border flex items-center justify-center">
-                  <svg className="w-6 h-6 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-text-primary font-body text-sm font-medium mb-1">Select a key</p>
-                  <p className="text-text-secondary font-body text-xs leading-relaxed max-w-[220px]">
-                    Click any segment on the wheel to browse your catalog by harmonic key
-                  </p>
-                </div>
-              </div>
-            ) : loading ? (
-              <div className="flex flex-col items-center gap-3 py-24">
-                <div className="w-6 h-6 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
-                {slowLoad && (
-                  <p className="text-text-secondary font-body text-sm animate-pulse">
-                    Waking up the server — first load can take up to 30s…
-                  </p>
-                )}
-              </div>
-            ) : tracks.length === 0 ? (
-              <div className="text-center py-24 text-text-secondary font-body text-sm">
-                No tracks found in {formatKey(selectedKey)}
-                {bpmEnabled ? ` between ${bpmMin}–${bpmMax} BPM` : ''}.
-              </div>
-            ) : (
-              <>
-                <div className="text-xs font-mono text-text-secondary mb-3">
-                  {tracks.length} {tracks.length === 1 ? 'track' : 'tracks'} in{' '}
-                  <span className="text-text-primary">{formatKey(selectedKey)}</span>
-                  {bpmEnabled && (
-                    <span> · {bpmMin}–{bpmMax} BPM</span>
-                  )}
-                </div>
-                <div className="flex flex-col gap-2">
-                  {tracks.map((track, i) => (
-                    <TrackRow
-                      key={track.id}
-                      track={track}
-                      rank={i + 1}
-                      onClick={() => navigate(`/results?id=${track.id}`)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>
