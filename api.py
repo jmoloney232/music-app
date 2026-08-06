@@ -26,7 +26,9 @@ from api_helpers import (
     fetch_track_features,
     fetch_candidates_by_vector,
     similarity,
+    tempo_penalty,
     vocal_class,
+    TEMPO_PENALTY_SHARE,
 )
 
 app = FastAPI(title="Jack's Similar Song Search API")
@@ -291,22 +293,45 @@ def get_similar(track_id: int, top: int = Query(default=15, ge=1, le=400)) -> di
     if not candidates:
         raise HTTPException(status_code=404, detail="No other indexed tracks to compare against.")
 
-    scored: list[tuple[float, int, dict]] = []
+    # Stage 1: how alike the two recordings sound. Untouched by tempo.
+    sound_scored: list[tuple[float, int, dict]] = []
     for tid, f in candidates:
         try:
-            score = similarity(query, f)
+            sound = similarity(query, f)
         except Exception:
             continue
-        scored.append((score, tid, f))
+        sound_scored.append((sound, tid, f))
+
+    if not sound_scored:
+        raise HTTPException(status_code=404, detail="No comparable tracks found.")
+
+    # Stage 2: demote tracks that could not be mixed with the query.
+    #
+    # The allowance is a share of this query's own spread rather than a fixed
+    # number. Sound scores cluster in a narrow band, so a constant penalty big
+    # enough to matter here would sort purely by BPM on a query whose candidates
+    # happen to sit closer together. Tying it to the spread means tempo can only
+    # ever separate near-ties — it can never outrank a clearly better match.
+    sounds = [s for s, _, _ in sound_scored]
+    allowance = (max(sounds) - min(sounds)) * TEMPO_PENALTY_SHARE
+
+    scored: list[tuple[float, float, float, int, dict]] = []
+    for sound, tid, f in sound_scored:
+        penalty = tempo_penalty(query.get("bpm"), f.get("bpm"))
+        scored.append((sound - penalty * allowance, sound, penalty, tid, f))
 
     scored.sort(key=lambda x: x[0], reverse=True)
 
-    all_scores = [s for s, _, _ in scored]
+    all_scores = [s for s, _, _, _, _ in scored]
 
     results = []
-    for score, tid, f in scored[:top]:
+    for score, sound, penalty, tid, f in scored[:top]:
         entry = _track_meta(tid, f)
         entry["score"] = round(score, 4)
+        # Both parts are returned so a surprising result can be explained:
+        # a low score with a high penalty is a tempo clash, not a bad match.
+        entry["sound_score"] = round(sound, 4)
+        entry["tempo_penalty"] = round(penalty, 3)
         results.append(entry)
 
     return {

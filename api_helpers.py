@@ -5,6 +5,7 @@ Extracted from track_ingestion.py so the API server stays within free-tier memor
 from __future__ import annotations
 
 import hashlib
+import math
 import os
 import re
 from typing import Any
@@ -141,6 +142,61 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     if denom == 0.0:
         return float("nan")
     return float(np.dot(a, b) / denom)
+
+
+# ---------------------------------------------------------------------------
+# Tempo compatibility
+# ---------------------------------------------------------------------------
+
+# Two tracks within this much of each other sit inside normal pitch-fader range
+# and count as an exact tempo match.
+TEMPO_FREE_RATIO = 0.06
+
+# Past this the penalty saturates. Once two tracks cannot be mixed at all,
+# being further apart should not keep pushing one down the list — that is what
+# would turn the ranking into a tempo sort.
+#
+# 0.18 rather than something tighter so the 10-13% band stays competitive. Those
+# pairs need real work to mix but are often the most interesting cross-genre
+# finds, which is the reason chart records and club tracks share this catalogue
+# at all. Anything past roughly 20% saturates either way.
+TEMPO_CEILING_RATIO = 0.18
+
+# Share of a query's own score spread that tempo is allowed to move a track.
+# Derived per query rather than fixed: the blended scores sit in a very narrow
+# band (~0.05 across fifty ranks), so any constant large enough to matter on one
+# query would rank purely by BPM on another.
+TEMPO_PENALTY_SHARE = 0.60
+
+
+def tempo_distance(bpm_a: float | None, bpm_b: float | None) -> float:
+    """Relative tempo difference, octave-folded. 0.10 means 10% apart.
+
+    70 and 140 BPM are the same tempo to a DJ, and the BPM detector halves or
+    doubles often enough that ignoring that would punish correct matches.
+    Folding in log space collapses every octave without special-casing each one.
+    """
+    if not bpm_a or not bpm_b or bpm_a <= 0 or bpm_b <= 0:
+        return 0.0
+    octaves = math.log2(bpm_a / bpm_b)
+    folded = octaves - round(octaves)
+    return abs(2.0 ** folded - 1.0)
+
+
+def tempo_penalty(bpm_a: float | None, bpm_b: float | None) -> float:
+    """0.0 for a mixable pair up to 1.0 for an unmixable one.
+
+    A missing BPM scores 0 — an unknown tempo is not evidence of a bad match,
+    and several hundred catalogue tracks have none.
+    """
+    distance = tempo_distance(bpm_a, bpm_b)
+    if distance <= TEMPO_FREE_RATIO:
+        return 0.0
+    if distance >= TEMPO_CEILING_RATIO:
+        return 1.0
+    x = (distance - TEMPO_FREE_RATIO) / (TEMPO_CEILING_RATIO - TEMPO_FREE_RATIO)
+    # Smoothstep so the ramp has no corner where tracks would jump ranks.
+    return x * x * (3.0 - 2.0 * x)
 
 
 def vocal_class(vd: float) -> str:
