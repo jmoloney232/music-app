@@ -1,48 +1,48 @@
 import { Link, useLocation } from 'react-router-dom'
 
+const LINKS = [
+  { to: '/explore', label: 'Explore', match: p => p === '/explore' },
+  { to: '/collections', label: 'Collections', match: p => p.startsWith('/collections') },
+  { to: '/dj', label: 'DJ Mode', match: p => p === '/dj' },
+]
+
 export default function Nav() {
   const { pathname } = useLocation()
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-20 flex items-center justify-between px-8
-                    bg-surface/80 backdrop-blur-md border-b border-border">
-      <Link to="/" className="font-headline font-bold text-xl tracking-widest hover:opacity-80 transition-opacity">
-        <span className="bg-gradient-to-r from-purple-light to-purple-primary bg-clip-text text-transparent">
-          JACK'S SIMILAR SONG SEARCH
-        </span>
-      </Link>
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-hairline bg-canvas/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-dense items-center justify-between gap-s4 px-s4 sm:h-20 sm:px-s5">
+        {/* Below 640px the full wordmark and three links can't share a line
+            without both wrapping, so the wordmark drops to its initials. */}
+        <Link
+          to="/"
+          className="flex-shrink-0 rounded text-sm font-semibold uppercase tracking-[0.18em] text-ink
+                     transition-colors hover:text-accent sm:text-base"
+        >
+          <span className="sm:hidden" aria-hidden="true">SSS</span>
+          <span className="hidden sm:inline">Similar Song Search</span>
+          <span className="sr-only sm:hidden">Similar Song Search</span>
+        </Link>
 
-      <div className="flex items-center gap-6">
-        <Link
-          to="/explore"
-          className={`text-sm font-body transition-colors ${
-            pathname === '/explore'
-              ? 'text-purple-light'
-              : 'text-text-secondary hover:text-text-primary'
-          }`}
-        >
-          Explore
-        </Link>
-        <Link
-          to="/collections"
-          className={`text-sm font-body transition-colors ${
-            pathname.startsWith('/collections')
-              ? 'text-purple-light'
-              : 'text-text-secondary hover:text-text-primary'
-          }`}
-        >
-          Collections
-        </Link>
-        <Link
-          to="/dj"
-          className={`px-4 py-2 rounded text-sm font-headline font-semibold transition-all duration-200 ${
-            pathname === '/dj'
-              ? 'bg-purple-light text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-              : 'bg-purple-primary hover:bg-purple-light text-white hover:shadow-[0_0_16px_rgba(168,85,247,0.3)]'
-          }`}
-        >
-          DJ MODE
-        </Link>
+        <div className="flex items-center gap-s1 sm:gap-s3">
+          {LINKS.map(({ to, label, match }) => {
+            const active = match(pathname)
+            return (
+              <Link
+                key={to}
+                to={to}
+                aria-current={active ? 'page' : undefined}
+                className={`whitespace-nowrap rounded px-2 py-1.5 text-sm transition-colors sm:px-3 ${
+                  active
+                    ? 'bg-tan font-medium text-ink'
+                    : 'text-ink-quiet hover:bg-sunken hover:text-ink'
+                }`}
+              >
+                {label}
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </nav>
   )

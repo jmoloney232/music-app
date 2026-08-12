@@ -12,7 +12,7 @@ export default function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <Nav />
-      <main className="flex-1 pt-20">
+      <main id="main" className="flex-1 pt-16 sm:pt-20">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/results" element={<Results />} />
