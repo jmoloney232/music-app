@@ -1,8 +1,14 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-surface px-8 py-6 flex items-center justify-between">
-      <span className="font-headline font-bold text-sm tracking-widest text-text-primary">JACK'S SIMILAR SONG SEARCH</span>
-      <span className="text-text-secondary text-xs font-body">© {new Date().getFullYear()} Jack's Similar Song Search</span>
+    <footer className="border-t border-hairline bg-canvas">
+      <div className="mx-auto flex max-w-dense flex-wrap items-center justify-between gap-s2 px-s4 py-s4 sm:px-s5">
+        <span className="text-xs uppercase tracking-[0.18em] text-ink-quiet">
+          Similar Song Search
+        </span>
+        <span className="text-xs text-ink-muted">
+          Similarity from audio embeddings · {new Date().getFullYear()}
+        </span>
+      </div>
     </footer>
   )
 }

@@ -1,44 +1,123 @@
+/* IBM Plex, self-hosted. Serving these locally rather than from the Google
+   Fonts CDN removes a render-blocking third-party request on every page load
+   and stops the app leaking visitor IPs to a third party for a font. Latin and
+   latin-ext only — that covers the catalogue's accented artist names; scripts
+   Plex doesn't carry (CJK, etc.) fall through to the system stack.
+   Plex Sans ships as a variable font, so one file serves 400-600. */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  background-color: #0A0A0A;
-  color: #F5F5F5;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  background-color: #F7E8D5;
+  color: #1B1815;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #404040; }
-
-/* Text selection */
-::selection { background: rgba(123, 47, 190, 0.35); color: #fff; }
-
-/* Animations */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+:focus-visible {
+  outline: 2px solid #A8442A;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #EEDFCB; }
+::-webkit-scrollbar-thumb { background: #CCBEB1; border: 2px solid #EEDFCB; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #8E7F6E; }
+
+::selection { background: #FBDFC0; color: #1B1815; }
+
+/* Without this the native controls render in the browser's default blue. */
+input[type='range'],
+input[type='checkbox'] { accent-color: #A8442A; }
 
 @keyframes shimmer {
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
 
-.animate-fade-up { animation: fadeUp 0.35s ease-out both; }
-.animate-fade-in { animation: fadeIn 0.25s ease-out both; }
-
 .skeleton {
-  background: linear-gradient(90deg, #1E1E1E 25%, #2A2A2A 50%, #1E1E1E 75%);
+  background: linear-gradient(90deg, #EEDFCB 25%, #E3D2BB 50%, #EEDFCB 75%);
   background-size: 200% auto;
-  animation: shimmer 1.5s linear infinite;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* The bar animates to communicate the value arriving — kept, unlike the
+   entrance animations, and still surrendered under reduced-motion below. */
+@keyframes score-grow {
+  from { width: 0; }
+  to   { width: var(--score-width); }
+}
+
+.score-fill {
+  width: var(--score-width);
+  animation: score-grow 250ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+/* The range track is not covered by accent-color; only the thumb and fill are. */
+input[type='range'] {
+  height: 4px;
+  background: #EEDFCB;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

@@ -6,18 +6,18 @@ import TrackRow from '../components/TrackRow'
 function SkeletonRow({ delay = 0 }) {
   return (
     <div
-      className="bg-surface border border-border rounded-lg px-4 py-3 flex items-center gap-3"
+      className="flex items-center gap-s3 rounded border border-hairline bg-surface px-s3 py-2.5"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="w-6 h-3 skeleton rounded flex-shrink-0" />
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <div className="h-3 skeleton rounded w-2/5" />
-        <div className="h-2.5 skeleton rounded w-1/4" />
+      <div className="skeleton h-3 w-6 flex-shrink-0 rounded" />
+      <div className="min-w-0 flex-1 space-y-1.5">
+        <div className="skeleton h-3 w-2/5 rounded" />
+        <div className="skeleton h-2.5 w-1/4 rounded" />
       </div>
-      <div className="flex gap-1.5 flex-shrink-0">
-        <div className="h-5 w-16 skeleton rounded" />
-        <div className="h-5 w-20 skeleton rounded" />
-        <div className="h-5 w-4 skeleton rounded" />
+      <div className="flex flex-shrink-0 gap-1.5">
+        <div className="skeleton h-5 w-16 rounded" />
+        <div className="skeleton h-5 w-20 rounded" />
+        <div className="skeleton h-5 w-4 rounded" />
       </div>
     </div>
   )
@@ -69,6 +69,7 @@ export default function Explore() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [slowLoad, setSlowLoad] = useState(false)
   const slowTimer = useRef(null)
+  const latestRequest = useRef(0)
 
   useEffect(() => {
     if (loading) {
@@ -90,23 +91,36 @@ export default function Explore() {
 
   // Reload track list when any filter changes
   useEffect(() => {
+    // Filters change faster than the catalogue responds; without a sequence
+    // guard a stale response can repopulate the list under the current filters.
+    const requestId = ++latestRequest.current
     setTracks([])
     setTotal(0)
     setLoading(true)
     fetch(`${API}/explore/tracks?${buildParams(selectedCluster, fetchBpm, camelot, vocalType, 0)}`)
       .then(r => r.json())
-      .then(d => { setTracks(d.tracks); setTotal(d.total) })
+      .then(d => {
+        if (requestId !== latestRequest.current) return
+        setTracks(d.tracks)
+        setTotal(d.total)
+      })
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => { if (requestId === latestRequest.current) setLoading(false) })
   }, [selectedCluster, fetchBpm, camelot, vocalType])
 
   const handleShowMore = () => {
+    const requestId = latestRequest.current
     setLoadingMore(true)
     fetch(`${API}/explore/tracks?${buildParams(selectedCluster, fetchBpm, camelot, vocalType, tracks.length)}`)
       .then(r => r.json())
-      .then(d => { setTracks(prev => [...prev, ...d.tracks]); setTotal(d.total) })
+      .then(d => {
+        // A filter change mid-page-load invalidates this page entirely.
+        if (requestId !== latestRequest.current) return
+        setTracks(prev => [...prev, ...d.tracks])
+        setTotal(d.total)
+      })
       .catch(() => {})
-      .finally(() => setLoadingMore(false))
+      .finally(() => { if (requestId === latestRequest.current) setLoadingMore(false) })
   }
 
   const clearFilters = () => {
@@ -121,41 +135,39 @@ export default function Explore() {
   const hasFilters = selectedCluster !== null || bpmEnabled || camelot || vocalType
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-background px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+    <div className="mx-auto max-w-dense px-s4 py-s5">
+      <div>
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-headline font-bold text-3xl text-text-primary tracking-wide">
-            EXPLORE
-          </h1>
-          <p className="text-text-secondary font-body text-sm mt-1">
-            Browse your catalog by genre, key, tempo, and more
+        <div className="mb-s5">
+          <h1 className="text-xl font-semibold text-ink">Explore the catalogue</h1>
+          <p className="mt-1 text-sm text-ink-quiet">
+            Narrow by tempo, key, vocal type, or the clusters the embeddings found.
           </p>
         </div>
 
         {/* Sound clusters */}
         {clusters.length > 0 && (
-          <div className="mb-8">
-            <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-3">
-              Sound Clusters
+          <div className="mb-s5">
+            <div className="mb-1.5 text-xs uppercase tracking-[0.16em] text-ink-quiet">
+              Sound clusters
             </div>
-            <p className="text-xs font-body text-text-secondary mb-3 opacity-70">
+            <p className="mb-s3 text-xs text-ink-quiet">
               Grouped by audio similarity — tracks in each cluster genuinely sound alike.
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-s2">
               {clusters.map(({ id, name, count }) => (
                 <button
                   key={id}
                   onClick={() => setSelectedCluster(selectedCluster === id ? null : id)}
-                  className={`text-sm px-3 py-1.5 rounded-full border font-body transition-colors ${
+                  aria-pressed={selectedCluster === id}
+                  className={`h-control-sm rounded border px-s3 text-sm transition-colors ${
                     selectedCluster === id
-                      ? 'bg-purple-primary border-purple-primary text-white'
-                      : 'border-border text-text-secondary hover:border-purple-primary hover:text-text-primary'
+                      ? 'border-accent bg-accent font-medium text-white'
+                      : 'border-hairline text-ink-quiet hover:border-line-strong hover:bg-sunken hover:text-ink'
                   }`}
                 >
                   {name}
-                  <span className="ml-1.5 font-mono text-xs opacity-60">{count}</span>
+                  <span className="ml-1.5 font-mono text-xs tabular-nums opacity-80">{count}</span>
                 </button>
               ))}
             </div>
@@ -163,69 +175,71 @@ export default function Explore() {
         )}
 
         {/* Filter bar */}
-        <div className="bg-surface border border-border rounded-lg px-5 py-4 mb-6">
-          <div className="flex flex-wrap gap-6 items-start">
+        <div className="mb-s4 border-y border-hairline bg-sunken px-s3 py-s3">
+          <div className="flex flex-wrap items-start gap-s4">
 
-            {/* BPM */}
-            <div className="flex-1 min-w-[200px]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-body text-text-secondary uppercase tracking-widest">BPM</span>
-                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <div className="min-w-[200px] flex-1">
+              <div className="mb-s2 flex items-center justify-between">
+                <span className="text-xs uppercase tracking-[0.16em] text-ink-quiet">BPM</span>
+                <label className="flex cursor-pointer select-none items-center gap-1.5">
                   <input
                     type="checkbox"
                     checked={bpmEnabled}
                     onChange={e => setBpmEnabled(e.target.checked)}
-                    style={{ accentColor: '#7B2FBE' }}
-                    className="w-3 h-3"
+                    className="h-3 w-3"
                   />
-                  <span className="text-xs font-body text-text-secondary">Enable</span>
+                  <span className="text-xs text-ink-quiet">Enable</span>
                 </label>
               </div>
-              <div className={`flex items-center gap-2 transition-opacity ${bpmEnabled ? 'opacity-100' : 'opacity-35 pointer-events-none'}`}>
-                <span className="font-mono text-xs text-text-primary w-7 text-right tabular-nums">{bpmMin}</span>
+              <div className={`flex items-center gap-s2 transition-opacity ${bpmEnabled ? 'opacity-100' : 'pointer-events-none opacity-40'}`}>
+                <span className="w-7 text-right font-mono text-xs tabular-nums text-ink">{bpmMin}</span>
                 <input
                   type="range" min={60} max={215} value={bpmMin}
+                  aria-label="Minimum BPM"
                   onChange={e => setBpmMin(Math.min(+e.target.value, bpmMax - 5))}
-                  className="flex-1" style={{ accentColor: '#7B2FBE' }}
+                  className="flex-1"
                 />
-                <span className="text-xs text-text-secondary">–</span>
+                <span className="text-xs text-ink-quiet">–</span>
                 <input
                   type="range" min={65} max={220} value={bpmMax}
+                  aria-label="Maximum BPM"
                   onChange={e => setBpmMax(Math.max(+e.target.value, bpmMin + 5))}
-                  className="flex-1" style={{ accentColor: '#7B2FBE' }}
+                  className="flex-1"
                 />
-                <span className="font-mono text-xs text-text-primary w-7 tabular-nums">{bpmMax}</span>
+                <span className="w-7 font-mono text-xs tabular-nums text-ink">{bpmMax}</span>
               </div>
             </div>
 
-            {/* Key */}
             <div>
-              <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-2">Key</div>
+              <label htmlFor="key-filter" className="mb-s2 block text-xs uppercase tracking-[0.16em] text-ink-quiet">
+                Key
+              </label>
               <select
+                id="key-filter"
                 value={camelot}
                 onChange={e => setCamelot(e.target.value)}
-                className="bg-background border border-border rounded px-3 py-1.5 text-xs font-mono
-                           text-text-primary focus:border-purple-primary outline-none cursor-pointer"
+                className="h-control-sm cursor-pointer rounded border border-line-control bg-surface px-s2
+                           font-mono text-xs text-ink outline-none focus:border-accent"
               >
-                <option value="">Any Key</option>
+                <option value="">Any key</option>
                 {KEY_OPTIONS.map(([key, standard]) => (
                   <option key={key} value={key}>{key} / {standard}</option>
                 ))}
               </select>
             </div>
 
-            {/* Vocal type */}
             <div>
-              <div className="text-xs font-body text-text-secondary uppercase tracking-widest mb-2">Type</div>
-              <div className="flex gap-1">
+              <div className="mb-s2 text-xs uppercase tracking-[0.16em] text-ink-quiet">Type</div>
+              <div className="flex flex-wrap gap-1">
                 {[['', 'All'], ['vocal', 'Vocal'], ['instrumental', 'Instrumental'], ['ambiguous', 'Mixed']].map(([val, label]) => (
                   <button
                     key={val}
                     onClick={() => setVocalType(val)}
-                    className={`text-xs px-3 py-1 rounded font-body transition-colors ${
+                    aria-pressed={vocalType === val}
+                    className={`h-control-sm rounded border px-s2 text-xs transition-colors ${
                       vocalType === val
-                        ? 'bg-purple-primary text-white'
-                        : 'border border-border text-text-secondary hover:text-text-primary'
+                        ? 'border-accent bg-accent font-medium text-white'
+                        : 'border-hairline text-ink-quiet hover:border-line-strong hover:bg-surface hover:text-ink'
                     }`}
                   >
                     {label}
@@ -237,14 +251,14 @@ export default function Explore() {
         </div>
 
         {/* Count + clear */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-mono text-text-secondary">
+        <div className="mb-s4 flex items-center justify-between">
+          <span className="font-mono text-xs tabular-nums text-ink-quiet">
             {loading ? '…' : `${total.toLocaleString()} track${total !== 1 ? 's' : ''}`}
           </span>
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs font-body text-text-secondary hover:text-purple-light transition-colors"
+              className="rounded text-xs text-ink-quiet transition-colors hover:text-accent"
             >
               Clear all filters
             </button>
@@ -253,23 +267,23 @@ export default function Explore() {
 
         {/* Track list */}
         {loading ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-s2">
             {Array.from({ length: 10 }).map((_, i) => (
               <SkeletonRow key={i} delay={i * 35} />
             ))}
             {slowLoad && (
-              <p className="text-center text-text-secondary font-body text-sm mt-4 animate-pulse">
+              <p className="mt-s3 text-center text-sm text-ink-quiet">
                 Waking up the server — first load can take up to 30s…
               </p>
             )}
           </div>
         ) : tracks.length === 0 ? (
-          <div className="text-center py-20 text-text-secondary font-body text-sm">
+          <div className="rounded border border-dashed border-line-strong px-s4 py-s6 text-center text-sm text-ink-quiet">
             No tracks match the current filters.
           </div>
         ) : (
           <>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-s2">
               {tracks.map((track, i) => (
                 <TrackRow
                   key={track.id}
@@ -285,9 +299,8 @@ export default function Explore() {
               <button
                 onClick={handleShowMore}
                 disabled={loadingMore}
-                className="w-full mt-4 py-3 border border-border rounded-lg text-text-secondary
-                           hover:border-purple-primary hover:text-text-primary font-body text-sm
-                           transition-colors disabled:opacity-50"
+                className="mt-s3 h-control w-full rounded border border-line-control text-sm text-ink-quiet
+                           transition-colors hover:bg-sunken hover:text-ink disabled:opacity-50"
               >
                 {loadingMore
                   ? 'Loading…'

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 const API = '/api'
 
-// Update with real artists/titles from your catalog
 const EXAMPLE_SEARCHES = [
   'Aphex Twin', 'Four Tet', 'Burial', 'Daft Punk', 'Boards of Canada', 'Jamie xx',
 ]
@@ -18,6 +17,7 @@ export default function Home() {
   const navigate = useNavigate()
   const debounce = useRef(null)
   const slowTimer = useRef(null)
+  const latestRequest = useRef(0)
 
   useEffect(() => {
     if (loading) {
@@ -37,79 +37,76 @@ export default function Home() {
     }
     clearTimeout(debounce.current)
     debounce.current = setTimeout(async () => {
+      // Responses can land out of order; only the newest query may write state.
+      const requestId = ++latestRequest.current
       setLoading(true)
       setFetchError(null)
       try {
         const res = await fetch(`${API}/search?q=${encodeURIComponent(query.trim())}`)
+        if (requestId !== latestRequest.current) return
         if (res.ok) setResults(await res.json())
-        else { setResults([]); setFetchError(`API error: ${res.status}`) }
+        else { setResults([]); setFetchError(`Search failed (HTTP ${res.status})`) }
       } catch (e) {
+        if (requestId !== latestRequest.current) return
         setResults([])
         setFetchError(e.message)
       } finally {
-        setLoading(false)
-        setSearched(true)
+        if (requestId === latestRequest.current) {
+          setLoading(false)
+          setSearched(true)
+        }
       }
     }, 300)
     return () => clearTimeout(debounce.current)
   }, [query])
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] bg-background flex flex-col items-center px-6 pt-24 pb-16 overflow-hidden">
+    <div className="mx-auto flex max-w-read flex-col px-s4 pb-s6 pt-s6 sm:pt-[72px]">
 
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute left-1/2 top-[-140px] -translate-x-1/2 w-[1000px] h-[750px] rounded-full opacity-55"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(123,47,190,0.45) 0%, rgba(123,47,190,0.15) 45%, transparent 70%)' }}
-        />
-      </div>
-
-      {/* Hero */}
-      <div className="relative text-center mb-10 max-w-3xl animate-fade-up">
-        <h1 className="font-headline font-bold text-7xl text-text-primary tracking-tight mb-5 leading-[1.05]">
-          Find Your{' '}
-          <span className="bg-gradient-to-r from-purple-light to-purple-primary bg-clip-text text-transparent">
-            Next Record
-          </span>
+      <header className="mb-s5">
+        <h1 className="text-2xl font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-3xl">
+          Find tracks that<br />actually sound alike
         </h1>
-        <p className="font-body text-text-secondary text-xl">
-          Search any track in the catalog and find sonically similar songs.
+        <p className="mt-s3 max-w-[52ch] text-ink-quiet">
+          Every track in the catalogue is compared by its audio, not its genre tag. Pick one and
+          you'll get the closest matches ranked, with BPM and harmonic key for mixing.
         </p>
-      </div>
+      </header>
 
-      {/* Search bar */}
-      <div className="relative w-full max-w-2xl mb-8 animate-fade-up" style={{ animationDelay: '80ms' }}>
+      <div className="relative mb-s4">
+        <label htmlFor="track-search" className="sr-only">Search the catalogue by artist or title</label>
         <input
-          type="text"
+          id="track-search"
+          type="search"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Search artist or title…"
-          className="w-full bg-surface border border-border rounded-2xl px-6 py-5
-                     font-body text-text-primary placeholder-text-secondary text-lg
-                     focus:outline-none focus:border-purple-primary
-                     transition-all duration-200
-                     focus:shadow-[0_0_0_3px_rgba(123,47,190,0.25)]"
+          placeholder="Artist or title…"
+          autoComplete="off"
+          className="h-control-lg w-full rounded border border-line-control bg-surface px-s3 pr-11
+                     text-base text-ink placeholder:text-ink-muted
+                     focus:border-accent focus:outline-none focus-visible:outline-none"
           autoFocus
         />
         {loading && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
-            <div className="w-5 h-5 border-2 border-purple-primary border-t-transparent rounded-full animate-spin" />
-          </div>
+          <div
+            role="status"
+            aria-label="Searching"
+            className="absolute right-s3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full
+                       border-2 border-line-strong border-t-accent"
+          />
         )}
       </div>
 
-      {/* Example searches — shown before the user types */}
       {!query && (
-        <div className="w-full max-w-2xl animate-fade-in" style={{ animationDelay: '160ms' }}>
-          <p className="text-sm font-body text-text-secondary mb-4 text-center">Try searching for</p>
-          <div className="flex flex-wrap gap-2 justify-center">
+        <div className="mb-s4">
+          <p className="mb-s2 text-sm text-ink-quiet">Artists in the catalogue to start from</p>
+          <div className="flex flex-wrap gap-s2">
             {EXAMPLE_SEARCHES.map(q => (
               <button
                 key={q}
                 onClick={() => setQuery(q)}
-                className="text-sm font-body text-text-secondary border border-border rounded-full px-4 py-2
-                           hover:border-purple-primary hover:text-text-primary transition-colors"
+                className="h-control-sm rounded border border-hairline px-s3 text-sm text-ink-quiet
+                           transition-colors hover:border-line-strong hover:bg-sunken hover:text-ink"
               >
                 {q}
               </button>
@@ -118,55 +115,45 @@ export default function Home() {
         </div>
       )}
 
-      {/* Cold-start notice */}
-      {slowLoad && (
-        <p className="text-text-secondary font-body text-sm mb-4 animate-pulse">
-          Waking up the server — first load can take up to 30s…
-        </p>
-      )}
+      <div aria-live="polite" className="min-w-0">
+        {slowLoad && (
+          <p className="mb-s3 text-sm text-ink-muted">
+            Waking up the server — the first search after a while can take up to 30s.
+          </p>
+        )}
 
-      {/* Error / empty state */}
-      {fetchError && (
-        <p className="text-red-400 font-mono text-xs mb-2">Error: {fetchError}</p>
-      )}
-      {searched && results.length === 0 && !loading && !fetchError && (
-        <p className="text-text-secondary font-body text-sm">No tracks found for "{query}"</p>
-      )}
+        {fetchError && (
+          <p className="mb-s3 rounded border border-error/40 bg-error/5 px-s3 py-2 text-sm text-error">
+            {fetchError}. Check your connection and try again.
+          </p>
+        )}
 
-      {/* Results list */}
-      {results.length > 0 && (
-        <ul className="w-full max-w-2xl divide-y divide-border rounded-xl border border-border overflow-hidden animate-fade-in">
-          {results.map((track, i) => (
-            <li
-              key={track.id}
-              className="animate-fade-up"
-              style={{ animationDelay: `${Math.min(i * 30, 240)}ms` }}
-            >
-              <button
-                onClick={() => navigate(`/results?id=${track.id}`)}
-                className="w-full flex items-center justify-between px-5 py-4 bg-surface
-                           hover:bg-[#1a1a1a] transition-all duration-150 text-left group"
-              >
-                <div>
-                  <span className="font-body font-medium text-text-primary group-hover:text-white transition-colors">
-                    {track.artist}
-                  </span>
-                  <span className="text-text-secondary mx-2">—</span>
-                  <span className="font-body text-text-secondary group-hover:text-text-primary transition-colors">
-                    {track.title}
-                  </span>
-                </div>
-                <svg
-                  className="w-4 h-4 text-text-secondary group-hover:text-purple-light transition-all duration-150 group-hover:translate-x-0.5 flex-shrink-0 ml-4"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        {searched && results.length === 0 && !loading && !fetchError && (
+          <p className="text-sm text-ink-quiet">
+            Nothing in the catalogue matches “{query}”. Try a different spelling, or browse{' '}
+            <button onClick={() => navigate('/explore')} className="rounded text-accent underline underline-offset-2 hover:text-accent-deep">
+              the full catalogue
+            </button>.
+          </p>
+        )}
+
+        {results.length > 0 && (
+          <ul className="divide-y divide-hairline overflow-hidden rounded border border-hairline bg-surface">
+            {results.map(track => (
+              <li key={track.id}>
+                <button
+                  onClick={() => navigate(`/results?id=${track.id}`)}
+                  className="flex w-full items-baseline gap-s2 px-s3 py-2.5 text-left
+                             transition-colors hover:bg-sunken"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                  <span className="truncate font-medium text-ink">{track.artist}</span>
+                  <span className="truncate text-sm text-ink-quiet">{track.title}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }
