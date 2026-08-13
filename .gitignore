@@ -2,6 +2,10 @@
 .venv/
 .claude/
 .DS_Store
+
+# Spotify OAuth token caches — contain live refresh tokens, never commit
+.cache
+.spotify_cache
 __pycache__/
 *.pyc
 
