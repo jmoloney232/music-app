@@ -1,43 +1,48 @@
 /** @type {import('tailwindcss').Config} */
+// Booth direction: dark ground, one gold accent, colour as stroke and small
+// marks — never a filled block. Semantic names kept from the previous theme so
+// most JSX reskins by value alone.
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        canvas:      '#F7E8D5',
-        surface:     '#FFFFFF',
-        sunken:      '#EEDFCB',
-        tan:         '#FBDFC0',
-        ink:         '#1B1815',
-        'ink-quiet': '#5C544B',
-        'ink-muted': '#695F55',
-        hairline:    '#E0CDB4',
-        'line-control': '#8E7F6E',
-        'line-strong':  '#CCBEB1',
-        accent:       '#A8442A',
-        'accent-deep': '#8C3721',
-        success:      '#2F6B3A',
-        error:        '#9E2B25',
-        spotify:      '#12833B',
+        canvas:      '#1A1918',
+        surface:     '#1A1918',
+        sunken:      '#201F1E',
+        tan:         '#2D2B2B',
+        ink:         '#F3F2F2',
+        'ink-soft':  '#BAB6B6',
+        'ink-quiet': '#9B9797',
+        'ink-muted': '#7D7979',
+        'ink-dim':   '#605D5D',
+        hairline:    'rgba(243,242,242,0.10)',
+        'line-control': 'rgba(243,242,242,0.24)',
+        'line-strong':  'rgba(243,242,242,0.24)',
+        divider:     'rgba(243,242,242,0.14)',
+        accent:       '#E1AD66',
+        'accent-deep': '#FACB8D',
+        'accent-fill': '#3A270D',
+        success:      '#7BC98B',
+        error:        '#E5736B',
+        spotify:      '#1DB954',
       },
       fontFamily: {
-        sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Lora', 'Georgia', 'serif'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        // No monospace in Booth — figures align via font-variant tabular-nums.
+        mono: ['Lora', 'Georgia', 'serif'],
       },
       fontSize: {
-        // 1.2 ratio from a 15px body
-        xs:   ['12px', '1.35'],
-        sm:   ['13px', '1.45'],
-        base: ['15px', '1.5'],
-        md:   ['18px', '1.4'],
+        xs:   ['12px', '1.4'],
+        sm:   ['13px', '1.5'],
+        base: ['14px', '1.7'],
+        md:   ['16px', '1.5'],
         lg:   ['22px', '1.3'],
-        xl:   ['28px', '1.2'],
-        '2xl': ['40px', '1.1'],
-        '3xl': ['56px', '1.05'],
+        xl:   ['30px', '1.15'],
+        '2xl': ['44px', '1.05'],
+        '3xl': ['56px', '1.0'],
       },
-      // Named so they never collide with Tailwind's own numeric scale.
-      // Derived from real control sizing: 15px body on a 22px line box,
-      // a 56px two-line track row, 20px tags, a 48px search field.
       spacing: {
         s1: '4px',
         s2: '8px',
@@ -56,11 +61,12 @@ export default {
       borderRadius: {
         DEFAULT: '4px',
         chip:    '2px',
-        panel:   '10px',
+        panel:   '4px',
       },
+      // Booth has no shadows: elevation is expressed with 1px rules only.
       boxShadow: {
-        raised:  '0 1px 2px rgba(27,24,21,0.06), 0 4px 12px rgba(27,24,21,0.08)',
-        overlay: '0 8px 32px rgba(27,24,21,0.16)',
+        raised:  'none',
+        overlay: 'none',
       },
       transitionTimingFunction: {
         DEFAULT: 'cubic-bezier(0.2, 0, 0, 1)',

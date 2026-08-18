@@ -1,0 +1,1405 @@
+<title>Similarity Search Directions</title>
+<style>
+  /* ================= SHARED / SHELL ================= */
+  :root{
+    --shell-bg:#F1F0EC;
+    --shell-surface:#FFFFFF;
+    --shell-text:#1C1D20;
+    --shell-muted:#6B6D72;
+    --shell-border:#DDDAD3;
+    --shell-accent:#3E5C76;
+    --shell-accent-ink:#FFFFFF;
+    --shell-shadow: 0 1px 2px rgba(20,20,15,.06), 0 8px 24px -12px rgba(20,20,15,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --shell-bg:#111216;
+      --shell-surface:#17181D;
+      --shell-text:#E8E8EA;
+      --shell-muted:#9A9CA3;
+      --shell-border:#2A2C31;
+      --shell-accent:#8FB4D9;
+      --shell-accent-ink:#0E1420;
+      --shell-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --shell-bg:#111216;
+    --shell-surface:#17181D;
+    --shell-text:#E8E8EA;
+    --shell-muted:#9A9CA3;
+    --shell-border:#2A2C31;
+    --shell-accent:#8FB4D9;
+    --shell-accent-ink:#0E1420;
+    --shell-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--shell-bg);
+    color:var(--shell-text);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{ max-width:100%; }
+  .num{ font-variant-numeric: tabular-nums; }
+  a{ color:inherit; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--shell-accent); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+
+  .wrap{ max-width:1120px; margin:0 auto; padding:28px 20px 80px; }
+
+  .shell-head{ padding-bottom:20px; margin-bottom:8px; border-bottom:1px solid var(--shell-border); }
+  .shell-eyebrow{
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--shell-muted);
+    font-weight:600; margin:0 0 8px;
+  }
+  .shell-title{
+    font-size:clamp(24px,4vw,34px); line-height:1.15; margin:0 0 8px; font-weight:700; letter-spacing:-0.01em;
+  }
+  .shell-lede{
+    max-width:66ch; color:var(--shell-muted); font-size:15px; line-height:1.55; margin:0;
+  }
+
+  .tabbar{
+    display:flex; gap:6px; margin:22px 0 6px; padding:4px; background:var(--shell-surface);
+    border:1px solid var(--shell-border); border-radius:12px; width:max-content; max-width:100%;
+    overflow-x:auto; box-shadow: var(--shell-shadow);
+  }
+  .tab{
+    appearance:none; border:0; background:transparent; cursor:pointer; padding:10px 18px;
+    border-radius:9px; font-size:13.5px; font-weight:600; color:var(--shell-muted); white-space:nowrap;
+    transition: background .15s ease, color .15s ease;
+  }
+  .tab .tab-num{ font-weight:700; opacity:.6; margin-right:7px; }
+  .tab.is-active{ background:var(--shell-accent); color:var(--shell-accent-ink); }
+  .tab.is-active .tab-num{ opacity:.85; }
+  .tab:not(.is-active):hover{ background:var(--shell-bg); color:var(--shell-text); }
+
+  .rationale{
+    margin:26px 0 34px; padding:18px 20px; background:var(--shell-surface); border:1px solid var(--shell-border);
+    border-radius:12px; max-width:78ch;
+  }
+  .rationale h2{ font-size:13px; text-transform:uppercase; letter-spacing:.08em; margin:0 0 8px; color:var(--shell-muted); font-weight:700; }
+  .rationale p{ margin:0; font-size:14.5px; line-height:1.65; color:var(--shell-text); }
+
+  .screen-cap{
+    display:flex; align-items:baseline; gap:10px; margin:40px 0 12px;
+  }
+  .screen-cap .n{ font-size:12px; font-weight:700; color:var(--shell-accent); font-variant-numeric:tabular-nums; }
+  .screen-cap h3{ font-size:15px; margin:0; font-weight:700; }
+  .screen-cap .d{ font-size:12.5px; color:var(--shell-muted); }
+  .screen-frame{
+    border-radius:16px; overflow:hidden; box-shadow:var(--shell-shadow); border:1px solid var(--shell-border);
+  }
+  .vignette-row{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .vignette-row{ grid-template-columns:1fr; } }
+
+  .footnote{ margin-top:64px; padding-top:18px; border-top:1px solid var(--shell-border); font-size:12.5px; color:var(--shell-muted); }
+
+  .visually-hidden{ position:absolute; width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
+
+  /* ============================================================
+     DIRECTION 1 — CONSOLE (dense / utilitarian / DJ-booth)
+     Fixed dark palette — a committed visual world, not theme-reactive.
+     ============================================================ */
+  .dir-console{
+    --bg:#0B0D0F; --panel:#14171A; --panel2:#1B1F23; --hair:#2A2F35;
+    --hi:#ECEEF0; --mid:#9AA2AA; --dim:#5C6570;
+    --teal:#4CD3C2; --amber:#FFB454;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background:var(--bg); color:var(--hi); font-family:var(--sans);
+  }
+  .dir-console .c-app{ padding:0; }
+  .dir-console .c-topbar{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 16px;
+    background:var(--panel2); border-bottom:1px solid var(--hair);
+    font-family:var(--mono); font-size:11px; color:var(--dim); letter-spacing:.04em;
+  }
+  .dir-console .c-topbar b{ color:var(--teal); font-weight:600; }
+  .dir-console .c-body{ padding:18px 16px 22px; }
+
+  .dir-console .c-h{
+    text-transform:uppercase; letter-spacing:.09em; font-size:11px; font-weight:700; color:var(--dim);
+    margin:0 0 10px;
+  }
+  .dir-console .c-searchrow{ display:flex; gap:10px; }
+  .dir-console .c-search{
+    flex:1; background:var(--panel); border:1px solid var(--hair); border-radius:4px;
+    padding:12px 14px; color:var(--hi); font-family:var(--mono); font-size:14px;
+  }
+  .dir-console .c-search::placeholder{ color:var(--dim); }
+  .dir-console .c-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .dir-console .c-chip{
+    background:var(--panel); border:1px solid var(--hair); color:var(--mid); font-family:var(--mono);
+    font-size:12px; padding:7px 11px; border-radius:3px; cursor:pointer;
+  }
+  .dir-console .c-chip:hover{ border-color:var(--teal); color:var(--hi); }
+
+  .dir-console .c-resultlist{ margin-top:16px; border:1px solid var(--hair); border-radius:4px; overflow:hidden; }
+  .dir-console .c-searchresult{
+    display:flex; justify-content:space-between; gap:10px; padding:11px 14px; font-family:var(--mono); font-size:13px;
+    border-bottom:1px solid var(--hair); background:var(--panel); cursor:pointer;
+  }
+  .dir-console .c-searchresult:last-child{ border-bottom:0; }
+  .dir-console .c-searchresult:hover{ background:var(--panel2); }
+  .dir-console .c-searchresult .t{ color:var(--hi); }
+  .dir-console .c-searchresult .a{ color:var(--dim); }
+  .dir-console .c-searchresult .go{ color:var(--teal); }
+
+  .dir-console .c-wake{
+    margin-top:16px; display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:#231C0E; border:1px solid #4A3A14; border-radius:4px; font-family:var(--mono);
+    font-size:12px; color:var(--amber);
+  }
+  .dir-console .c-wake .dot{ width:7px; height:7px; border-radius:50%; background:var(--amber); animation:c-pulse 1.1s infinite ease-in-out; flex:none; }
+  @keyframes c-pulse{ 0%,100%{opacity:.35;} 50%{opacity:1;} }
+
+  .dir-console .c-querystrip{
+    background:var(--panel2); border:1px solid var(--hair); border-radius:4px; padding:14px 16px; margin-bottom:14px;
+  }
+  .dir-console .c-querystrip .lbl{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; }
+  .dir-console .c-querystrip .title{ font-size:19px; font-weight:700; margin:4px 0 2px; letter-spacing:-0.01em; }
+  .dir-console .c-querystrip .artist{ color:var(--mid); font-size:13px; margin-bottom:10px; }
+  .dir-console .c-meta{
+    display:flex; flex-wrap:wrap; gap:14px; font-family:var(--mono); font-size:12px; color:var(--mid);
+    padding-top:10px; border-top:1px solid var(--hair);
+  }
+  .dir-console .c-meta b{ color:var(--hi); font-weight:600; }
+  .dir-console .c-meta a{ color:var(--teal); text-decoration:none; }
+  .dir-console .c-meta a:hover{ text-decoration:underline; }
+
+  .dir-console .c-statline{
+    font-family:var(--mono); font-size:12px; color:var(--mid); display:flex; flex-wrap:wrap; gap:16px;
+    padding:10px 16px; background:var(--panel); border:1px solid var(--hair); border-radius:4px; margin-bottom:14px;
+  }
+  .dir-console .c-statline b{ color:var(--hi); font-weight:700; }
+  .dir-console .c-statline .hi{ color:var(--teal); }
+
+  .dir-console .c-filterbar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:12px;
+  }
+  .dir-console .c-segctrl{ display:flex; border:1px solid var(--hair); border-radius:4px; overflow:hidden; }
+  .dir-console .c-segctrl button{
+    background:var(--panel); border:0; border-right:1px solid var(--hair); color:var(--mid);
+    font-family:var(--mono); font-size:11.5px; padding:8px 12px; cursor:pointer;
+  }
+  .dir-console .c-segctrl button:last-child{ border-right:0; }
+  .dir-console .c-segctrl button.is-on{ background:var(--teal); color:#06201C; font-weight:700; }
+  .dir-console .c-bpmtoggle{
+    display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; color:var(--mid);
+  }
+  .dir-console .c-switch{ width:30px; height:17px; border-radius:9px; background:var(--hair); position:relative; cursor:pointer; flex:none; }
+  .dir-console .c-switch::after{ content:""; position:absolute; width:13px; height:13px; border-radius:50%; background:var(--dim); top:2px; left:2px; transition:.15s; }
+  .dir-console .c-switch.is-on{ background:#1B4A44; }
+  .dir-console .c-switch.is-on::after{ left:15px; background:var(--teal); }
+  .dir-console .c-count{ margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--dim); }
+  .dir-console .c-count b{ color:var(--hi); }
+
+  .dir-console .c-table{ border:1px solid var(--hair); border-radius:4px; overflow:hidden; }
+  .dir-console .c-thead, .dir-console .c-row{
+    display:grid;
+    grid-template-columns: 30px minmax(0,1fr) 96px 62px 58px 96px 24px;
+    gap:10px; align-items:center; padding:0 12px;
+  }
+  .dir-console .c-thead{
+    padding:8px 12px; background:var(--panel2); border-bottom:1px solid var(--hair);
+    font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase;
+  }
+  .dir-console .c-row{
+    height:52px; border-bottom:1px solid var(--hair); background:var(--panel); cursor:pointer;
+    transition:background .1s;
+  }
+  .dir-console .c-row:last-child{ border-bottom:0; }
+  .dir-console .c-row:hover{ background:var(--panel2); }
+  .dir-console .c-row.is-compat{ border-left:3px solid var(--amber); box-shadow: inset 0 0 0 9999px rgba(255,180,84,.035); }
+  .dir-console .c-rank{ font-family:var(--mono); color:var(--dim); font-size:12px; }
+  .dir-console .c-track{ min-width:0; }
+  .dir-console .c-track .t{ font-size:13.5px; font-weight:600; color:var(--hi); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dir-console .c-track .a{ font-size:11.5px; color:var(--mid); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dir-console .c-score{ display:flex; align-items:center; gap:8px; }
+  .dir-console .c-scorebar{ display:flex; gap:2px; }
+  .dir-console .c-scorebar i{ width:5px; height:14px; background:var(--hair); border-radius:1px; display:block; }
+  .dir-console .c-scorebar i.on{ background:var(--teal); }
+  .dir-console .c-scorepct{ font-family:var(--mono); font-size:12.5px; color:var(--hi); font-weight:600; }
+  .dir-console .c-bpm{ font-family:var(--mono); font-size:12.5px; color:var(--mid); }
+  .dir-console .c-key{
+    font-family:var(--mono); font-size:11.5px; font-weight:700; padding:4px 7px; border-radius:3px;
+    display:inline-flex; align-items:center; gap:5px; width:max-content; color:#0B0D0F;
+  }
+  .dir-console .c-key .swatch{ width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.0; }
+  .dir-console .c-tags{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .dir-console .c-tags .tg{ font-size:10.5px; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dir-console .c-spot{ color:var(--teal); text-align:center; font-size:13px; text-decoration:none; }
+
+  @media (max-width:640px){
+    .dir-console .c-thead, .dir-console .c-row{
+      grid-template-columns: 20px minmax(0,1fr) 66px 44px 38px 20px;
+      gap:6px; padding:0 10px;
+    }
+    .dir-console .c-thead{ padding:8px 10px; }
+    .dir-console .c-thead span:nth-child(6),
+    .dir-console .c-row .c-tags{ display:none; }
+    .dir-console .c-scorebar i{ width:4px; height:12px; }
+    .dir-console .c-scorepct{ font-size:11px; }
+    .dir-console .c-bpm{ font-size:11px; }
+    .dir-console .c-key{ font-size:10px; padding:3px 5px; }
+    .dir-console .c-spot{ font-size:12px; }
+    .dir-console .c-row{ height:46px; }
+  }
+
+  .dir-console .c-explore-clusters{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .dir-console .c-cluster{
+    font-family:var(--mono); font-size:11.5px; padding:7px 11px; border-radius:3px; border:1px solid var(--hair);
+    background:var(--panel); color:var(--mid); cursor:pointer;
+  }
+  .dir-console .c-cluster.is-on{ background:var(--teal); color:#06201C; border-color:var(--teal); font-weight:700; }
+  .dir-console .c-cluster .ct{ opacity:.65; margin-left:5px; }
+
+  .dir-console .c-wheelgrid{ display:grid; grid-template-columns: 340px 1fr; gap:22px; }
+  @media (max-width:700px){ .dir-console .c-wheelgrid{ grid-template-columns:1fr; } }
+  .dir-console .c-wheelwrap{ position:relative; aspect-ratio:1/1; max-width:340px; margin:0 auto; }
+  .dir-console .c-wheel-center{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; pointer-events:none; padding:0 20%;
+  }
+  .dir-console .c-wheel-center .code{ font-family:var(--mono); font-size:26px; font-weight:700; color:var(--teal); line-height:1; }
+  .dir-console .c-wheel-center .name{ font-family:var(--mono); font-size:11px; color:var(--mid); margin-top:6px; }
+  .dir-console .c-wheel-center .hint{ font-family:var(--mono); font-size:10.5px; color:var(--dim); max-width:16ch; line-height:1.4; }
+  .dir-console .c-legend{ font-family:var(--mono); font-size:10.5px; color:var(--dim); text-align:center; margin-top:10px; }
+
+  .dir-console .c-bykey-panel{ }
+  .dir-console .c-bpmrange{ display:flex; align-items:center; gap:10px; margin-bottom:14px; font-family:var(--mono); font-size:11px; color:var(--mid); }
+  .dir-console .c-slider{ position:relative; height:4px; background:var(--hair); border-radius:2px; flex:1; }
+  .dir-console .c-slider .fill{ position:absolute; left:22%; right:32%; top:0; bottom:0; background:var(--teal); border-radius:2px; }
+  .dir-console .c-slider .thumb{ position:absolute; width:11px; height:11px; border-radius:50%; background:var(--teal); top:50%; transform:translate(-50%,-50%); border:2px solid var(--bg); }
+  .dir-console .c-note{ font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:10px; line-height:1.6; }
+  .dir-console .c-note em{ color:var(--mid); font-style:normal; }
+
+  .dir-console .c-collgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media (max-width:640px){ .dir-console .c-collgrid{ grid-template-columns:repeat(2,1fr); } }
+  .dir-console .c-collcard{ background:var(--panel); border:1px solid var(--hair); border-radius:4px; padding:13px; }
+  .dir-console .c-collcard .name{ font-size:13px; font-weight:700; margin-bottom:4px; }
+  .dir-console .c-collcard .desc{ font-size:11px; color:var(--mid); line-height:1.5; margin-bottom:10px; min-height:32px; }
+  .dir-console .c-collcard .keystrip{ display:flex; gap:2px; margin-bottom:8px; }
+  .dir-console .c-collcard .keystrip i{ flex:1; height:5px; background:var(--hair); border-radius:1px; }
+  .dir-console .c-collcard .count{ font-family:var(--mono); font-size:10.5px; color:var(--dim); }
+
+  /* ============================================================
+     DIRECTION 2 — LINER NOTES (editorial / spacious)
+     Fixed warm-stone light palette — a committed visual world.
+     ============================================================ */
+  .dir-liner{
+    --bg:#E5E1D8; --surface:#EFEBE3; --ink:#232017; --ink-mid:#5B5648; --ink-dim:#8C8672;
+    --rule:#C9C2AF; --navy:#1F2A44; --ochre:#8C6423;
+    --serif: ui-serif, "New York", Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    background:var(--bg); color:var(--ink); font-family:var(--sans);
+  }
+  .dir-liner .l-body{ padding:34px 30px 40px; }
+  .dir-liner .l-masthead{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:26px;
+    padding-bottom:14px; border-bottom:1px solid var(--rule);
+  }
+  .dir-liner .l-masthead .mark{ font-family:var(--serif); font-size:16px; font-weight:600; font-style:italic; }
+  .dir-liner .l-masthead nav{ display:flex; gap:18px; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); }
+
+  .dir-liner .l-eyebrow{ font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 10px; font-weight:600; }
+  .dir-liner .l-searchfield{
+    font-family:var(--serif); font-size:26px; border:0; border-bottom:2px solid var(--ink); background:transparent;
+    width:100%; padding:6px 0 12px; color:var(--ink); font-style:italic;
+  }
+  .dir-liner .l-searchfield::placeholder{ color:var(--ink-dim); opacity:.7; }
+  .dir-liner .l-chips{ display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:18px; }
+  .dir-liner .l-chip{
+    background:transparent; border:0; border-bottom:1px solid var(--rule); color:var(--ink-mid);
+    font-family:var(--serif); font-style:italic; font-size:14.5px; padding:2px 0 4px; cursor:pointer;
+  }
+  .dir-liner .l-chip:hover{ color:var(--navy); border-color:var(--navy); }
+
+  .dir-liner .l-searchresult{
+    display:flex; justify-content:space-between; align-items:baseline; padding:13px 0; border-bottom:1px solid var(--rule);
+    cursor:pointer;
+  }
+  .dir-liner .l-searchresult .t{ font-family:var(--serif); font-size:16px; }
+  .dir-liner .l-searchresult .a{ font-size:12px; color:var(--ink-dim); margin-left:8px; }
+  .dir-liner .l-searchresult .go{ font-size:11px; color:var(--navy); text-transform:uppercase; letter-spacing:.06em; }
+
+  .dir-liner .l-wake{
+    margin-top:20px; padding:14px 16px; border-left:3px solid var(--ochre); background:var(--surface);
+    font-size:13px; color:var(--ink-mid); line-height:1.6; font-style:italic;
+  }
+
+  .dir-liner .l-querymast{ margin-bottom:22px; }
+  .dir-liner .l-querymast .lbl{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:10px; }
+  .dir-liner .l-querymast h1{ font-family:var(--serif); font-size:clamp(28px,4vw,40px); font-weight:600; margin:0 0 4px; line-height:1.08; letter-spacing:-0.01em; }
+  .dir-liner .l-querymast .by{ font-size:15px; color:var(--ink-mid); font-style:italic; margin-bottom:14px; }
+  .dir-liner .l-metaline{ font-size:12.5px; color:var(--ink-mid); display:flex; flex-wrap:wrap; gap:6px 4px; }
+  .dir-liner .l-metaline a{ color:var(--navy); text-decoration:none; border-bottom:1px solid currentColor; }
+
+  .dir-liner .l-statline{
+    font-family:var(--serif); font-size:15.5px; color:var(--ink-mid); line-height:1.7; margin:22px 0;
+    padding:16px 18px; background:var(--surface); border-radius:8px; max-width:70ch;
+  }
+  .dir-liner .l-statline b{ color:var(--ink); font-weight:600; }
+
+  .dir-liner .l-filterrow{
+    display:flex; flex-wrap:wrap; align-items:center; gap:18px; padding:12px 0; border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule); margin-bottom:6px; font-size:12.5px;
+  }
+  .dir-liner .l-fgroup{ color:var(--ink-dim); }
+  .dir-liner .l-fgroup button{ background:none; border:0; color:var(--ink-dim); cursor:pointer; padding:2px 0; margin-right:14px; font-size:12.5px; }
+  .dir-liner .l-fgroup button.is-on{ color:var(--ink); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+  .dir-liner .l-toggle{ display:flex; align-items:center; gap:7px; color:var(--ink-dim); }
+  .dir-liner .l-toggle .box{ width:14px; height:14px; border:1px solid var(--ink-mid); border-radius:3px; }
+  .dir-liner .l-count{ margin-left:auto; color:var(--ink-dim); font-style:italic; }
+
+  .dir-liner .l-list{ }
+  .dir-liner .l-row{
+    display:grid; grid-template-columns: 44px 1fr auto; gap:16px; align-items:start; padding:18px 0;
+    border-bottom:1px solid var(--rule); cursor:pointer;
+  }
+  .dir-liner .l-row:hover .t{ color:var(--navy); }
+  .dir-liner .l-rank{ font-family:var(--serif); font-style:italic; color:var(--ink-dim); font-size:13px; padding-top:4px; }
+  .dir-liner .l-track .t{ font-family:var(--serif); font-size:19px; margin:0 0 2px; transition:color .1s; }
+  .dir-liner .l-track .a{ font-size:12.5px; color:var(--ink-mid); letter-spacing:.02em; margin-bottom:6px; }
+  .dir-liner .l-track .meta{ font-size:11.5px; color:var(--ink-dim); }
+  .dir-liner .l-track .meta .compat{ color:var(--ochre); font-weight:600; }
+  .dir-liner .l-scorecol{ text-align:right; min-width:120px; }
+  .dir-liner .l-tier{ font-size:13px; font-weight:600; color:var(--ink); margin-bottom:5px; }
+  .dir-liner .l-scorebar{ width:100px; height:2px; background:var(--rule); margin-left:auto; position:relative; }
+  .dir-liner .l-scorebar span{ position:absolute; left:0; top:0; bottom:0; background:var(--navy); }
+  .dir-liner .l-pct{ font-size:10.5px; color:var(--ink-dim); margin-top:5px; }
+  .dir-liner .l-spot{ display:block; margin-top:8px; font-size:10.5px; color:var(--navy); text-decoration:none; border-bottom:1px solid currentColor; }
+
+  .dir-liner .l-clusters{ display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:20px; }
+  .dir-liner .l-cluster{ background:none; border:0; border-bottom:1px solid var(--rule); color:var(--ink-mid); font-size:13px; padding:2px 0 5px; cursor:pointer; }
+  .dir-liner .l-cluster.is-on{ color:var(--navy); border-color:var(--navy); font-weight:600; }
+  .dir-liner .l-cluster .ct{ color:var(--ink-dim); margin-left:4px; }
+
+  .dir-liner .l-wheelgrid{ display:grid; grid-template-columns:320px 1fr; gap:30px; }
+  @media (max-width:700px){ .dir-liner .l-wheelgrid{ grid-template-columns:1fr; } }
+  .dir-liner .l-wheelwrap{ position:relative; aspect-ratio:1/1; max-width:320px; margin:0 auto; }
+  .dir-liner .l-wheel-center{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; pointer-events:none; padding:0 22%;
+  }
+  .dir-liner .l-wheel-center .code{ font-family:var(--serif); font-size:26px; font-style:italic; color:var(--navy); line-height:1; }
+  .dir-liner .l-wheel-center .name{ font-size:11px; color:var(--ink-mid); margin-top:6px; }
+  .dir-liner .l-wheel-center .hint{ font-size:10.5px; color:var(--ink-dim); font-style:italic; max-width:16ch; line-height:1.5; }
+  .dir-liner .l-caption{ text-align:center; font-size:11px; font-style:italic; color:var(--ink-dim); margin-top:10px; }
+
+  .dir-liner .l-bpmrange{ display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:11.5px; color:var(--ink-mid); }
+  .dir-liner .l-slider{ position:relative; height:1px; background:var(--rule); flex:1; }
+  .dir-liner .l-slider .fill{ position:absolute; left:22%; right:32%; top:0; bottom:0; background:var(--navy); height:1px; }
+  .dir-liner .l-slider .thumb{ position:absolute; width:9px; height:9px; border-radius:50%; background:var(--surface); border:1.5px solid var(--navy); top:50%; transform:translate(-50%,-50%); }
+  .dir-liner .l-note{ font-size:13px; color:var(--ink-mid); line-height:1.7; font-style:italic; margin-top:12px; max-width:48ch; }
+
+  .dir-liner .l-collgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--rule); border:1px solid var(--rule); }
+  @media (max-width:640px){ .dir-liner .l-collgrid{ grid-template-columns:repeat(2,1fr); } }
+  .dir-liner .l-collcard{ background:var(--surface); padding:16px; }
+  .dir-liner .l-collcard .name{ font-family:var(--serif); font-size:16px; margin-bottom:5px; }
+  .dir-liner .l-collcard .desc{ font-size:11.5px; color:var(--ink-mid); line-height:1.55; margin-bottom:12px; min-height:33px; }
+  .dir-liner .l-collcard .keystrip{ display:flex; gap:2px; margin-bottom:8px; height:3px; }
+  .dir-liner .l-collcard .keystrip i{ flex:1; background:var(--rule); }
+  .dir-liner .l-collcard .count{ font-size:10.5px; color:var(--ink-dim); font-style:italic; }
+
+  /* ============================================================
+     DIRECTION 3 — PULSE (bold / flat-color / poster energy)
+     Fixed bright palette — a committed visual world.
+     ============================================================ */
+  .dir-pulse{
+    --bg:#FAFAF6; --surface:#FFFFFF; --ink:#14121A; --ink-mid:#57536A; --ink-dim:#8B87A0;
+    --line:#E7E4EE; --violet:#6A35FF; --lime:#C6FF3D; --violet-soft:#EDE6FF;
+    --disp: -apple-system, "SF Pro Display", ui-sans-serif, "Segoe UI", system-ui, sans-serif;
+    background:var(--bg); color:var(--ink); font-family:var(--disp);
+  }
+  .dir-pulse .p-body{ padding:26px 22px 34px; }
+  .dir-pulse .p-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  .dir-pulse .p-brand{ font-weight:900; font-size:15px; letter-spacing:-0.02em; }
+  .dir-pulse .p-brand span{ color:var(--violet); }
+  .dir-pulse .p-navchip{ font-size:11px; font-weight:700; background:var(--ink); color:#fff; padding:6px 12px; border-radius:999px; }
+
+  .dir-pulse .p-h1{ font-size:clamp(26px,5vw,36px); font-weight:900; letter-spacing:-0.03em; line-height:1.05; margin:0 0 16px; }
+  .dir-pulse .p-search{
+    width:100%; border:2.5px solid var(--ink); border-radius:14px; padding:15px 16px; font-size:16px; font-weight:600;
+    background:var(--surface); color:var(--ink);
+  }
+  .dir-pulse .p-search::placeholder{ color:var(--ink-dim); font-weight:500; }
+  .dir-pulse .p-chips{ display:flex; flex-wrap:wrap; gap:9px; margin-top:16px; }
+  .dir-pulse .p-chip{
+    font-weight:700; font-size:12.5px; padding:8px 14px; border-radius:999px; border:2px solid var(--ink);
+    background:var(--surface); color:var(--ink); cursor:pointer;
+  }
+  .dir-pulse .p-chip:hover{ background:var(--ink); color:#fff; }
+
+  .dir-pulse .p-searchresult{
+    display:flex; justify-content:space-between; align-items:center; padding:14px 16px; margin-top:10px;
+    border:2px solid var(--ink); border-radius:12px; cursor:pointer; background:var(--surface);
+  }
+  .dir-pulse .p-searchresult .t{ font-weight:800; font-size:15px; }
+  .dir-pulse .p-searchresult .a{ font-size:12px; color:var(--ink-mid); font-weight:600; }
+  .dir-pulse .p-searchresult .go{ font-weight:900; font-size:18px; color:var(--violet); }
+
+  .dir-pulse .p-wake{
+    margin-top:14px; display:flex; align-items:center; gap:10px; padding:13px 16px; border-radius:12px;
+    background:var(--ink); color:#fff; font-weight:700; font-size:12.5px;
+  }
+  .dir-pulse .p-wake .dot{ width:8px; height:8px; border-radius:50%; background:var(--lime); animation:p-pulse 1s infinite ease-in-out; flex:none; }
+  @keyframes p-pulse{ 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.5); opacity:.5; } }
+
+  .dir-pulse .p-querycard{
+    background:var(--ink); color:#fff; border-radius:18px; padding:22px 22px 20px; margin-bottom:16px;
+  }
+  .dir-pulse .p-querycard .lbl{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--lime); margin-bottom:8px; }
+  .dir-pulse .p-querycard h1{ font-size:clamp(24px,4vw,32px); font-weight:900; letter-spacing:-0.02em; margin:0 0 3px; line-height:1.05; }
+  .dir-pulse .p-querycard .by{ font-size:14px; color:#C7C4D6; font-weight:600; margin-bottom:14px; }
+  .dir-pulse .p-qchips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .dir-pulse .p-qchip{ font-size:11.5px; font-weight:700; padding:6px 11px; border-radius:999px; background:#26232F; color:#fff; }
+  .dir-pulse .p-qchip.key{ color:#14121A; }
+  .dir-pulse .p-qchip.spot{ background:var(--violet); color:#fff; text-decoration:none; }
+
+  .dir-pulse .p-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+  .dir-pulse .p-stattile{ border-radius:12px; padding:12px 10px; text-align:center; }
+  .dir-pulse .p-stattile .v{ font-size:22px; font-weight:900; letter-spacing:-0.02em; }
+  .dir-pulse .p-stattile .l{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; opacity:.75; margin-top:2px; }
+  .dir-pulse .p-stattile.t1{ background:var(--violet); color:#fff; }
+  .dir-pulse .p-stattile.t2{ background:var(--violet-soft); color:var(--violet); }
+  .dir-pulse .p-stattile.t3{ background:var(--line); color:var(--ink-mid); }
+  .dir-pulse .p-stattile.t4{ background:var(--line); color:var(--ink-mid); }
+
+  .dir-pulse .p-filterrow{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px; }
+  .dir-pulse .p-pillgroup{ display:flex; gap:6px; }
+  .dir-pulse .p-pill{ font-size:11.5px; font-weight:700; padding:8px 13px; border-radius:999px; border:2px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
+  .dir-pulse .p-pill.is-on{ background:var(--ink); color:#fff; }
+  .dir-pulse .p-swtoggle{ display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; color:var(--ink-mid); }
+  .dir-pulse .p-switch{ width:34px; height:19px; border-radius:10px; background:var(--line); border:2px solid var(--ink); position:relative; cursor:pointer; }
+  .dir-pulse .p-switch::after{ content:""; width:11px; height:11px; border-radius:50%; background:var(--ink); position:absolute; top:2px; left:2px; }
+  .dir-pulse .p-switch.is-on{ background:var(--lime); }
+  .dir-pulse .p-switch.is-on::after{ left:17px; }
+  .dir-pulse .p-count{ margin-left:auto; font-size:11.5px; font-weight:800; background:var(--line); padding:6px 11px; border-radius:999px; }
+
+  .dir-pulse .p-cards{ display:flex; flex-direction:column; gap:10px; }
+  .dir-pulse .p-card{
+    display:grid; grid-template-columns:52px 1fr auto; gap:14px; align-items:center;
+    border:2px solid var(--ink); border-radius:14px; overflow:hidden; cursor:pointer; background:var(--surface);
+    position:relative;
+  }
+  .dir-pulse .p-card.is-compat{ box-shadow: 0 0 0 3px var(--lime); }
+  .dir-pulse .p-swatch{ align-self:stretch; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#14121A; }
+  .dir-pulse .p-card .mid{ min-width:0; padding:12px 0; }
+  .dir-pulse .p-card .t{ font-weight:800; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dir-pulse .p-card .a{ font-size:11.5px; color:var(--ink-mid); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dir-pulse .p-card .tagrow{ display:flex; gap:5px; margin-top:5px; flex-wrap:wrap; }
+  .dir-pulse .p-card .tagrow span{ font-size:9.5px; font-weight:700; background:var(--line); color:var(--ink-mid); padding:2px 7px; border-radius:999px; }
+  .dir-pulse .p-right{ display:flex; align-items:center; gap:10px; padding-right:14px; }
+  .dir-pulse .p-scorechip{ font-weight:900; font-size:15px; padding:8px 11px; border-radius:10px; text-align:center; min-width:52px; }
+  .dir-pulse .p-scorechip.lead{ background:var(--violet); color:#fff; }
+  .dir-pulse .p-scorechip.rest{ background:var(--violet-soft); color:var(--violet); }
+  .dir-pulse .p-bpm{ font-size:12px; font-weight:700; color:var(--ink-mid); text-align:right; }
+  .dir-pulse .p-spotbtn{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:13px; flex:none; }
+  .dir-pulse .p-mixtag{ position:absolute; top:-1px; right:12px; background:var(--lime); color:#14121A; font-size:9px; font-weight:900; padding:3px 8px; border-radius:0 0 6px 6px; letter-spacing:.03em; }
+
+  .dir-pulse .p-clusters{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .dir-pulse .p-cluster{ font-size:12px; font-weight:700; padding:8px 13px; border-radius:999px; border:2px solid var(--ink); background:var(--surface); cursor:pointer; }
+  .dir-pulse .p-cluster.is-on{ background:var(--ink); color:#fff; }
+  .dir-pulse .p-cluster .ct{ opacity:.65; margin-left:4px; }
+
+  .dir-pulse .p-wheelgrid{ display:grid; grid-template-columns:330px 1fr; gap:22px; }
+  @media (max-width:700px){ .dir-pulse .p-wheelgrid{ grid-template-columns:1fr; } }
+  .dir-pulse .p-wheelwrap{ position:relative; aspect-ratio:1/1; max-width:330px; margin:0 auto; }
+  .dir-pulse .p-wheel-center{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; pointer-events:none; padding:0 20%;
+  }
+  .dir-pulse .p-wheel-center .code{ font-size:28px; font-weight:900; letter-spacing:-0.02em; line-height:1; }
+  .dir-pulse .p-wheel-center .name{ font-size:11px; font-weight:700; color:var(--ink-mid); margin-top:6px; }
+  .dir-pulse .p-wheel-center .hint{ font-size:11px; font-weight:700; color:var(--ink-dim); max-width:15ch; line-height:1.4; }
+  .dir-pulse .p-caption{ text-align:center; font-size:11px; font-weight:700; color:var(--ink-mid); margin-top:10px; }
+
+  .dir-pulse .p-bpmrange{ display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:11.5px; font-weight:700; color:var(--ink-mid); }
+  .dir-pulse .p-slider{ position:relative; height:6px; background:var(--line); border-radius:3px; flex:1; border:2px solid var(--ink); }
+  .dir-pulse .p-slider .fill{ position:absolute; left:22%; right:32%; top:-2px; bottom:-2px; background:var(--violet); border-radius:3px; }
+  .dir-pulse .p-slider .thumb{ width:16px; height:16px; border-radius:50%; background:var(--lime); border:2.5px solid var(--ink); position:absolute; top:50%; transform:translate(-50%,-50%); }
+  .dir-pulse .p-note{ font-size:12.5px; font-weight:600; color:var(--ink-mid); line-height:1.6; margin-top:10px; max-width:44ch; }
+
+  .dir-pulse .p-collgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media (max-width:640px){ .dir-pulse .p-collgrid{ grid-template-columns:repeat(2,1fr); } }
+  .dir-pulse .p-collcard{ border:2px solid var(--ink); border-radius:14px; padding:14px; background:var(--surface); }
+  .dir-pulse .p-collcard .name{ font-weight:900; font-size:14px; margin-bottom:5px; }
+  .dir-pulse .p-collcard .desc{ font-size:11px; font-weight:600; color:var(--ink-mid); line-height:1.5; margin-bottom:12px; min-height:33px; }
+  .dir-pulse .p-collcard .keystrip{ display:flex; gap:2px; margin-bottom:9px; height:6px; }
+  .dir-pulse .p-collcard .keystrip i{ flex:1; background:var(--line); border-radius:2px; }
+  .dir-pulse .p-collcard .count{ font-size:10.5px; font-weight:800; color:var(--ink-dim); }
+
+  /* Shared wheel segment interaction states (geometry via JS, state via class) */
+  .wheel-seg{ cursor:pointer; }
+  .wheel-seg text{ pointer-events:none; user-select:none; }
+</style>
+
+<div class="wrap">
+
+  <header class="shell-head">
+    <p class="shell-eyebrow">Design exploration &middot; design-blind</p>
+    <h1 class="shell-title">Three directions for the similarity search tool</h1>
+    <p class="shell-lede">Same product, same fixture data — three different bets on how a DJ finds the next
+      record. Built only from the product brief, with no reference to any existing implementation.</p>
+  </header>
+
+  <div class="tabbar" role="tablist" aria-label="Design directions">
+    <button class="tab is-active" role="tab" aria-selected="true" data-target="panel-console"><span class="tab-num">01</span>Console</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="panel-liner"><span class="tab-num">02</span>Liner Notes</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="panel-pulse"><span class="tab-num">03</span>Pulse</button>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DIRECTION 1 — CONSOLE -->
+  <!-- ============================================================ -->
+  <section class="direction-panel" id="panel-console" data-direction="console">
+    <div class="rationale">
+      <h2>Console &mdash; dense, utilitarian, DJ-booth usable</h2>
+      <p>Console is built for the booth, not the couch: dense rows, monospace data, and a full-spectrum
+        Camelot wheel mean the next record can be found at a glance under stage lighting, one thumb on a
+        phone propped against the mixer. Compatibility is answered on the wheel itself &mdash; select a key and
+        its A/B partner and neighbors light up &mdash; so a DJ never opens a filter to check whether two records
+        will mix. Score shows as a short segmented bar before it shows a percentage, because at this
+        density eight results in the high 80s should look like what they are: nearly tied. The trade-off is
+        warmth &mdash; this is an instrument panel, not a place to linger.</p>
+    </div>
+
+    <div class="screen-cap"><span class="n">01</span><h3>Search landing</h3><span class="d">— seed chips, live results, cold-start state</span></div>
+    <div class="screen-frame dir-console">
+      <div class="c-app">
+        <div class="c-topbar"><span>STRATA / SEARCH</span><span><b>16,014</b> tracks indexed</span></div>
+        <div class="c-body">
+          <p class="c-h">Find a track</p>
+          <div class="c-searchrow"><input class="c-search" value="gorgon" readonly aria-label="Search by artist or title" placeholder="artist or title…"></div>
+          <div class="c-resultlist">
+            <div class="c-searchresult"><span><span class="t">Imagination</span> &nbsp;<span class="a">Gorgon City</span></span><span class="go">→</span></div>
+          </div>
+          <p class="c-h" style="margin-top:20px;">Or start from</p>
+          <div class="c-chips">
+            <button class="c-chip">FISHER</button>
+            <button class="c-chip">Fred again..</button>
+            <button class="c-chip">Dua Lipa</button>
+            <button class="c-chip">CamelPhat</button>
+            <button class="c-chip">Skrillex</button>
+          </div>
+          <div class="c-wake"><span class="dot"></span> SERVER COLD — WAKING (≈30S). FIRST QUERY ONLY.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">02</span><h3>Similar results</h3><span class="d">— the core screen: query, stats, filters, 8 ranked rows</span></div>
+    <div class="screen-frame dir-console">
+      <div class="c-app">
+        <div class="c-topbar"><span>STRATA / SIMILAR</span><span><b>7A</b> · 124.0 BPM</span></div>
+        <div class="c-body">
+          <div class="c-querystrip">
+            <span class="lbl">Matching against</span>
+            <div class="title">Imagination</div>
+            <div class="artist">Gorgon City</div>
+            <div class="c-meta">
+              <span>BPM <b class="num">124.0</b></span>
+              <span>KEY <b>7A</b> / D min</span>
+              <span>CLASS <b>Vocal</b></span>
+              <span>STYLE <b>House</b></span>
+              <a href="#">SPOTIFY ↗</a>
+            </div>
+          </div>
+          <div class="c-statline">
+            <span>COMPARED <b class="num">387</b></span>
+            <span>HIGH <b class="hi num">92%</b></span>
+            <span>MED <b class="num">84%</b></span>
+            <span>LOW <b class="num">71%</b></span>
+          </div>
+          <div class="c-filterbar">
+            <div class="c-segctrl">
+              <button class="is-on">ALL KEYS</button>
+              <button>COMPATIBLE</button>
+              <button>EXACT</button>
+            </div>
+            <div class="c-bpmtoggle"><span class="c-switch"></span> ±6% BPM</div>
+            <div class="c-count">SHOWING <b>8</b> OF <b>8</b></div>
+          </div>
+          <div class="c-table">
+            <div class="c-thead"><span>#</span><span>Track</span><span>Score</span><span>BPM</span><span>Key</span><span>Tags</span><span></span></div>
+
+            <div class="c-row is-compat"><span class="c-rank num">1</span>
+              <div class="c-track"><div class="t">Losing It</div><div class="a">FISHER</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="c-scorepct num">92%</span></div>
+              <span class="c-bpm num">125.0</span>
+              <span class="c-key" style="background:hsl(180,46%,34%);color:#fff;">7A</span>
+              <div class="c-tags"><span class="tg">Instrumental</span><span class="tg">Tech House</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row"><span class="c-rank num">2</span>
+              <div class="c-track"><div class="t">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="c-scorepct num">91%</span></div>
+              <span class="c-bpm num">122.0</span>
+              <span class="c-key" style="background:hsl(330,62%,52%);">12A</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">House</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row is-compat"><span class="c-rank num">3</span>
+              <div class="c-track"><div class="t">Murder On The Dancefloor</div><div class="a">Sophie Ellis-Bextor</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">89%</span></div>
+              <span class="c-bpm num">117.0</span>
+              <span class="c-key" style="background:hsl(210,62%,52%);">8A</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">Disco</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row is-compat"><span class="c-rank num">4</span>
+              <div class="c-track"><div class="t">On My Mind</div><div class="a">Diplo &amp; SIDEPIECE</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">89%</span></div>
+              <span class="c-bpm num">124.0</span>
+              <span class="c-key" style="background:hsl(180,62%,52%);">7B</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">Tech House</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row is-compat"><span class="c-rank num">5</span>
+              <div class="c-track"><div class="t">Cold Heart (PNAU Remix)</div><div class="a">Elton John &amp; Dua Lipa</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">88%</span></div>
+              <span class="c-bpm num">116.0</span>
+              <span class="c-key" style="background:hsl(150,46%,34%);color:#fff;">6A</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">Dance-pop</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row"><span class="c-rank num">6</span>
+              <div class="c-track"><div class="t">Rumble</div><div class="a">Skrillex, Fred again.. &amp; Flowdan</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">87%</span></div>
+              <span class="c-bpm num">140.0</span>
+              <span class="c-key" style="background:hsl(30,46%,34%);color:#fff;">2A</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">UK Garage</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row"><span class="c-rank num">7</span>
+              <div class="c-track"><div class="t">Houdini</div><div class="a">Dua Lipa</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">87%</span></div>
+              <span class="c-bpm num">117.0</span>
+              <span class="c-key" style="background:hsl(60,46%,34%);color:#fff;">3A</span>
+              <div class="c-tags"><span class="tg">Vocal</span><span class="tg">Dance-pop</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+
+            <div class="c-row is-compat"><span class="c-rank num">8</span>
+              <div class="c-track"><div class="t">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div></div>
+              <div class="c-score"><span class="c-scorebar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="c-scorepct num">86%</span></div>
+              <span class="c-bpm num">130.0</span>
+              <span class="c-key" style="background:hsl(180,46%,34%);color:#fff;">7A</span>
+              <div class="c-tags"><span class="tg">Instrumental</span><span class="tg">House</span></div>
+              <a class="c-spot" href="#">♫</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">03</span><h3>Browse by key</h3><span class="d">— interactive Camelot wheel, 24 segments, dual ring</span></div>
+    <div class="screen-frame dir-console">
+      <div class="c-app">
+        <div class="c-topbar"><span>STRATA / BY KEY</span><span>CLICK A SEGMENT</span></div>
+        <div class="c-body">
+          <div class="c-wheelgrid">
+            <div>
+              <div class="c-wheelwrap">
+                <svg id="wheel-console" viewBox="0 0 400 400" role="img" aria-label="Camelot wheel, 24 keys"></svg>
+                <div class="c-wheel-center" id="wheel-console-center">
+                  <div class="code">7A</div>
+                  <div class="name">D minor</div>
+                </div>
+              </div>
+              <div class="c-legend">INNER = A (MINOR) &middot; OUTER = B (MAJOR)</div>
+            </div>
+            <div class="c-bykey-panel">
+              <p class="c-h">BPM range</p>
+              <div class="c-bpmrange">
+                <span class="num">96</span>
+                <div class="c-slider"><div class="fill"></div><div class="thumb" style="left:22%;"></div><div class="thumb" style="left:68%;"></div></div>
+                <span class="num">150</span>
+              </div>
+              <p class="c-h">Tracks in <span id="wheel-console-listlabel">7A</span>, sorted by BPM</p>
+              <div class="c-table">
+                <div class="c-thead" style="grid-template-columns:minmax(0,1fr) 62px;"><span>Track</span><span>BPM</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px;"><div class="c-track"><div class="t">Night Signal</div><div class="a">Halcyon Row</div></div><span class="c-bpm num">120.0</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px;"><div class="c-track"><div class="t">Undertow</div><div class="a">Marlowe &amp; Kite</div></div><span class="c-bpm num">122.0</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px;"><div class="c-track"><div class="t">Losing It</div><div class="a">FISHER</div></div><span class="c-bpm num">125.0</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px;"><div class="c-track"><div class="t">Concrete Bloom</div><div class="a">Vela Sun</div></div><span class="c-bpm num">126.0</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px;"><div class="c-track"><div class="t">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div></div><span class="c-bpm num">130.0</span></div>
+                <div class="c-row" style="grid-template-columns:minmax(0,1fr) 62px; border-bottom:0;"><div class="c-track"><div class="t">Afterglow</div><div class="a">Ren Sable</div></div><span class="c-bpm num">132.0</span></div>
+              </div>
+              <p class="c-note" id="wheel-console-note">Showing prepared data for <em>7A</em>. Selecting another segment updates the wheel and compatibility highlight live — this mock only carries full track data for 7A.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">04</span><h3>Explore &amp; Collections</h3><span class="d">— condensed vignettes</span></div>
+    <div class="vignette-row">
+      <div class="screen-frame dir-console">
+        <div class="c-app"><div class="c-topbar"><span>STRATA / EXPLORE</span><span><b>388</b> match</span></div>
+          <div class="c-body">
+            <div class="c-explore-clusters">
+              <span class="c-cluster is-on">Vocal house<span class="ct">388</span></span>
+              <span class="c-cluster">Peak-time techno<span class="ct">412</span></span>
+              <span class="c-cluster">Chart pop<span class="ct">2,051</span></span>
+              <span class="c-cluster">Melodic/deep<span class="ct">623</span></span>
+              <span class="c-cluster">Hip-hop adjacent<span class="ct">940</span></span>
+              <span class="c-cluster">Ballads &amp; downtempo<span class="ct">1,204</span></span>
+            </div>
+            <div class="c-table">
+              <div class="c-thead" style="grid-template-columns:26px minmax(0,1fr) 56px 44px 90px;"><span>#</span><span>Track</span><span>BPM</span><span>Key</span><span>Class/Style</span></div>
+              <div class="c-row" style="grid-template-columns:26px minmax(0,1fr) 56px 44px 90px;"><span class="c-rank num">1</span><div class="c-track"><div class="t">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div></div><span class="c-bpm num">122.0</span><span class="c-key" style="background:hsl(330,62%,52%);">12A</span><div class="c-tags"><span class="tg">Vocal · House</span></div></div>
+              <div class="c-row" style="grid-template-columns:26px minmax(0,1fr) 56px 44px 90px;"><span class="c-rank num">2</span><div class="c-track"><div class="t">Paper Moon</div><div class="a">Ines Calder</div></div><span class="c-bpm num">119.0</span><span class="c-key" style="background:hsl(240,46%,34%);color:#fff;">9B</span><div class="c-tags"><span class="tg">Vocal · Nu-Disco</span></div></div>
+              <div class="c-row" style="grid-template-columns:26px minmax(0,1fr) 56px 44px 90px; border-bottom:0;"><span class="c-rank num">3</span><div class="c-track"><div class="t">Houdini</div><div class="a">Dua Lipa</div></div><span class="c-bpm num">117.0</span><span class="c-key" style="background:hsl(60,46%,34%);color:#fff;">3A</span><div class="c-tags"><span class="tg">Vocal · Dance-pop</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-frame dir-console">
+        <div class="c-app"><div class="c-topbar"><span>STRATA / COLLECTIONS</span><span>6 sets</span></div>
+          <div class="c-body">
+            <div class="c-collgrid">
+              <div class="c-collcard"><div class="name">Late Night Drive</div><div class="desc">Slow-building, key-friendly runs for the drive home.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+              <div class="c-collcard"><div class="name">Peak Time</div><div class="desc">High-energy peak-hour selections.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+              <div class="c-collcard"><div class="name">Sunrise Set</div><div class="desc">Warm, melodic tracks for the last hour.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+              <div class="c-collcard"><div class="name">Afters</div><div class="desc">Deeper and stranger, once the main room closes.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+              <div class="c-collcard"><div class="name">Open to Close</div><div class="desc">A full-night arc, opener to closer.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+              <div class="c-collcard"><div class="name">Support Slot</div><div class="desc">Warm-up material that doesn't outshine the headliner.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">0 TRACKS</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- DIRECTION 2 — LINER NOTES -->
+  <!-- ============================================================ -->
+  <section class="direction-panel" id="panel-liner" data-direction="liner" hidden>
+    <div class="rationale">
+      <h2>Liner Notes &mdash; editorial, spacious</h2>
+      <p>Liner Notes treats a result list like a crate-digger's shortlist, not a database dump: serif
+        display type stands in for the missing album art, and every match opens with a word &mdash; Best
+        match, Close match &mdash; before it ever shows a digit, because the brief is explicit that 92% and 86%
+        are closer than the numbers suggest. Compatible keys get a quiet ochre mark and a line of
+        explanation rather than a loud badge, fitting a page built for browsing at leisure rather than
+        deciding in a hurry. The Camelot wheel is drawn like a diagram in a liner-notes booklet &mdash; thin ink
+        lines on stone paper &mdash; a reference chart, not a control surface. This direction optimizes for
+        trust and pace over speed of scanning.</p>
+    </div>
+
+    <div class="screen-cap"><span class="n">01</span><h3>Search landing</h3><span class="d">— seed chips, live results, cold-start state</span></div>
+    <div class="screen-frame dir-liner">
+      <div class="l-body">
+        <div class="l-masthead"><span class="mark">Strata Notes</span><nav><span>Explore</span><span>By key</span><span>Collections</span></nav></div>
+        <p class="l-eyebrow">Find a track</p>
+        <input class="l-searchfield" value="gorgon" readonly aria-label="Search by artist or title" placeholder="an artist, a title…">
+        <div class="l-searchresult"><span><span class="t">Imagination</span><span class="a">Gorgon City</span></span><span class="go">Open →</span></div>
+        <p class="l-eyebrow" style="margin-top:26px;">Or begin with</p>
+        <div class="l-chips">
+          <button class="l-chip">FISHER</button>
+          <button class="l-chip">Fred again..</button>
+          <button class="l-chip">Dua Lipa</button>
+          <button class="l-chip">CamelPhat</button>
+          <button class="l-chip">Skrillex</button>
+        </div>
+        <div class="l-wake">The server's just waking up &mdash; this can take up to 30 seconds on the first search of the day.</div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">02</span><h3>Similar results</h3><span class="d">— the core screen: query, stats, filters, 8 ranked rows</span></div>
+    <div class="screen-frame dir-liner">
+      <div class="l-body">
+        <div class="l-masthead"><span class="mark">Strata Notes</span><nav><span>Explore</span><span>By key</span><span>Collections</span></nav></div>
+        <div class="l-querymast">
+          <p class="lbl">Now matching against</p>
+          <h1>Imagination</h1>
+          <p class="by">Gorgon City</p>
+          <p class="l-metaline">124 BPM &middot; 7A (D minor) &middot; Vocal &middot; House &middot; <a href="#">Open on Spotify</a></p>
+        </div>
+        <p class="l-statline"><b>387</b> tracks were compared against it. The closest match sits at <b>92%</b>,
+          the median at <b>84%</b>, and the furthest one still considered at <b>71%</b>. Above the median, treat
+          the order as the signal &mdash; the percentages themselves sit close together.</p>
+        <div class="l-filterrow">
+          <div class="l-fgroup"><button class="is-on">All keys</button><button>Compatible keys</button><button>Exact key</button></div>
+          <div class="l-toggle"><span class="box"></span> Within ±6% BPM</div>
+          <div class="l-count">showing all 8</div>
+        </div>
+        <div class="l-list">
+
+          <div class="l-row"><span class="l-rank">No. 1</span>
+            <div class="l-track"><div class="t">Losing It</div><div class="a">FISHER</div><div class="meta">125.0 BPM &middot; 7A &middot; Instrumental &middot; Tech House &middot; <span class="compat">compatible key</span></div></div>
+            <div class="l-scorecol"><div class="l-tier">Best match</div><div class="l-scorebar"><span style="width:96%;"></span></div><div class="l-pct">92%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 2</span>
+            <div class="l-track"><div class="t">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div><div class="meta">122.0 BPM &middot; 12A &middot; Vocal &middot; House</div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:91%;"></span></div><div class="l-pct">91%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 3</span>
+            <div class="l-track"><div class="t">Murder On The Dancefloor</div><div class="a">Sophie Ellis-Bextor</div><div class="meta">117.0 BPM &middot; 8A &middot; Vocal &middot; Disco &middot; <span class="compat">compatible key</span></div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:89%;"></span></div><div class="l-pct">89%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 4</span>
+            <div class="l-track"><div class="t">On My Mind</div><div class="a">Diplo &amp; SIDEPIECE</div><div class="meta">124.0 BPM &middot; 7B &middot; Vocal &middot; Tech House &middot; <span class="compat">compatible key</span></div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:89%;"></span></div><div class="l-pct">89%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 5</span>
+            <div class="l-track"><div class="t">Cold Heart (PNAU Remix)</div><div class="a">Elton John &amp; Dua Lipa</div><div class="meta">116.0 BPM &middot; 6A &middot; Vocal &middot; Dance-pop &middot; <span class="compat">compatible key</span></div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:88%;"></span></div><div class="l-pct">88%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 6</span>
+            <div class="l-track"><div class="t">Rumble</div><div class="a">Skrillex, Fred again.. &amp; Flowdan</div><div class="meta">140.0 BPM &middot; 2A &middot; Vocal &middot; UK Garage</div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:87%;"></span></div><div class="l-pct">87%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 7</span>
+            <div class="l-track"><div class="t">Houdini</div><div class="a">Dua Lipa</div><div class="meta">117.0 BPM &middot; 3A &middot; Vocal &middot; Dance-pop</div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:87%;"></span></div><div class="l-pct">87%</div></div>
+          </div>
+
+          <div class="l-row"><span class="l-rank">No. 8</span>
+            <div class="l-track"><div class="t">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div><div class="meta">130.0 BPM &middot; 7A &middot; Instrumental &middot; House &middot; <span class="compat">compatible key</span></div></div>
+            <div class="l-scorecol"><div class="l-tier">Close match</div><div class="l-scorebar"><span style="width:86%;"></span></div><div class="l-pct">86%</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">03</span><h3>Browse by key</h3><span class="d">— interactive Camelot wheel, 24 segments, dual ring</span></div>
+    <div class="screen-frame dir-liner">
+      <div class="l-body">
+        <div class="l-masthead"><span class="mark">Strata Notes</span><nav><span>Explore</span><span>By key</span><span>Collections</span></nav></div>
+        <div class="l-wheelgrid">
+          <div>
+            <div class="l-wheelwrap">
+              <svg id="wheel-liner" viewBox="0 0 400 400" role="img" aria-label="Camelot wheel, 24 keys"></svg>
+              <div class="l-wheel-center" id="wheel-liner-center">
+                <div class="code">7A</div>
+                <div class="name">D minor</div>
+              </div>
+            </div>
+            <p class="l-caption">inner ring, minor (A) &middot; outer ring, major (B)</p>
+          </div>
+          <div>
+            <p class="l-eyebrow">BPM range</p>
+            <div class="l-bpmrange"><span>96</span><div class="l-slider"><div class="fill"></div><div class="thumb" style="left:22%;"></div><div class="thumb" style="left:68%;"></div></div><span>150</span></div>
+            <p class="l-eyebrow" style="margin-top:22px;">Tracks in <span id="wheel-liner-listlabel">7A</span>, by tempo</p>
+            <div class="l-list">
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px;"><span class="l-rank">1</span><div class="l-track"><div class="t" style="font-size:16px;">Night Signal</div><div class="a">Halcyon Row</div></div><div class="l-pct" style="text-align:right;">120.0</div></div>
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px;"><span class="l-rank">2</span><div class="l-track"><div class="t" style="font-size:16px;">Undertow</div><div class="a">Marlowe &amp; Kite</div></div><div class="l-pct" style="text-align:right;">122.0</div></div>
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px;"><span class="l-rank">3</span><div class="l-track"><div class="t" style="font-size:16px;">Losing It</div><div class="a">FISHER</div></div><div class="l-pct" style="text-align:right;">125.0</div></div>
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px;"><span class="l-rank">4</span><div class="l-track"><div class="t" style="font-size:16px;">Concrete Bloom</div><div class="a">Vela Sun</div></div><div class="l-pct" style="text-align:right;">126.0</div></div>
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px;"><span class="l-rank">5</span><div class="l-track"><div class="t" style="font-size:16px;">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div></div><div class="l-pct" style="text-align:right;">130.0</div></div>
+              <div class="l-row" style="grid-template-columns:44px 1fr 70px; border-bottom:0;"><span class="l-rank">6</span><div class="l-track"><div class="t" style="font-size:16px;">Afterglow</div><div class="a">Ren Sable</div></div><div class="l-pct" style="text-align:right;">132.0</div></div>
+            </div>
+            <p class="l-note" id="wheel-liner-note">This mock only sets a full tempo-sorted list for 7A; the wheel itself responds to any segment, updating the centre mark and its compatible neighbours.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">04</span><h3>Explore &amp; Collections</h3><span class="d">— condensed vignettes</span></div>
+    <div class="vignette-row">
+      <div class="screen-frame dir-liner">
+        <div class="l-body">
+          <p class="l-eyebrow">Browse the catalogue</p>
+          <div class="l-clusters">
+            <button class="l-cluster is-on">Vocal house<span class="ct">388</span></button>
+            <button class="l-cluster">Peak-time techno<span class="ct">412</span></button>
+            <button class="l-cluster">Chart pop<span class="ct">2,051</span></button>
+            <button class="l-cluster">Melodic/deep<span class="ct">623</span></button>
+            <button class="l-cluster">Hip-hop adjacent<span class="ct">940</span></button>
+            <button class="l-cluster">Ballads &amp; downtempo<span class="ct">1,204</span></button>
+          </div>
+          <div class="l-list">
+            <div class="l-row" style="grid-template-columns:44px 1fr 90px;"><span class="l-rank">No. 1</span><div class="l-track"><div class="t" style="font-size:17px;">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div><div class="meta">122.0 BPM &middot; 12A &middot; Vocal</div></div><div></div></div>
+            <div class="l-row" style="grid-template-columns:44px 1fr 90px;"><span class="l-rank">No. 2</span><div class="l-track"><div class="t" style="font-size:17px;">Paper Moon</div><div class="a">Ines Calder</div><div class="meta">119.0 BPM &middot; 9B &middot; Vocal</div></div><div></div></div>
+            <div class="l-row" style="grid-template-columns:44px 1fr 90px; border-bottom:0;"><span class="l-rank">No. 3</span><div class="l-track"><div class="t" style="font-size:17px;">Houdini</div><div class="a">Dua Lipa</div><div class="meta">117.0 BPM &middot; 3A &middot; Vocal</div></div><div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-frame dir-liner">
+        <div class="l-body">
+          <p class="l-eyebrow">Collections</p>
+          <div class="l-collgrid">
+            <div class="l-collcard"><div class="name">Late Night Drive</div><div class="desc">Slow-building, key-friendly runs for the drive home.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+            <div class="l-collcard"><div class="name">Peak Time</div><div class="desc">High-energy peak-hour selections.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+            <div class="l-collcard"><div class="name">Sunrise Set</div><div class="desc">Warm, melodic tracks for the last hour.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+            <div class="l-collcard"><div class="name">Afters</div><div class="desc">Deeper and stranger, once the main room closes.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+            <div class="l-collcard"><div class="name">Open to Close</div><div class="desc">A full-night arc, opener to closer.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+            <div class="l-collcard"><div class="name">Support Slot</div><div class="desc">Warm-up material that doesn't outshine the headliner.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">no tracks yet</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- DIRECTION 3 — PULSE -->
+  <!-- ============================================================ -->
+  <section class="direction-panel" id="panel-pulse" data-direction="pulse" hidden>
+    <div class="rationale">
+      <h2>Pulse &mdash; bold, flat-color, built for chained discovery</h2>
+      <p>Pulse is for a phone in someone's hand at a party, chaining one track into the next for fun: flat,
+        saturated color takes over the job album art usually does, with every result getting a swatch
+        generated from its key and score tier so the list has visual texture with zero images. The same
+        twelve-hue system used across those swatches becomes the hero of the key-browser wheel, so the
+        color language is consistent rather than decorative &mdash; learn it once on the wheel and it explains
+        the whole app. Compatibility uses one dedicated lime accent everywhere, kept apart from the violet
+        brand color, so "this will mix" is never confused with "this is selected." It trades density for
+        momentum &mdash; built to be tapped through quickly, not studied.</p>
+    </div>
+
+    <div class="screen-cap"><span class="n">01</span><h3>Search landing</h3><span class="d">— seed chips, live results, cold-start state</span></div>
+    <div class="screen-frame dir-pulse">
+      <div class="p-body">
+        <div class="p-topbar"><span class="p-brand">strata<span>.</span></span><span class="p-navchip">Explore ↗</span></div>
+        <h1 class="p-h1">Find your next record.</h1>
+        <input class="p-search" value="gorgon" readonly aria-label="Search by artist or title" placeholder="artist or title">
+        <div class="p-searchresult"><span><span class="t">Imagination</span><br><span class="a">Gorgon City</span></span><span class="go">→</span></div>
+        <div class="p-chips">
+          <button class="p-chip">FISHER</button>
+          <button class="p-chip">Fred again..</button>
+          <button class="p-chip">Dua Lipa</button>
+          <button class="p-chip">CamelPhat</button>
+          <button class="p-chip">Skrillex</button>
+        </div>
+        <div class="p-wake"><span class="dot"></span> Warming up the server — first search can take ~30s.</div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">02</span><h3>Similar results</h3><span class="d">— the core screen: query, stats, filters, 8 ranked rows</span></div>
+    <div class="screen-frame dir-pulse">
+      <div class="p-body">
+        <div class="p-topbar"><span class="p-brand">strata<span>.</span></span><span class="p-navchip">Explore ↗</span></div>
+        <div class="p-querycard">
+          <p class="lbl">Matching against</p>
+          <h1>Imagination</h1>
+          <p class="by">Gorgon City</p>
+          <div class="p-qchips">
+            <span class="p-qchip">124 BPM</span>
+            <span class="p-qchip key" style="background:hsl(180,70%,66%);">7A · D min</span>
+            <span class="p-qchip">Vocal</span>
+            <span class="p-qchip">House</span>
+            <a class="p-qchip spot" href="#">Spotify ↗</a>
+          </div>
+        </div>
+        <div class="p-stats">
+          <div class="p-stattile t1"><div class="v num">387</div><div class="l">compared</div></div>
+          <div class="p-stattile t2"><div class="v num">92%</div><div class="l">best</div></div>
+          <div class="p-stattile t3"><div class="v num">84%</div><div class="l">median</div></div>
+          <div class="p-stattile t4"><div class="v num">71%</div><div class="l">lowest</div></div>
+        </div>
+        <div class="p-filterrow">
+          <div class="p-pillgroup"><button class="p-pill is-on">All</button><button class="p-pill">Compatible</button><button class="p-pill">Exact</button></div>
+          <div class="p-swtoggle"><span class="p-switch"></span> ±6% BPM</div>
+          <div class="p-count">8 / 8</div>
+        </div>
+
+        <div class="p-cards">
+          <div class="p-card is-compat"><span class="p-mixtag">MIXABLE</span>
+            <div class="p-swatch" style="background:hsl(180,70%,66%);">1</div>
+            <div class="mid"><div class="t">Losing It</div><div class="a">FISHER</div><div class="tagrow"><span>Instrumental</span><span>Tech House</span></div></div>
+            <div class="p-right"><div class="p-scorechip lead">92%</div><div class="p-bpm num">125.0<br>7A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-swatch" style="background:hsl(330,85%,52%);color:#fff;">2</div>
+            <div class="mid"><div class="t">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div><div class="tagrow"><span>Vocal</span><span>House</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">91%</div><div class="p-bpm num">122.0<br>12A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card is-compat"><span class="p-mixtag">MIXABLE</span>
+            <div class="p-swatch" style="background:hsl(210,85%,52%);color:#fff;">3</div>
+            <div class="mid"><div class="t">Murder On The Dancefloor</div><div class="a">Sophie Ellis-Bextor</div><div class="tagrow"><span>Vocal</span><span>Disco</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">89%</div><div class="p-bpm num">117.0<br>8A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card is-compat"><span class="p-mixtag">MIXABLE</span>
+            <div class="p-swatch" style="background:hsl(180,85%,52%);color:#fff;">4</div>
+            <div class="mid"><div class="t">On My Mind</div><div class="a">Diplo &amp; SIDEPIECE</div><div class="tagrow"><span>Vocal</span><span>Tech House</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">89%</div><div class="p-bpm num">124.0<br>7B</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card is-compat"><span class="p-mixtag">MIXABLE</span>
+            <div class="p-swatch" style="background:hsl(150,70%,66%);">5</div>
+            <div class="mid"><div class="t">Cold Heart (PNAU Remix)</div><div class="a">Elton John &amp; Dua Lipa</div><div class="tagrow"><span>Vocal</span><span>Dance-pop</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">88%</div><div class="p-bpm num">116.0<br>6A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-swatch" style="background:hsl(30,70%,66%);">6</div>
+            <div class="mid"><div class="t">Rumble</div><div class="a">Skrillex, Fred again.. &amp; Flowdan</div><div class="tagrow"><span>Vocal</span><span>UK Garage</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">87%</div><div class="p-bpm num">140.0<br>2A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-swatch" style="background:hsl(60,70%,66%);">7</div>
+            <div class="mid"><div class="t">Houdini</div><div class="a">Dua Lipa</div><div class="tagrow"><span>Vocal</span><span>Dance-pop</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">87%</div><div class="p-bpm num">117.0<br>3A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+
+          <div class="p-card is-compat"><span class="p-mixtag">MIXABLE</span>
+            <div class="p-swatch" style="background:hsl(180,70%,66%);">8</div>
+            <div class="mid"><div class="t">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div><div class="tagrow"><span>Instrumental</span><span>House</span></div></div>
+            <div class="p-right"><div class="p-scorechip rest">86%</div><div class="p-bpm num">130.0<br>7A</div><a class="p-spotbtn" href="#">♫</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">03</span><h3>Browse by key</h3><span class="d">— interactive Camelot wheel, 24 segments, dual ring</span></div>
+    <div class="screen-frame dir-pulse">
+      <div class="p-body">
+        <div class="p-topbar"><span class="p-brand">strata<span>.</span></span><span class="p-navchip">Explore ↗</span></div>
+        <div class="p-wheelgrid">
+          <div>
+            <div class="p-wheelwrap">
+              <svg id="wheel-pulse" viewBox="0 0 400 400" role="img" aria-label="Camelot wheel, 24 keys"></svg>
+              <div class="p-wheel-center" id="wheel-pulse-center">
+                <div class="code">7A</div>
+                <div class="name">D minor</div>
+              </div>
+            </div>
+            <p class="p-caption">inner = minor (A) &middot; outer = major (B)</p>
+          </div>
+          <div>
+            <p class="p-caption" style="text-align:left; margin-bottom:8px;">BPM range</p>
+            <div class="p-bpmrange"><span>96</span><div class="p-slider"><div class="fill"></div><div class="thumb" style="left:22%;"></div><div class="thumb" style="left:68%;"></div></div><span>150</span></div>
+            <p class="p-caption" style="text-align:left; margin:18px 0 8px;">Tracks in <span id="wheel-pulse-listlabel">7A</span></p>
+            <div class="p-cards">
+              <div class="p-card" style="grid-template-columns:40px 1fr auto;"><div class="p-swatch" style="background:hsl(180,70%,66%); font-size:13px;">1</div><div class="mid"><div class="t" style="font-size:13px;">Night Signal</div><div class="a">Halcyon Row</div></div><div class="p-right"><div class="p-bpm num">120.0</div></div></div>
+              <div class="p-card" style="grid-template-columns:40px 1fr auto;"><div class="p-swatch" style="background:hsl(180,70%,66%); font-size:13px;">2</div><div class="mid"><div class="t" style="font-size:13px;">Undertow</div><div class="a">Marlowe &amp; Kite</div></div><div class="p-right"><div class="p-bpm num">122.0</div></div></div>
+              <div class="p-card" style="grid-template-columns:40px 1fr auto;"><div class="p-swatch" style="background:hsl(180,70%,66%); font-size:13px;">3</div><div class="mid"><div class="t" style="font-size:13px;">Losing It</div><div class="a">FISHER</div></div><div class="p-right"><div class="p-bpm num">125.0</div></div></div>
+              <div class="p-card" style="grid-template-columns:40px 1fr auto;"><div class="p-swatch" style="background:hsl(180,70%,66%); font-size:13px;">4</div><div class="mid"><div class="t" style="font-size:13px;">Baby again..</div><div class="a">Fred again.., Skrillex &amp; Four Tet</div></div><div class="p-right"><div class="p-bpm num">130.0</div></div></div>
+            </div>
+            <p class="p-note" id="wheel-pulse-note">Full tempo-sorted data is only prepped for 7A in this mock — the wheel still lights up compatible neighbours for whichever segment you tap.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-cap"><span class="n">04</span><h3>Explore &amp; Collections</h3><span class="d">— condensed vignettes</span></div>
+    <div class="vignette-row">
+      <div class="screen-frame dir-pulse">
+        <div class="p-body">
+          <p class="p-caption" style="text-align:left; margin-bottom:10px;">Browse the catalogue</p>
+          <div class="p-clusters">
+            <span class="p-cluster is-on">Vocal house<span class="ct">388</span></span>
+            <span class="p-cluster">Peak-time techno<span class="ct">412</span></span>
+            <span class="p-cluster">Chart pop<span class="ct">2,051</span></span>
+            <span class="p-cluster">Melodic/deep<span class="ct">623</span></span>
+            <span class="p-cluster">Hip-hop adj.<span class="ct">940</span></span>
+            <span class="p-cluster">Ballads<span class="ct">1,204</span></span>
+          </div>
+          <div class="p-cards">
+            <div class="p-card"><div class="p-swatch" style="background:hsl(330,85%,52%);color:#fff;">1</div><div class="mid"><div class="t">Cola</div><div class="a">CamelPhat &amp; Elderbrook</div></div><div class="p-right"><div class="p-bpm num">122.0<br>12A</div></div></div>
+            <div class="p-card"><div class="p-swatch" style="background:hsl(270,85%,52%);color:#fff;">2</div><div class="mid"><div class="t">Paper Moon</div><div class="a">Ines Calder</div></div><div class="p-right"><div class="p-bpm num">119.0<br>9B</div></div></div>
+            <div class="p-card"><div class="p-swatch" style="background:hsl(60,70%,66%);">3</div><div class="mid"><div class="t">Houdini</div><div class="a">Dua Lipa</div></div><div class="p-right"><div class="p-bpm num">117.0<br>3A</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-frame dir-pulse">
+        <div class="p-body">
+          <p class="p-caption" style="text-align:left; margin-bottom:10px;">Collections</p>
+          <div class="p-collgrid">
+            <div class="p-collcard"><div class="name">Late Night Drive</div><div class="desc">Slow-building, key-friendly runs for the drive home.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+            <div class="p-collcard"><div class="name">Peak Time</div><div class="desc">High-energy peak-hour selections.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+            <div class="p-collcard"><div class="name">Sunrise Set</div><div class="desc">Warm, melodic tracks for the last hour.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+            <div class="p-collcard"><div class="name">Afters</div><div class="desc">Deeper and stranger, once the main room closes.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+            <div class="p-collcard"><div class="name">Open to Close</div><div class="desc">A full-night arc, opener to closer.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+            <div class="p-collcard"><div class="name">Support Slot</div><div class="desc">Warm-up material that doesn't outshine the headliner.</div><div class="keystrip"><i></i><i></i><i></i><i></i></div><div class="count">EMPTY — 0 TRACKS</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">Three directions, one fixture set (Gorgon City &mdash; Imagination and its top 8 matches, from the product brief). No album artwork exists in the catalogue today; each direction stands on typography, color, and data instead, per the brief's constraint.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tab switching ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  var panels = Array.prototype.slice.call(document.querySelectorAll(".direction-panel"));
+  tabs.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var target = btn.getAttribute("data-target");
+      tabs.forEach(function(b){
+        var on = b === btn;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      panels.forEach(function(p){ p.hidden = (p.id !== target); });
+    });
+  });
+
+  /* ---------- Camelot wheel geometry + data ---------- */
+  var CAMELOT = [
+    {pos:1,  aShort:"Abm", bShort:"B",  aName:"Ab minor", bName:"B major"},
+    {pos:2,  aShort:"Ebm", bShort:"F#", aName:"Eb minor", bName:"F# major"},
+    {pos:3,  aShort:"Bbm", bShort:"Db", aName:"Bb minor", bName:"Db major"},
+    {pos:4,  aShort:"Fm",  bShort:"Ab", aName:"F minor",  bName:"Ab major"},
+    {pos:5,  aShort:"Cm",  bShort:"Eb", aName:"C minor",  bName:"Eb major"},
+    {pos:6,  aShort:"Gm",  bShort:"Bb", aName:"G minor",  bName:"Bb major"},
+    {pos:7,  aShort:"Dm",  bShort:"F",  aName:"D minor",  bName:"F major"},
+    {pos:8,  aShort:"Am",  bShort:"C",  aName:"A minor",  bName:"C major"},
+    {pos:9,  aShort:"Em",  bShort:"G",  aName:"E minor",  bName:"G major"},
+    {pos:10, aShort:"Bm",  bShort:"D",  aName:"B minor",  bName:"D major"},
+    {pos:11, aShort:"F#m", bShort:"A",  aName:"F# minor", bName:"A major"},
+    {pos:12, aShort:"Dbm", bShort:"E",  aName:"Db minor", bName:"E major"}
+  ];
+
+  function polar(cx, cy, r, angleDeg){
+    var rad = angleDeg * Math.PI / 180;
+    return [cx + r * Math.sin(rad), cy - r * Math.cos(rad)];
+  }
+  function sectorPath(cx, cy, rInner, rOuter, startDeg, endDeg){
+    var p1 = polar(cx, cy, rOuter, startDeg);
+    var p2 = polar(cx, cy, rOuter, endDeg);
+    var p3 = polar(cx, cy, rInner, endDeg);
+    var p4 = polar(cx, cy, rInner, startDeg);
+    var large = (endDeg - startDeg) > 180 ? 1 : 0;
+    return "M " + p1[0] + " " + p1[1] +
+      " A " + rOuter + " " + rOuter + " 0 " + large + " 1 " + p2[0] + " " + p2[1] +
+      " L " + p3[0] + " " + p3[1] +
+      " A " + rInner + " " + rInner + " 0 " + large + " 0 " + p4[0] + " " + p4[1] + " Z";
+  }
+  function labelXform(cx, cy, r, angleDeg){
+    var pt = polar(cx, cy, r, angleDeg);
+    var rot = angleDeg;
+    if (angleDeg > 90 && angleDeg < 270) rot += 180;
+    return "translate(" + pt[0] + " " + pt[1] + ") rotate(" + rot + ")";
+  }
+  function compatKeys(pos, ring){
+    var prev = pos === 1 ? 12 : pos - 1;
+    var next = pos === 12 ? 1 : pos + 1;
+    var other = ring === "A" ? "B" : "A";
+    return [ pos + ring, pos + other, prev + ring, next + ring ];
+  }
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs){
+    var el = document.createElementNS(SVGNS, tag);
+    for (var k in attrs){ el.setAttribute(k, attrs[k]); }
+    return el;
+  }
+
+  function buildWheel(config){
+    var svg = document.getElementById(config.svgId);
+    if (!svg) return;
+    var cx = 200, cy = 200, gap = 1.4;
+    var segMap = {};
+
+    // base ground circle
+    svg.appendChild(svgEl("circle", {cx:cx, cy:cy, r:config.rB1 + 3, fill:config.groundFill, stroke:config.groundStroke, "stroke-width":config.groundStrokeW || 0}));
+
+    CAMELOT.forEach(function(entry){
+      var start = (entry.pos - 1) * 30 - 15 + gap;
+      var end = start + 30 - gap * 2;
+      var mid = (start + end) / 2;
+
+      // A ring (inner, minor)
+      var gA = svgEl("g", {class:"wheel-seg", tabindex:"0", role:"button", "aria-label":entry.pos + "A, " + entry.aName, "data-key": entry.pos + "A"});
+      var pathA = svgEl("path", {d:sectorPath(cx,cy,config.rA0,config.rA1,start,end), fill:config.colorA(entry.pos), stroke:config.segStroke, "stroke-width":config.segStrokeW});
+      gA.appendChild(pathA);
+      var txtA = svgEl("text", {"text-anchor":"middle","dominant-baseline":"middle",transform:labelXform(cx,cy,(config.rA0+config.rA1)/2,mid), fill:config.labelColorA, "font-family":config.fontFamily, "font-size":config.fontSizeCode, "font-weight":config.fontWeightCode});
+      var tsA1 = document.createElementNS(SVGNS,"tspan"); tsA1.setAttribute("x",0); tsA1.setAttribute("dy","-0.15em"); tsA1.textContent = entry.pos + "A";
+      var tsA2 = document.createElementNS(SVGNS,"tspan"); tsA2.setAttribute("x",0); tsA2.setAttribute("dy","1.15em"); tsA2.setAttribute("font-size", config.fontSizeName); tsA2.setAttribute("font-weight", config.fontWeightName); tsA2.textContent = entry.aShort;
+      txtA.appendChild(tsA1); txtA.appendChild(tsA2);
+      gA.appendChild(txtA);
+      svg.appendChild(gA);
+      segMap[entry.pos+"A"] = {g:gA, path:pathA, ring:"A", pos:entry.pos, baseFill:config.colorA(entry.pos)};
+
+      // B ring (outer, major)
+      var gB = svgEl("g", {class:"wheel-seg", tabindex:"0", role:"button", "aria-label":entry.pos + "B, " + entry.bName, "data-key": entry.pos + "B"});
+      var pathB = svgEl("path", {d:sectorPath(cx,cy,config.rB0,config.rB1,start,end), fill:config.colorB(entry.pos), stroke:config.segStroke, "stroke-width":config.segStrokeW});
+      gB.appendChild(pathB);
+      var txtB = svgEl("text", {"text-anchor":"middle","dominant-baseline":"middle",transform:labelXform(cx,cy,(config.rB0+config.rB1)/2,mid), fill:config.labelColorB, "font-family":config.fontFamily, "font-size":config.fontSizeCode, "font-weight":config.fontWeightCode});
+      var tsB1 = document.createElementNS(SVGNS,"tspan"); tsB1.setAttribute("x",0); tsB1.setAttribute("dy","-0.15em"); tsB1.textContent = entry.pos + "B";
+      var tsB2 = document.createElementNS(SVGNS,"tspan"); tsB2.setAttribute("x",0); tsB2.setAttribute("dy","1.15em"); tsB2.setAttribute("font-size", config.fontSizeName); tsB2.setAttribute("font-weight", config.fontWeightName); tsB2.textContent = entry.bShort;
+      txtB.appendChild(tsB1); txtB.appendChild(tsB2);
+      gB.appendChild(txtB);
+      svg.appendChild(gB);
+      segMap[entry.pos+"B"] = {g:gB, path:pathB, ring:"B", pos:entry.pos, baseFill:config.colorB(entry.pos)};
+    });
+
+    var selected = null;
+
+    function applyStates(){
+      Object.keys(segMap).forEach(function(key){
+        var seg = segMap[key];
+        seg.g.classList.remove("is-selected","is-compat");
+        config.applyState(seg, "none");
+      });
+      if (selected){
+        var compats = compatKeys(selected.pos, selected.ring);
+        compats.forEach(function(key){
+          var seg = segMap[key];
+          if (!seg) return;
+          var isSelf = (key === selected.pos + selected.ring);
+          seg.g.classList.add(isSelf ? "is-selected" : "is-compat");
+          config.applyState(seg, isSelf ? "selected" : "compat");
+        });
+      }
+    }
+
+    function selectKey(pos, ring, entry, fromClick){
+      var key = pos + ring;
+      if (selected && selected.pos === pos && selected.ring === ring){
+        selected = null;
+        applyStates();
+        config.onChange(null);
+        return;
+      }
+      selected = {pos:pos, ring:ring};
+      applyStates();
+      config.onChange({pos:pos, ring:ring, name: ring === "A" ? entry.aName : entry.bName, code:key});
+    }
+
+    CAMELOT.forEach(function(entry){
+      [["A",segMap[entry.pos+"A"]], ["B",segMap[entry.pos+"B"]]].forEach(function(pair){
+        var ring = pair[0], seg = pair[1];
+        function activate(){ selectKey(entry.pos, ring, entry, true); }
+        seg.g.addEventListener("click", activate);
+        seg.g.addEventListener("keydown", function(e){
+          if (e.key === "Enter" || e.key === " "){ e.preventDefault(); activate(); }
+        });
+      });
+    });
+
+    // default selection: 7A, to match the query-track context shown elsewhere
+    selectKey(7, "A", CAMELOT[6], false);
+  }
+
+  function hue(pos){ return (pos - 1) * 30; }
+
+  /* ---------- Console wheel: full-hue, dark, monospace ---------- */
+  buildWheel({
+    svgId:"wheel-console",
+    rA0:66, rA1:128, rB0:132, rB1:196,
+    groundFill:"#14171A", groundStroke:"#2A2F35", groundStrokeW:1,
+    segStroke:"#0B0D0F", segStrokeW:1.5,
+    colorA:function(p){ return "hsl(" + hue(p) + ",46%,34%)"; },
+    colorB:function(p){ return "hsl(" + hue(p) + ",62%,52%)"; },
+    labelColorA:"#ECEEF0", labelColorB:"#0B0D0F",
+    fontFamily:"ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+    fontSizeCode:13, fontWeightCode:700, fontSizeName:7.5, fontWeightName:500,
+    applyState:function(seg, state){
+      if (state === "none"){ seg.path.setAttribute("opacity","1"); seg.path.setAttribute("stroke","#0B0D0F"); seg.path.setAttribute("stroke-width","1.5"); seg.g.style.transform=""; }
+      if (state === "selected"){ seg.path.setAttribute("stroke","#4CD3C2"); seg.path.setAttribute("stroke-width","3"); }
+      if (state === "compat"){ seg.path.setAttribute("stroke","#FFB454"); seg.path.setAttribute("stroke-width","2.5"); }
+    },
+    onChange:function(sel){
+      var codeEl = document.querySelector("#wheel-console-center .code");
+      var nameEl = document.querySelector("#wheel-console-center .name");
+      var labelEl = document.getElementById("wheel-console-listlabel");
+      var noteEl = document.getElementById("wheel-console-note");
+      if (!sel){
+        codeEl.textContent = "—"; nameEl.textContent = "SELECT A KEY";
+        return;
+      }
+      codeEl.textContent = sel.code; nameEl.textContent = sel.name.toUpperCase();
+      if (labelEl) labelEl.textContent = sel.code;
+      if (noteEl){
+        noteEl.innerHTML = sel.code === "7A"
+          ? 'Showing prepared data for <em>7A</em>. Selecting another segment updates the wheel and compatibility highlight live — this mock only carries full track data for 7A.'
+          : 'Compatibility now highlighted for <em>' + sel.code + '</em>. Full tempo-sorted track data in this mock is only prepared for 7A — the list above stays as reference.';
+      }
+    }
+  });
+
+  /* ---------- Liner wheel: ink-diagram, restrained ---------- */
+  buildWheel({
+    svgId:"wheel-liner",
+    rA0:64, rA1:126, rB0:130, rB1:194,
+    groundFill:"#EFEBE3", groundStroke:"#C9C2AF", groundStrokeW:1,
+    segStroke:"#C9C2AF", segStrokeW:1,
+    colorA:function(){ return "transparent"; },
+    colorB:function(){ return "transparent"; },
+    labelColorA:"#5B5648", labelColorB:"#5B5648",
+    fontFamily:'ui-serif, "New York", Georgia, serif',
+    fontSizeCode:12.5, fontWeightCode:600, fontSizeName:7, fontWeightName:400,
+    applyState:function(seg, state){
+      if (state === "none"){ seg.path.setAttribute("fill","transparent"); seg.path.setAttribute("stroke","#C9C2AF"); seg.path.setAttribute("stroke-width","1"); }
+      if (state === "selected"){ seg.path.setAttribute("fill","rgba(140,100,35,0.28)"); seg.path.setAttribute("stroke","#8C6423"); seg.path.setAttribute("stroke-width","1.5"); }
+      if (state === "compat"){ seg.path.setAttribute("fill","rgba(140,100,35,0.12)"); seg.path.setAttribute("stroke","#8C6423"); seg.path.setAttribute("stroke-width","1"); }
+    },
+    onChange:function(sel){
+      var codeEl = document.querySelector("#wheel-liner-center .code");
+      var nameEl = document.querySelector("#wheel-liner-center .name");
+      var labelEl = document.getElementById("wheel-liner-listlabel");
+      var noteEl = document.getElementById("wheel-liner-note");
+      if (!sel){
+        codeEl.textContent = "—"; nameEl.textContent = "choose a key";
+        return;
+      }
+      codeEl.textContent = sel.code; nameEl.textContent = sel.name;
+      if (labelEl) labelEl.textContent = sel.code;
+      if (noteEl){
+        noteEl.textContent = sel.code === "7A"
+          ? "This mock only sets a full tempo-sorted list for 7A; the wheel itself responds to any segment, updating the centre mark and its compatible neighbours."
+          : "Compatible neighbours of " + sel.code + " are now marked on the wheel. The list at left keeps its 7A reference data in this mock.";
+      }
+    }
+  });
+
+  /* ---------- Pulse wheel: bold flat poster color ---------- */
+  buildWheel({
+    svgId:"wheel-pulse",
+    rA0:66, rA1:126, rB0:130, rB1:194,
+    groundFill:"#FFFFFF", groundStroke:"#14121A", groundStrokeW:2.5,
+    segStroke:"#14121A", segStrokeW:2.5,
+    colorA:function(p){ return "hsl(" + hue(p) + ",70%,66%)"; },
+    colorB:function(p){ return "hsl(" + hue(p) + ",85%,52%)"; },
+    labelColorA:"#14121A", labelColorB:"#FFFFFF",
+    fontFamily:'-apple-system, "SF Pro Display", system-ui, sans-serif',
+    fontSizeCode:13.5, fontWeightCode:900, fontSizeName:7.5, fontWeightName:700,
+    applyState:function(seg, state){
+      if (state === "none"){ seg.path.setAttribute("stroke","#14121A"); seg.path.setAttribute("stroke-width","2.5"); seg.g.setAttribute("transform",""); }
+      if (state === "selected"){ seg.path.setAttribute("stroke","#C6FF3D"); seg.path.setAttribute("stroke-width","4"); }
+      if (state === "compat"){ seg.path.setAttribute("stroke","#C6FF3D"); seg.path.setAttribute("stroke-width","3"); }
+    },
+    onChange:function(sel){
+      var codeEl = document.querySelector("#wheel-pulse-center .code");
+      var nameEl = document.querySelector("#wheel-pulse-center .name");
+      var labelEl = document.getElementById("wheel-pulse-listlabel");
+      var noteEl = document.getElementById("wheel-pulse-note");
+      if (!sel){
+        codeEl.textContent = "—"; nameEl.textContent = "TAP A KEY";
+        return;
+      }
+      codeEl.textContent = sel.code; nameEl.textContent = sel.name;
+      if (labelEl) labelEl.textContent = sel.code;
+      if (noteEl){
+        noteEl.textContent = sel.code === "7A"
+          ? "Full tempo-sorted data is only prepped for 7A in this mock — the wheel still lights up compatible neighbours for whichever segment you tap."
+          : "Compatible neighbours of " + sel.code + " are lit up in lime. Card list above still shows 7A reference data in this mock.";
+      }
+    }
+  });
+
+})();
+</script>
