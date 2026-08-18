@@ -1,6 +1,14 @@
-fastapi
-uvicorn[standard]
-psycopg[binary]
-pgvector
-numpy
-python-dotenv
+# Pinned deliberately. These were unpinned, and on 2026-08-18 a Render rebuild
+# picked up pgvector 0.5.0, which changed `vector` columns from NumPy arrays to
+# Vector objects. Every similarity comparison then raised TypeError into a bare
+# `except: continue`, so /similar/{id} returned 404 "No comparable tracks found."
+# for every track in the catalogue while search and explore kept working.
+#
+# api_helpers._as_array now accepts either shape, so these can be raised again —
+# but raise them on purpose, with a request against a real track afterwards.
+fastapi==0.136.3
+uvicorn[standard]==0.48.0
+psycopg[binary]==3.3.4
+pgvector==0.5.0
+numpy==2.5.2
+python-dotenv==1.2.2

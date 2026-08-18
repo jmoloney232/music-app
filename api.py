@@ -9,6 +9,7 @@ Endpoints:
 from __future__ import annotations
 
 import json
+import logging
 import os
 import statistics
 from pathlib import Path
@@ -30,6 +31,8 @@ from api_helpers import (
     vocal_class,
     TEMPO_PENALTY_SHARE,
 )
+
+log = logging.getLogger("similar_song_search")
 
 app = FastAPI(title="Jack's Similar Song Search API")
 
@@ -294,16 +297,35 @@ def get_similar(track_id: int, top: int = Query(default=15, ge=1, le=400)) -> di
         raise HTTPException(status_code=404, detail="No other indexed tracks to compare against.")
 
     # Stage 1: how alike the two recordings sound. Untouched by tempo.
+    #
+    # Skipping a single unusable candidate is deliberate — one row with a
+    # missing stem embedding should not sink the request. Skipping every
+    # candidate is not a thin catalogue, it is the scoring being broken. This
+    # has happened once already: a pgvector upgrade changed the column type,
+    # every comparison raised, and the endpoint answered a confident 404 while
+    # search and explore looked fine, which sent the search for a cause to the
+    # database rather than the loop. So keep the first exception and report it
+    # rather than reporting an empty ranking.
     sound_scored: list[tuple[float, int, dict]] = []
+    first_error: Exception | None = None
     for tid, f in candidates:
         try:
             sound = similarity(query, f)
-        except Exception:
+        except Exception as exc:
+            if first_error is None:
+                first_error = exc
+                log.exception("similarity() failed for candidate %s", tid)
             continue
         sound_scored.append((sound, tid, f))
 
     if not sound_scored:
-        raise HTTPException(status_code=404, detail="No comparable tracks found.")
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                f"Scoring failed for all {len(candidates)} candidates: "
+                f"{type(first_error).__name__}: {first_error}"
+            ),
+        )
 
     # Stage 2: demote tracks that could not be mixed with the query.
     #

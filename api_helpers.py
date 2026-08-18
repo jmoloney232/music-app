@@ -34,6 +34,25 @@ def get_connection() -> Any:
     return conn
 
 
+def _as_array(value: Any) -> Any:
+    """Normalise an embedding column to a NumPy array.
+
+    pgvector hands back a NumPy array for `vector` columns up to 0.4.x and a
+    `Vector` object from 0.5.0 on. The scoring code multiplies these directly,
+    and a `Vector` has no arithmetic, so every comparison raised TypeError and
+    the whole candidate list was silently dropped. Coerce at the fetch boundary
+    so the rest of the module sees one shape whichever version is installed.
+    """
+    if value is None:
+        return None
+    if isinstance(value, np.ndarray):
+        return value
+    to_numpy = getattr(value, "to_numpy", None)
+    if to_numpy is not None:
+        return to_numpy()
+    return np.asarray(value, dtype=np.float32)
+
+
 def fetch_track_features(track_id: int) -> dict[str, Any]:
     conn = get_connection()
     with conn.cursor() as cur:
@@ -65,12 +84,12 @@ def fetch_track_features(track_id: int) -> dict[str, Any]:
         "artist": artist,
         "title": title,
         "track_key": stable_track_key(artist, title),
-        "emb_full":    muq_full,
-        "emb_vocals":  muq_vocals,
-        "emb_backing": muq_backing,
-        "emb_drums":   muq_drums,
-        "emb_bass":    muq_bass,
-        "emb_other":   muq_other,
+        "emb_full":    _as_array(muq_full),
+        "emb_vocals":  _as_array(muq_vocals),
+        "emb_backing": _as_array(muq_backing),
+        "emb_drums":   _as_array(muq_drums),
+        "emb_bass":    _as_array(muq_bass),
+        "emb_other":   _as_array(muq_other),
         "vocal_dominance": vocal_dominance,
         "bpm":         bpm,
         "key":         key,
@@ -119,12 +138,12 @@ def fetch_candidates_by_vector(
         f: dict[str, Any] = {
             "artist": artist,
             "title": title,
-            "emb_full":    muq_full,
-            "emb_vocals":  muq_vocals,
-            "emb_backing": muq_backing,
-            "emb_drums":   muq_drums,
-            "emb_bass":    muq_bass,
-            "emb_other":   muq_other,
+            "emb_full":    _as_array(muq_full),
+            "emb_vocals":  _as_array(muq_vocals),
+            "emb_backing": _as_array(muq_backing),
+            "emb_drums":   _as_array(muq_drums),
+            "emb_bass":    _as_array(muq_bass),
+            "emb_other":   _as_array(muq_other),
             "vocal_dominance": vocal_dominance,
             "bpm":         bpm,
             "key":         key,
