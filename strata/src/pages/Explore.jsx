@@ -3,22 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { CAMELOT_TO_KEY } from '../utils/camelot'
 import TrackRow from '../components/TrackRow'
 
-function SkeletonRow({ delay = 0 }) {
+/* Skeletons hold the table's column tracks so nothing shifts when data lands. */
+function SkeletonRow({ opacity = 1 }) {
   return (
     <div
-      className="flex items-center gap-s3 rounded border border-hairline bg-surface px-s3 py-2.5"
-      style={{ animationDelay: `${delay}ms` }}
+      className="grid grid-cols-[minmax(0,1fr)_28px] items-center gap-x-s4 border-b border-hairline py-[15px]
+                 md:grid-cols-[minmax(0,1fr)_92px_130px_116px_140px_28px]"
+      style={{ opacity }}
     >
-      <div className="skeleton h-3 w-6 flex-shrink-0 rounded" />
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <div className="skeleton h-3 w-2/5 rounded" />
-        <div className="skeleton h-2.5 w-1/4 rounded" />
-      </div>
-      <div className="flex flex-shrink-0 gap-1.5">
-        <div className="skeleton h-5 w-16 rounded" />
-        <div className="skeleton h-5 w-20 rounded" />
-        <div className="skeleton h-5 w-4 rounded" />
-      </div>
+      <div className="skeleton h-[15px] max-w-[280px] rounded-chip" />
+      <div className="hidden h-[15px] rounded-chip bg-tan md:block" />
+      <div className="hidden h-[15px] rounded-chip bg-tan md:block" />
+      <div className="hidden h-[15px] rounded-chip bg-tan md:block" />
+      <div className="hidden h-[15px] rounded-chip bg-tan md:block" />
+      <span />
     </div>
   )
 }
@@ -135,181 +133,180 @@ export default function Explore() {
   const hasFilters = selectedCluster !== null || bpmEnabled || camelot || vocalType
 
   return (
-    <div className="mx-auto max-w-dense px-s4 py-s5">
-      <div>
+    <div className="mx-auto max-w-dense px-s4 pb-s6 pt-s5 sm:px-s6">
 
-        <div className="mb-s5">
-          <h1 className="text-xl font-semibold text-ink">Explore the catalogue</h1>
-          <p className="mt-1 text-sm text-ink-quiet">
-            Narrow by tempo, key, vocal type, or the clusters the embeddings found.
-          </p>
-        </div>
+      {/* Title row */}
+      <div className="mb-[30px] flex flex-wrap items-end justify-between gap-s4 border-b border-line-strong pb-s4">
+        <h1 className="font-display text-[clamp(36px,6vw,56px)] font-light leading-none text-ink">
+          The catalogue
+        </h1>
+        <span className="font-display text-[34px] leading-none tabular-nums text-ink">
+          {loading ? '…' : total.toLocaleString()}{' '}
+          <span className="font-sans text-base text-ink-quiet">tracks match</span>
+        </span>
+      </div>
 
-        {/* Sound clusters */}
-        {clusters.length > 0 && (
-          <div className="mb-s5">
-            <div className="mb-1.5 text-xs uppercase tracking-[0.16em] text-ink-quiet">
-              Sound clusters
-            </div>
-            <p className="mb-s3 text-xs text-ink-quiet">
-              Grouped by audio similarity — tracks in each cluster genuinely sound alike.
-            </p>
-            <div className="flex flex-wrap gap-s2">
-              {clusters.map(({ id, name, count }) => (
-                <button
-                  key={id}
-                  onClick={() => setSelectedCluster(selectedCluster === id ? null : id)}
-                  aria-pressed={selectedCluster === id}
-                  className={`h-control-sm rounded border px-s3 text-sm transition-colors ${
-                    selectedCluster === id
-                      ? 'border-accent bg-accent font-medium text-white'
-                      : 'border-hairline text-ink-quiet hover:border-line-strong hover:bg-sunken hover:text-ink'
-                  }`}
-                >
-                  {name}
-                  <span className="ml-1.5 font-mono text-xs tabular-nums opacity-80">{count}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Filter bar */}
-        <div className="mb-s4 border-y border-hairline bg-sunken px-s3 py-s3">
-          <div className="flex flex-wrap items-start gap-s4">
-
-            <div className="min-w-[200px] flex-1">
-              <div className="mb-s2 flex items-center justify-between">
-                <span className="text-xs uppercase tracking-[0.16em] text-ink-quiet">BPM</span>
-                <label className="flex cursor-pointer select-none items-center gap-1.5">
-                  <input
-                    type="checkbox"
-                    checked={bpmEnabled}
-                    onChange={e => setBpmEnabled(e.target.checked)}
-                    className="h-3 w-3"
-                  />
-                  <span className="text-xs text-ink-quiet">Enable</span>
-                </label>
-              </div>
-              <div className={`flex items-center gap-s2 transition-opacity ${bpmEnabled ? 'opacity-100' : 'pointer-events-none opacity-40'}`}>
-                <span className="w-7 text-right font-mono text-xs tabular-nums text-ink">{bpmMin}</span>
-                <input
-                  type="range" min={60} max={215} value={bpmMin}
-                  aria-label="Minimum BPM"
-                  onChange={e => setBpmMin(Math.min(+e.target.value, bpmMax - 5))}
-                  className="flex-1"
-                />
-                <span className="text-xs text-ink-quiet">–</span>
-                <input
-                  type="range" min={65} max={220} value={bpmMax}
-                  aria-label="Maximum BPM"
-                  onChange={e => setBpmMax(Math.max(+e.target.value, bpmMin + 5))}
-                  className="flex-1"
-                />
-                <span className="w-7 font-mono text-xs tabular-nums text-ink">{bpmMax}</span>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="key-filter" className="mb-s2 block text-xs uppercase tracking-[0.16em] text-ink-quiet">
-                Key
-              </label>
-              <select
-                id="key-filter"
-                value={camelot}
-                onChange={e => setCamelot(e.target.value)}
-                className="h-control-sm cursor-pointer rounded border border-line-control bg-surface px-s2
-                           font-mono text-xs text-ink outline-none focus:border-accent"
-              >
-                <option value="">Any key</option>
-                {KEY_OPTIONS.map(([key, standard]) => (
-                  <option key={key} value={key}>{key} / {standard}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <div className="mb-s2 text-xs uppercase tracking-[0.16em] text-ink-quiet">Type</div>
-              <div className="flex flex-wrap gap-1">
-                {[['', 'All'], ['vocal', 'Vocal'], ['instrumental', 'Instrumental'], ['ambiguous', 'Mixed']].map(([val, label]) => (
-                  <button
-                    key={val}
-                    onClick={() => setVocalType(val)}
-                    aria-pressed={vocalType === val}
-                    className={`h-control-sm rounded border px-s2 text-xs transition-colors ${
-                      vocalType === val
-                        ? 'border-accent bg-accent font-medium text-white'
-                        : 'border-hairline text-ink-quiet hover:border-line-strong hover:bg-surface hover:text-ink'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Count + clear */}
-        <div className="mb-s4 flex items-center justify-between">
-          <span className="font-mono text-xs tabular-nums text-ink-quiet">
-            {loading ? '…' : `${total.toLocaleString()} track${total !== 1 ? 's' : ''}`}
-          </span>
-          {hasFilters && (
+      {/* Sound clusters */}
+      {clusters.length > 0 && (
+        <div className="mb-[30px] flex flex-wrap gap-[10px]">
+          {clusters.map(({ id, name, count }) => (
             <button
-              onClick={clearFilters}
-              className="rounded text-xs text-ink-quiet transition-colors hover:text-accent"
+              key={id}
+              onClick={() => setSelectedCluster(selectedCluster === id ? null : id)}
+              aria-pressed={selectedCluster === id}
+              className={`rounded border px-4 py-2 text-sm tabular-nums transition-colors ${
+                selectedCluster === id
+                  ? 'border-accent text-accent'
+                  : 'border-line-strong text-ink-soft hover:border-accent hover:text-accent'
+              }`}
             >
-              Clear all filters
+              {name} · {count.toLocaleString()}
             </button>
+          ))}
+        </div>
+      )}
+
+      {/* Filter band */}
+      <div className="mb-[30px] grid grid-cols-1 items-end gap-s5 border-y border-divider py-s4 lg:grid-cols-[1fr_240px_260px] lg:gap-[44px]">
+
+        <div className="flex flex-col gap-s3">
+          <div className="flex items-baseline justify-between">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-ink-quiet">Tempo</span>
+            <label className="flex cursor-pointer select-none items-center gap-2 text-xs text-ink-quiet">
+              <input
+                type="checkbox"
+                checked={bpmEnabled}
+                onChange={e => setBpmEnabled(e.target.checked)}
+                className="h-3 w-3"
+              />
+              Enable
+            </label>
+          </div>
+          <div className={`flex flex-col gap-2 transition-opacity ${bpmEnabled ? 'opacity-100' : 'pointer-events-none opacity-40'}`}>
+            <span className="font-display text-[24px] leading-none tabular-nums text-ink">
+              {bpmMin} <span className="text-ink-muted">–</span> {bpmMax}
+            </span>
+            <div className="flex items-center gap-s3">
+              <input
+                type="range" min={60} max={215} value={bpmMin}
+                aria-label="Minimum BPM"
+                onChange={e => setBpmMin(Math.min(+e.target.value, bpmMax - 5))}
+                className="flex-1"
+              />
+              <input
+                type="range" min={65} max={220} value={bpmMax}
+                aria-label="Maximum BPM"
+                onChange={e => setBpmMax(Math.max(+e.target.value, bpmMin + 5))}
+                className="flex-1"
+              />
+            </div>
+            <div className="flex justify-between text-[11px] tabular-nums text-ink-muted">
+              <span>60</span><span>220</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-s3">
+          <label htmlFor="key-filter" className="text-[10px] uppercase tracking-[0.2em] text-ink-quiet">
+            Key
+          </label>
+          <select
+            id="key-filter"
+            value={camelot}
+            onChange={e => setCamelot(e.target.value)}
+            className="cursor-pointer rounded border border-line-control bg-canvas px-[14px] py-[10px]
+                       text-sm text-ink-soft outline-none focus:border-accent"
+          >
+            <option value="">All 24 keys</option>
+            {KEY_OPTIONS.map(([key, standard]) => (
+              <option key={key} value={key}>{key} / {standard}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-s3">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-ink-quiet">Vocal</span>
+          <div className="flex gap-2">
+            {[['', 'Any'], ['vocal', 'Vocal'], ['instrumental', 'Instr.'], ['ambiguous', 'Mixed']].map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setVocalType(val)}
+                aria-pressed={vocalType === val}
+                className={`flex-1 rounded border py-[9px] text-xs transition-colors ${
+                  vocalType === val
+                    ? 'border-accent text-accent'
+                    : 'border-line-strong text-ink-soft hover:border-accent hover:text-accent'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {hasFilters && (
+        <div className="mb-s4 flex justify-end">
+          <button
+            onClick={clearFilters}
+            className="rounded border-b border-accent pb-[2px] text-xs uppercase tracking-[0.08em] text-accent
+                       transition-colors hover:text-accent-deep"
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="hidden grid-cols-[minmax(0,1fr)_92px_130px_116px_140px_28px] gap-x-s4 border-b border-line-strong
+                      pb-2 text-[10px] uppercase tracking-[0.18em] text-ink-muted md:grid">
+        <span>Track</span><span>BPM</span><span>Key</span><span>Vocal</span><span>Style</span><span />
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonRow key={i} opacity={Math.max(0.15, 1 - i * 0.12)} />
+          ))}
+          {slowLoad && (
+            <p className="mt-s4 text-center text-sm italic text-ink-quiet">
+              Waking up the server — first load can take up to 30s…
+            </p>
           )}
         </div>
-
-        {/* Track list */}
-        {loading ? (
-          <div className="flex flex-col gap-s2">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <SkeletonRow key={i} delay={i * 35} />
+      ) : tracks.length === 0 ? (
+        <div className="rounded border border-dashed border-line-strong px-s4 py-s6 text-center text-sm text-ink-quiet">
+          No tracks match the current filters.
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col">
+            {tracks.map(track => (
+              <TrackRow
+                key={track.id}
+                track={track}
+                onClick={() => navigate(`/results?id=${track.id}`)}
+              />
             ))}
-            {slowLoad && (
-              <p className="mt-s3 text-center text-sm text-ink-quiet">
-                Waking up the server — first load can take up to 30s…
-              </p>
-            )}
           </div>
-        ) : tracks.length === 0 ? (
-          <div className="rounded border border-dashed border-line-strong px-s4 py-s6 text-center text-sm text-ink-quiet">
-            No tracks match the current filters.
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col gap-s2">
-              {tracks.map((track, i) => (
-                <TrackRow
-                  key={track.id}
-                  track={track}
-                  rank={i + 1}
-                  onClick={() => navigate(`/results?id=${track.id}`)}
-                  showStyles
-                />
-              ))}
-            </div>
 
-            {tracks.length < total && (
+          {tracks.length < total && (
+            <div className="mt-s4 flex items-center gap-[18px]">
               <button
                 onClick={handleShowMore}
                 disabled={loadingMore}
-                className="mt-s3 h-control w-full rounded border border-line-control text-sm text-ink-quiet
-                           transition-colors hover:bg-sunken hover:text-ink disabled:opacity-50"
+                className="rounded border border-accent px-[22px] py-[9px] text-sm text-accent
+                           transition-colors hover:bg-accent-fill disabled:opacity-50"
               >
-                {loadingMore
-                  ? 'Loading…'
-                  : `Show more (${(total - tracks.length).toLocaleString()} remaining)`}
+                {loadingMore ? 'Loading…' : 'Next 50'}
               </button>
-            )}
-          </>
-        )}
-      </div>
+              <span className="text-xs tabular-nums text-ink-muted">
+                {(total - tracks.length).toLocaleString()} remaining
+              </span>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

@@ -14,6 +14,7 @@ export default function Home() {
   const [slowLoad, setSlowLoad] = useState(false)
   const [searched, setSearched] = useState(false)
   const [fetchError, setFetchError] = useState(null)
+  const [catalogueTotal, setCatalogueTotal] = useState(null)
   const navigate = useNavigate()
   const debounce = useRef(null)
   const slowTimer = useRef(null)
@@ -28,6 +29,14 @@ export default function Home() {
     }
     return () => clearTimeout(slowTimer.current)
   }, [loading])
+
+  // The kicker states the real catalogue size, not a hard-coded one.
+  useEffect(() => {
+    fetch(`${API}/explore/tracks?limit=1`)
+      .then(r => r.json())
+      .then(d => setCatalogueTotal(d.total))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!query.trim()) {
@@ -61,99 +70,121 @@ export default function Home() {
   }, [query])
 
   return (
-    <div className="mx-auto flex max-w-read flex-col px-s4 pb-s6 pt-s6 sm:pt-[72px]">
+    <div className="mx-auto flex max-w-[1020px] flex-col items-center px-s4 pb-s6 pt-[64px] text-center sm:pt-[110px]">
 
-      <header className="mb-s5">
-        <h1 className="text-2xl font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-3xl">
-          Find tracks that<br />actually sound alike
-        </h1>
-        <p className="mt-s3 max-w-[52ch] text-ink-quiet">
-          Every track in the catalogue is compared by its audio, not its genre tag. Pick one and
-          you'll get the closest matches ranked, with BPM and harmonic key for mixing.
+      <header className="mb-[56px] flex flex-col items-center gap-s4">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-ink-quiet">
+          {catalogueTotal != null
+            ? `${catalogueTotal.toLocaleString()} tracks · analysed from the audio, not the tags`
+            : 'Analysed from the audio, not the tags'}
         </p>
+        <h1 className="font-display text-[clamp(48px,9vw,86px)] font-light leading-[0.95] tracking-[-0.02em] text-ink">
+          What else sounds<br />
+          <span className="italic text-accent">like this?</span>
+        </h1>
       </header>
 
-      <div className="relative mb-s4">
-        <label htmlFor="track-search" className="sr-only">Search the catalogue by artist or title</label>
-        <input
-          id="track-search"
-          type="search"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Artist or title…"
-          autoComplete="off"
-          className="h-control-lg w-full rounded border border-line-control bg-surface px-s3 pr-11
-                     text-base text-ink placeholder:text-ink-muted
-                     focus:border-accent focus:outline-none focus-visible:outline-none"
-          autoFocus
-        />
-        {loading && (
-          <div
-            role="status"
-            aria-label="Searching"
-            className="absolute right-s3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full
-                       border-2 border-line-strong border-t-accent"
-          />
-        )}
+      <div className="w-full max-w-[780px] text-left">
+        <div className="relative border-b border-accent pb-[18px]">
+          <label htmlFor="track-search" className="sr-only">Search the catalogue by artist or title</label>
+          <div className="flex items-center gap-s4 px-1">
+            <span aria-hidden="true" className="text-[22px] leading-none text-accent">⌕</span>
+            <input
+              id="track-search"
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Artist or title…"
+              autoComplete="off"
+              className="w-full border-none bg-transparent font-display text-[clamp(26px,5vw,38px)] font-normal
+                         leading-tight text-ink caret-accent outline-none placeholder:text-ink-muted
+                         focus:outline-none focus-visible:outline-none
+                         [&::-webkit-search-cancel-button]:hidden"
+              autoFocus
+            />
+            {loading && (
+              <div
+                role="status"
+                aria-label="Searching"
+                className="h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-line-strong border-t-accent"
+              />
+            )}
+          </div>
+        </div>
+
+        <div aria-live="polite" className="min-w-0">
+          {fetchError && (
+            <p className="mt-s4 rounded border border-error/40 px-s3 py-2 text-sm text-error">
+              {fetchError}. Check your connection and try again.
+            </p>
+          )}
+
+          {searched && results.length === 0 && !loading && !fetchError && (
+            <p className="mt-s4 text-sm text-ink-quiet">
+              Nothing in the catalogue matches “{query}”. Try a different spelling, or browse{' '}
+              <button
+                onClick={() => navigate('/explore')}
+                className="rounded text-accent underline underline-offset-2 hover:text-accent-deep"
+              >
+                the full catalogue
+              </button>.
+            </p>
+          )}
+
+          {results.length > 0 && (
+            <ul>
+              {results.map(track => (
+                <li key={track.id} className="border-b border-hairline">
+                  <button
+                    onClick={() => navigate(`/results?id=${track.id}`)}
+                    className="group flex w-full items-baseline justify-between gap-s4 px-1 py-[18px] text-left"
+                  >
+                    <span className="flex min-w-0 items-baseline gap-s3">
+                      <span className="truncate font-display text-[26px] leading-tight text-ink
+                                       transition-colors group-hover:text-accent group-focus-visible:text-accent">
+                        {track.title}
+                      </span>
+                      <span className="truncate text-sm text-ink-quiet">{track.artist}</span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="hidden flex-shrink-0 text-[11px] uppercase tracking-[0.16em] text-accent
+                                 group-hover:inline group-focus-visible:inline"
+                    >
+                      ⏎ open
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       {!query && (
-        <div className="mb-s4">
-          <p className="mb-s2 text-sm text-ink-quiet">Artists in the catalogue to start from</p>
-          <div className="flex flex-wrap gap-s2">
-            {EXAMPLE_SEARCHES.map(q => (
-              <button
-                key={q}
-                onClick={() => setQuery(q)}
-                className="h-control-sm rounded border border-hairline px-s3 text-sm text-ink-quiet
-                           transition-colors hover:border-line-strong hover:bg-sunken hover:text-ink"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
+        <div className="mt-[56px] flex flex-wrap items-center justify-center gap-s3 text-sm italic text-ink-quiet">
+          <span>Or start from</span>
+          {EXAMPLE_SEARCHES.map(q => (
+            <button
+              key={q}
+              onClick={() => setQuery(q)}
+              className="rounded border border-line-strong px-[15px] py-[7px] text-sm not-italic text-ink-soft
+                         transition-colors hover:border-accent hover:text-accent"
+            >
+              {q}
+            </button>
+          ))}
         </div>
       )}
 
-      <div aria-live="polite" className="min-w-0">
-        {slowLoad && (
-          <p className="mb-s3 text-sm text-ink-muted">
-            Waking up the server — the first search after a while can take up to 30s.
-          </p>
-        )}
-
-        {fetchError && (
-          <p className="mb-s3 rounded border border-error/40 bg-error/5 px-s3 py-2 text-sm text-error">
-            {fetchError}. Check your connection and try again.
-          </p>
-        )}
-
-        {searched && results.length === 0 && !loading && !fetchError && (
-          <p className="text-sm text-ink-quiet">
-            Nothing in the catalogue matches “{query}”. Try a different spelling, or browse{' '}
-            <button onClick={() => navigate('/explore')} className="rounded text-accent underline underline-offset-2 hover:text-accent-deep">
-              the full catalogue
-            </button>.
-          </p>
-        )}
-
-        {results.length > 0 && (
-          <ul className="divide-y divide-hairline overflow-hidden rounded border border-hairline bg-surface">
-            {results.map(track => (
-              <li key={track.id}>
-                <button
-                  onClick={() => navigate(`/results?id=${track.id}`)}
-                  className="flex w-full items-baseline gap-s2 px-s3 py-2.5 text-left
-                             transition-colors hover:bg-sunken"
-                >
-                  <span className="truncate font-medium text-ink">{track.artist}</span>
-                  <span className="truncate text-sm text-ink-quiet">{track.title}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {slowLoad && (
+        <div className="mt-[26px] flex w-full max-w-[780px] items-center justify-center gap-s3 border-t border-divider pt-[26px]">
+          <span aria-hidden="true" className="h-[9px] w-[9px] flex-shrink-0 rounded-full border border-accent" />
+          <span className="text-sm italic text-ink-soft">
+            Waking the server. It sleeps when idle — the first search can take 30 seconds.
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -76,6 +76,34 @@ export function keyColor(camelot, tone) {
   return oklchToHex(ramp.L, ramp.C, ((pos - 1) * 30 + 20) % 360)
 }
 
+// "D minor" -> "D min"; "F major" -> "F maj" — the short form Booth rows use.
+export function shortKeyName(camelot) {
+  const standard = CAMELOT_TO_KEY[camelot]
+  if (!standard) return null
+  return standard.replace(' minor', ' min').replace(' major', ' maj')
+}
+
+/**
+ * The harmonic relationship between a query key and another key, in words —
+ * Booth states compatibility on the chip ("7B · relative maj") rather than
+ * leaving it to be decoded from colour. Returns null when the keys don't mix.
+ */
+export function keyRelationship(query, other) {
+  if (!query || !other) return null
+  if (query === other) return 'same key'
+  const q = query.match(/^(\d+)([AB])$/)
+  const o = other.match(/^(\d+)([AB])$/)
+  if (!q || !o) return null
+  const [qn, qr] = [parseInt(q[1]), q[2]]
+  const [on, or] = [parseInt(o[1]), o[2]]
+  if (qn === on && qr !== or) return or === 'B' ? 'relative maj' : 'relative min'
+  if (qr === or) {
+    if ((qn % 12) + 1 === on) return '+1 step'
+    if ((on % 12) + 1 === qn) return '−1 step'
+  }
+  return null
+}
+
 // Returns [same, parallel, -1 step, +1 step] — standard harmonic mixing compatibility
 export function compatibleKeys(camelot) {
   if (!camelot) return []

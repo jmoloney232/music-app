@@ -1,27 +1,40 @@
 import { keyColor } from '../utils/camelot'
 
 /**
- * A playlist's harmonic fingerprint, drawn from the keys of the tracks actually
- * in it. This is the collection artwork — derived from catalogue data rather
- * than invented, so an empty playlist correctly shows nothing.
+ * A collection's harmonic fingerprint: twelve fixed ticks, one per wheel
+ * position, lit for positions present in the collection. Fixed positions
+ * rather than one bar per track, so a collection's harmonic spread reads at a
+ * glance — and an empty collection shows twelve unlit ticks instead of nothing.
  */
-export default function KeyStrip({ camelots = [], limit = 16 }) {
-  const keys = camelots.filter(Boolean).slice(0, limit)
-  if (keys.length === 0) return null
+export default function KeyStrip({ camelots = [] }) {
+  const present = new Set(
+    camelots
+      .filter(Boolean)
+      .map(c => parseInt(c))
+      .filter(n => n >= 1 && n <= 12),
+  )
 
   return (
     <div
-      className="flex h-2 gap-px overflow-hidden rounded-chip"
+      className="flex gap-1"
       role="img"
-      aria-label={`Keys in this collection: ${keys.join(', ')}`}
+      aria-label={
+        present.size === 0
+          ? 'No keys in this collection yet'
+          : `Wheel positions in this collection: ${[...present].sort((a, b) => a - b).join(', ')}`
+      }
     >
-      {keys.map((c, i) => (
-        <span
-          key={`${c}-${i}`}
-          className="h-full flex-1"
-          style={{ backgroundColor: keyColor(c) }}
-        />
-      ))}
+      {Array.from({ length: 12 }, (_, i) => {
+        const pos = i + 1
+        const lit = present.has(pos)
+        return (
+          <span
+            key={pos}
+            className="h-[18px] w-[2px]"
+            style={{ backgroundColor: lit ? keyColor(`${pos}A`, 'selected') : '#2D2B2B' }}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -3,8 +3,25 @@ function cleanTitle(title) {
   return title.replace(/\s*[([].*?[)\]]/g, '').trim()
 }
 
-export default function SpotifyButton({ artist, title }) {
+export default function SpotifyButton({ artist, title, variant = 'icon' }) {
   const query = encodeURIComponent(`${artist} ${cleanTitle(title)}`)
+
+  // Booth's rows and query card link out in words, not with an icon.
+  if (variant === 'text') {
+    return (
+      <a
+        href={`https://open.spotify.com/search/${query}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={e => e.stopPropagation()}
+        aria-label={`Search Spotify for ${title} by ${artist}`}
+        className="relative z-10 whitespace-nowrap rounded text-xs uppercase tracking-[0.1em] text-accent
+                   underline-offset-4 transition-colors hover:text-accent-deep hover:underline"
+      >
+        Spotify ↗
+      </a>
+    )
+  }
 
   return (
     <a

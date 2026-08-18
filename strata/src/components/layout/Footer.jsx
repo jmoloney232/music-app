@@ -1,12 +1,12 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-hairline bg-canvas">
-      <div className="mx-auto flex max-w-dense flex-wrap items-center justify-between gap-s2 px-s4 py-s4 sm:px-s5">
-        <span className="text-xs uppercase tracking-[0.18em] text-ink-quiet">
-          Similar Song Search
+    <footer className="border-t border-divider bg-canvas">
+      <div className="mx-auto flex max-w-dense flex-wrap items-center justify-between gap-s2 px-s4 py-s3 sm:px-s6">
+        <span className="text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+          Similar Song Search · similarity from audio embeddings
         </span>
-        <span className="text-xs text-ink-muted">
-          Similarity from audio embeddings · {new Date().getFullYear()}
+        <span className="text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+          Scores are relative, not absolute
         </span>
       </div>
     </footer>
