@@ -115,7 +115,7 @@ def ingest_one_track_4stem(artist: str, title: str) -> dict[str, Any]:
     ensure_dirs()
     track_key = stable_track_key(artist, title)
 
-    audio_path = fetch_audio(artist, title, track_key)
+    audio_path, _itunes_match = fetch_audio(artist, title, track_key)
 
     log.info("loading full mix: %s - %s", artist, title)
     full_mix_wav = load_audio_librosa(audio_path, 44_100)

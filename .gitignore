@@ -20,3 +20,6 @@ feature_cache/
 
 # Essentia model binaries — download via ensure_essentia_models()
 essentia_models/*.pb
+
+# Generated audit reports
+catalog_audio_audit.jsonl

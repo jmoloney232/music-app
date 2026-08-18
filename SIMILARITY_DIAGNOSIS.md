@@ -50,19 +50,21 @@ two tempos cannot be played together.
 | Hub tracks appear in everyone's results | 150-query × 6-neighbour sample: max appearances = 2, exactly what chance predicts (~25 tracks expected at ≥2). No concentration. |
 | Whole sources point at the wrong genre | Objective audio measures match their source: `csv` 5.8% instrumental / tempo-varied (pop), `beatport` 59% instrumental / 62% in dance range. |
 | Vocal-vs-instrumental weight profiles bias ranking | Real effect in principle — the weight table changes per pair — but the top-80 candidate pool for vocal queries contains **zero** instrumentals. It never fires. |
-| Base rate: Hot 100 is 60% of the catalogue and drowns everything | Backwards. Rekordbox tracks are **5.8× over**-represented in results, Hot 100 **3× under**-represented. Retrieval already favours the right material. |
+| Base rate: Hot 100 is 60% of the catalogue and drowns everything | Backwards. Rekordbox tracks are **5.8×  over**-represented in results, Hot 100 **3× under**-represented. Retrieval already favours the right material. |
 | The Discogs classifier says Hot 100 audio is 79% "Electronic", so the audio is wrong | False alarm — only 1,228 of 16,402 rows have style data (7.5%, unrepresentative). Tempo and vocal-dominance contradict it. |
 
 ## 4. Confirmed but unresolved
 
-### 4a. Wrong audio from iTunes — real, small, ongoing
+> **Update 2026-08-17: §4a and §4b are now resolved in code — see §9.**
 
-`track_ingestion.py:238` — the path commented `STRICT FIRST` returns **the first
+### 4a. Wrong audio from iTunes — real, ongoing (~10% of Hot 100, measured)
+
+`track_ingestion.py` — the path commented `STRICT FIRST` returned **the first
 iTunes search result that has a preview, with no verification of artist or
-title**. The proper checker (`_score_match`, 0.45 artist floor, 0.72 confidence
-threshold) exists but only runs in the *fallback* block, which executes only when
-the strict search returns nothing. Since iTunes almost always returns something,
-**the verification is effectively dead code**.
+title**. The proper checker (`_score_match`) existed but only ran in the
+*fallback* block, which executed only when the strict search returned nothing.
+Since iTunes almost always returns something, **the verification was
+effectively dead code**.
 
 - **303 tracks** were rejected at ingest for producing an embedding identical to
   an existing track — the error message names the mechanism: *"iTunes likely
@@ -70,20 +72,22 @@ the strict search returns nothing. Since iTunes almost always returns something,
 - That is a **floor, not an estimate**. The guard only fires when the wrong
   answer already exists in the catalogue. Wrong audio landing on any of iTunes'
   other millions of tracks passes silently.
-- The second-chance search uses `media=all`, so it can return podcasts,
-  audiobooks and interviews — all of which have preview URLs.
-- **This path is still live.** Every newly ingested track can get wrong audio.
+- The second-chance search used `media=all`, so it could return podcasts,
+  audiobooks and interviews — all of which have preview URLs. (Measured: ~1% of
+  picks were literally feature films.)
 
 ### 4b. No provenance is recorded
 
 `tracks` has `itunes_id`, `itunes_preview_url`, `deezer_id`, `audio_r2_key` and
-`isrc` columns. **Every one is NULL for every row.** The schema was added; the
-ingestion never writes to it. Consequences:
+`isrc` columns. **Every one is NULL for every row** ingested before 2026-08-17.
+Consequences:
 
 - A wrongly-matched track is indistinguishable from a correct one in the database.
-- Audio is not retained, so after-the-fact listening checks are impossible.
 - No ISRC anywhere, so the exact-recording lookup path (ISRC → Deezer preview,
   which would eliminate fuzzy matching entirely) is unavailable from existing data.
+- Correction from the original handoff: audio **is** partially retained locally —
+  `audio_cache/` holds the ingested m4a for 54% of indexed Hot 100 and 66% of
+  Beatport tracks on the dev machine.
 
 ### 4c. Score compression — probably the biggest remaining lever
 
@@ -103,19 +107,21 @@ subtract the dataset's mean vector before comparing. Cheap (one average vector,
 no re-ingestion) and testable entirely in SQL before touching code.
 **Untested. This is a hypothesis, not a finding.**
 
-## 5. What was changed
+## 5. What was changed (tempo branch)
 
 Branch `claude/tempo-aware-similarity` (based on `main`, 2 files, 86 lines).
+**Merged to `main` 2026-08-18 (PR #2, commit 5392227) — but still unverified
+against real result lists; `verify_tempo.sql` is now in the repo root.**
 
 `api_helpers.py` gains `tempo_distance()` and `tempo_penalty()`:
 
-- Octave-folded in log space, so 70 ↔ 140 ↔ 280 BPM read as identical. The BPM
+- Octave-folded in log space, so 70 ≡ 140 ≡ 280 BPM read as identical. The BPM
   detector halves and doubles often enough that ignoring this would punish
   correct matches.
 - No penalty below 6% apart (pitch-fader range); smoothstep ramp to 18%;
   saturated beyond. Saturation is deliberate — once two tracks cannot be mixed,
   pushing further would make this a tempo sorter.
-- Missing BPM ⇒ penalty 0. An unknown tempo is not evidence of a bad match, and
+- Missing BPM → penalty 0. An unknown tempo is not evidence of a bad match, and
   ~641 Hot 100 tracks have none.
 
 `similarity()` is **unchanged** and still returns the pure sound score.
@@ -166,9 +172,8 @@ good 118 BPM results stay at ~0.0.
    plumbing.
 3. **Test mean-centering** (§4c). Highest potential upside; do it *after* ground
    truth exists or the result cannot be judged.
-4. **Fix iTunes matching** (§4a): move `_score_match` onto the main path, drop the
-   `media=all` fallback, fail loudly instead of substituting, and populate the
-   provenance columns. Stops the problem growing.
+4. ~~Fix iTunes matching~~ **Done 2026-08-17, see §9.** Remaining: repair the
+   already-damaged rows (§9.4).
 5. **Consider key/Camelot in ranking.** It is in the identical position tempo was:
    stored, displayed, filterable, ignored by ranking. Deliberately left out of the
    tempo change so its effect can be measured separately.
@@ -179,14 +184,92 @@ good 118 BPM results stay at ~0.0.
 ## 8. Other known issues
 
 - **Search-as-you-type had an unguarded response race** (`Home.jsx`, `Explore.jsx`,
-  `DJMode.jsx`): the timer was debounced but not the response, so a slow early
-  fetch could land after a newer one and show stale results. Fixed on the frontend
-  redesign branch only — **still present on `main`.**
-- **`formatKey` was called but never imported in `DJMode.jsx`**, throwing a
-  `ReferenceError` on both branches of the key-selection path. Fixed on the
-  redesign branch only — **still present on `main`.**
+  `DJMode.jsx`) and **`formatKey` was called but never imported in `DJMode.jsx`**.
+  Both were fixed on the frontend redesign branch, which has since been merged to
+  `main` (commit 96829e0).
 - `npm run lint` reports 7 `react-hooks/set-state-in-effect` errors in the data
-  fetching effects. Pre-existing, present on `main`.
-- Branch `claude/frontend-redesign-tan-grey-nkf4y2` holds a full light-theme
-  rebuild (26 files). Rendered and contrast-audited against fixture data only —
-  **never run against the real API.**
+  fetching effects. Pre-existing.
+
+---
+
+## 9. Addendum 2026-08-17 — wrong-audio measured; ingestion fixed
+
+### 9.1 How much audio is actually wrong (measured two ways)
+
+**Metadata replay** (210 random indexed tracks; re-run the old first-preview-wins
+lookup and score what it picks): ~37% of Hot 100 picks fail naive artist/title
+verification, but two-thirds of those are the *correct* audio penalized by
+chart-credit formatting ("Beyonce Featuring Kendrick Lamar" vs iTunes
+"Beyoncé — Freedom (feat. Kendrick Lamar)"). Genuinely wrong picks:
+**~11% Hot 100, ~7% Beatport**. 2/210 picks were feature films via `media=all`.
+
+**Audio-level ground truth** (100 random indexed Hot 100 rows; download the
+*verified* iTunes preview, MuQ-embed it, cosine against the stored `muq_full`):
+
+| Verdict | n | Meaning |
+|---|---|---|
+| correct (cos ≥ 0.98) | 78 | stored audio is the verified recording |
+| wrong (cos < 0.90) | 10 | stored audio is some other recording/excerpt¹ |
+| gray (0.90–0.98) | 5 | almost certainly right song, different excerpt/encode |
+| no verified match | 7 | not confidently on iTunes; unfixable by re-ingest² |
+
+¹ ~6–7 are unambiguous (e.g. cos 0.07 for "Swae Lee — Guatemala"); the
+0.77–0.86 band may partly be same-recording/different-preview-window.
+² A few may be throttling artifacts; the full scan re-checks them.
+
+**Bottom line: ~1 in 10 Hot 100 rows carries wrong audio. Real and worth a
+targeted repair; NOT the cause of "every search looks wrong" — that is §2/§4c,
+and the §5 tempo fix, merged 2026-08-18, is still unverified.** Full
+catalogue re-ingestion is not
+justified (2–4 weeks of compute, ~89% of it reproducing identical embeddings).
+
+### 9.2 Ingestion fix (in `track_ingestion.py`, replaces §4a's dead code)
+
+- `search_itunes_preview()` now verifies **every** result with `_score_match`;
+  first-preview-wins and `media=all` are gone; no verified match ⇒ loud
+  `ValueError`, never a substitute. Returns match metadata, not a bare URL.
+- `_score_match` is credit-aware, calibrated on real failures:
+  - feat/ft/featuring credits stripped from both sides ("(feat. X)" titles);
+  - bracketed album tags dropped, but bracketed **version markers kept**
+    ("[NASHUP Remix]" must mismatch);
+  - a version marker (remix/live/acoustic/edit/…) present on the result but
+    absent from the request halves the score → "American Boy (TS7 Remix)"
+    rejected at 0.40;
+  - artist floor raised 0.45 → 0.60 (coincidences measure 0.48–0.56; legitimate
+    renderings 0.86+).
+- `_itunes_candidates` adds a primary-artist candidate ("A Featuring B",
+  "A, B & C", "A x B" → "A") — rescues chart credits iTunes indexes under the
+  primary artist; several previously-failed tracks (e.g. Meek Mill — Froze) now
+  resolve.
+- Provenance recorded: `itunes_id`, `itunes_preview_url`, `audio_fetched_at`
+  written on every new ingest (`save_track_features`). Cache-hit ingests leave
+  them NULL — origin unknown by definition.
+- `muq`/torch import made lazy (metadata-only scripts no longer pay a
+  minutes-long `torch._dynamo` import).
+- Validated: 7-case block/keep unit suite green; 210-row offline regression
+  keeps all 38 legitimate cures and all true rejections.
+
+### 9.3 New tool: `verify_catalog_audio.py`
+
+Read-only, resumable full-catalogue audit (`--group hot100|beatport|rekordbox|all`).
+Re-resolves each indexed track through the verified lookup and writes
+verified/no_match per row to JSONL. ~3.5 s/track (iTunes rate limits) ⇒ ~10 h
+for Hot 100. Its output is the repair worklist.
+
+### 9.4 Remaining repair plan
+
+1. Run the full Hot 100 audit overnight (or `caffeinate -i` in a terminal).
+2. For flagged rows: **delete their `audio_cache`/`stems_cache`/
+   `embedding_cache`/`feature_cache` entries** (the pipeline trusts caches
+   blindly — stale wrong audio would be silently reused), set status
+   `pending`, re-run `ingestion_worker.py`. Unverifiable rows fail loudly and
+   drop out of the index.
+3. Verify the §5 tempo change with `verify_tempo.sql` (merged 2026-08-18,
+   still unverified) — the actual "every search" lever.
+
+### 9.5 Corrections to this document
+
+- §4a "small" → measured at ~10% of Hot 100 (§9.1).
+- §4b "audio is not retained" → partially retained locally (54% Hot 100 / 66%
+  Beatport in `audio_cache/`).
+- §8 frontend fixes are merged to `main`; that bullet is resolved.

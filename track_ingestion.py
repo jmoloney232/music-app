@@ -35,7 +35,6 @@ import librosa
 import numpy as np
 import requests
 from dotenv import load_dotenv
-from muq import MuQMuLan
 
 
 # ---------------------------------------------------------------------------
@@ -160,17 +159,80 @@ def _strip_junk(text: str) -> str:
     return _JUNK_RE.sub("", text).strip()
 
 
-_MIN_ARTIST_SCORE = 0.45  # prevents title-only coincidences from matching wrong artists
+# Prevents title-only coincidences from matching wrong artists. Measured on the
+# catalogue: coincidences score 0.48-0.56 (Lil Uzi Vert/Vinai & VAMERO, Glee
+# Cast/Sleeping At Last); legitimate renderings of the same artist score 0.86+
+# (Beyonce/Beyoncé, Travi$ Scott/Travis Scott). 0.60 splits them with margin.
+_MIN_ARTIST_SCORE = 0.60
+
+# iTunes moves featuring credits into the track name — "Freedom (feat. Kendrick
+# Lamar)" — while chart CSVs keep them in the artist, and appends album tags
+# like "[From Barbie The Album]". Strip credits and tags from titles and feat
+# credits from artists before comparing, else correct matches score near zero.
+# Bare "with"/"x"/"&" are NOT stripped from title tails ("Dancing With a
+# Stranger" would be mangled); "with" is only stripped inside parens/brackets.
+# Version markers — "(Acoustic)", "(Live ...)", "(X Remix)" — are deliberately
+# NOT stripped: those are different recordings and must fail verification.
+_TITLE_FEAT_RE = re.compile(
+    r"\s*[\(\[]\s*(?:feat\.?|featuring|ft\.?|with)\s[^\)\]]*[\)\]]?", re.IGNORECASE
+)
+_TITLE_FEAT_TAIL_RE = re.compile(r"\s+(?:feat\.?|featuring|ft\.?)\s+.*$", re.IGNORECASE)
+_ARTIST_FEAT_RE = re.compile(
+    r"\s+(?:featuring|feat\.?|ft\.?)\s+.*$", re.IGNORECASE
+)
+# Words inside a bracketed tag that mean "different recording" — such tags must
+# survive junk-stripping so the mismatch penalizes the score. Remasters are the
+# same recording and are deliberately absent.
+_VERSION_MARKER_RE = re.compile(
+    r"\b(?:remix|mix|edit|live|acoustic|version|demo|instrumental|karaoke|"
+    r"cover|tribute|sped.?up|slowed)\b",
+    re.IGNORECASE,
+)
+
+
+def _strip_title_feat(title: str) -> str:
+    def _bracket_tag(m: re.Match) -> str:
+        # keep "[NASHUP Remix - Radio Edit]", drop "[From Barbie The Album]"
+        return m.group(0) if _VERSION_MARKER_RE.search(m.group(0)) else ""
+
+    out = re.sub(r"\s*\[[^\]]{0,80}\]", _bracket_tag, title)
+    out = _TITLE_FEAT_RE.sub("", out)
+    out = _TITLE_FEAT_TAIL_RE.sub("", out).strip()
+    return out or title
+
+
+def _strip_artist_feat(artist: str) -> str:
+    return _ARTIST_FEAT_RE.sub("", artist).strip() or artist
 
 
 def _score_match(result: dict, cand_artist: str, cand_title: str) -> float:
     def norm(s: str) -> str:
         return re.sub(r"[^\w\s]", "", s.lower()).strip()
-    a = difflib.SequenceMatcher(None, norm(cand_artist), norm(result.get("artistName") or "")).ratio()
+
+    def ratio(x: str, y: str) -> float:
+        return difflib.SequenceMatcher(None, norm(x), norm(y)).ratio()
+
+    r_artist = result.get("artistName") or ""
+    r_title = result.get("trackName") or ""
+
+    a = max(
+        ratio(cand_artist, r_artist),
+        ratio(_strip_artist_feat(cand_artist), _strip_artist_feat(r_artist)),
+    )
     if a < _MIN_ARTIST_SCORE:
         return 0.0
-    t = difflib.SequenceMatcher(None, norm(cand_title), norm(result.get("trackName") or "")).ratio()
-    return 0.35 * a + 0.65 * t
+    t = max(
+        ratio(cand_title, r_title),
+        ratio(_strip_title_feat(cand_title), _strip_title_feat(r_title)),
+    )
+    score = 0.35 * a + 0.65 * t
+    # A version marker on the result that the request never asked for means a
+    # different recording ("American Boy (TS7 Remix)" for "American Boy") —
+    # halve the score so it cannot clear the confidence threshold on a strong
+    # title alone.
+    if _VERSION_MARKER_RE.search(r_title) and not _VERSION_MARKER_RE.search(cand_title):
+        score *= 0.5
+    return score
 
 
 def _itunes_candidates(artist: str, title: str) -> list[tuple[str, str]]:
@@ -189,6 +251,16 @@ def _itunes_candidates(artist: str, title: str) -> list[tuple[str, str]]:
 
     # 1. Mojibake-fixed + square-bracket junk stripped
     add(fa, _strip_junk(ft))
+
+    # 1b. Chart-style artist credits: "A Featuring B", "A x B", "A, B & C" —
+    #     iTunes credits the primary artist, so search under it too. Safe under
+    #     verification: a wrong parse simply fails _score_match.
+    primary = re.split(
+        r"\s+(?:featuring|feat\.?|ft\.?|with|x)\s+|\s*,\s*|\s+&\s+",
+        fa, maxsplit=1, flags=re.IGNORECASE,
+    )[0].strip()
+    if primary and primary.lower() != fa.lower():
+        add(primary, _strip_junk(ft))
 
     # 2. Split combined label on " - " to detect prefixed-label layout (SoundCloud/UKF style)
     #    e.g. "Wakaan - PEEKABOO - Maniac [UKF Premiere]" → parts[1]=PEEKABOO, parts[2]=Maniac
@@ -232,30 +304,25 @@ def _itunes_query(params: dict) -> list[dict]:
     return resp.json().get("results", [])
 
 
-def search_itunes_preview(artist: str, title: str) -> str:
+def search_itunes_preview(artist: str, title: str) -> dict[str, Any]:
+    """Find a verified iTunes preview for (artist, title).
+
+    Every result is scored with _score_match; nothing is accepted below
+    MATCH_CONFIDENCE_THRESHOLD. Substituting unverified audio poisons the
+    embedding index, so a miss raises instead of returning a guess.
+
+    Returns {"preview_url", "itunes_id", "matched_artist", "matched_title",
+    "match_score"}.
+    """
     label = f"{artist} - {title}"
-
-    # ---- STRICT FIRST: identical to prior behavior — first previewUrl wins ----
-    for params in [
-        {"term": label, "media": "music", "entity": "song", "limit": 5},
-        {"term": label, "media": "all", "limit": 10},
-    ]:
-        for result in _itunes_query(params):
-            url = result.get("previewUrl")
-            if url:
-                return url
-
-    # ---- FALLBACK (strict miss only): candidate parsing + fuzzy scoring ----
     candidates = _itunes_candidates(artist, title)
-    log.info("iTunes strict miss for %r — trying %d fallback candidates", label, len(candidates))
 
-    best_url: str | None = None
+    best: dict[str, Any] | None = None
     best_score = 0.0
     best_info = ""
 
     for cand_artist, cand_title in candidates:
         cand_label = f"{cand_artist} - {cand_title}"
-        log.info("  candidate: %r", cand_label)
         for q_variant, params in [
             ("combined", {"term": cand_label, "media": "music", "entity": "song", "limit": 25}),
             ("title-only", {"term": cand_title, "media": "music", "entity": "song", "limit": 25}),
@@ -267,7 +334,13 @@ def search_itunes_preview(artist: str, title: str) -> str:
                 score = _score_match(result, cand_artist, cand_title)
                 if score > best_score:
                     best_score = score
-                    best_url = url
+                    best = {
+                        "preview_url": url,
+                        "itunes_id": result.get("trackId"),
+                        "matched_artist": result.get("artistName"),
+                        "matched_title": result.get("trackName"),
+                        "match_score": round(score, 3),
+                    }
                     best_info = (
                         f"candidate=({cand_artist!r}, {cand_title!r}), "
                         f"query={q_variant!r}, score={score:.3f}, "
@@ -278,25 +351,30 @@ def search_itunes_preview(artist: str, title: str) -> str:
         if best_score >= MATCH_CONFIDENCE_THRESHOLD:
             break
 
-    if best_url and best_score >= MATCH_CONFIDENCE_THRESHOLD:
-        log.info("iTunes fallback matched: %s", best_info)
-        return best_url
+    if best and best_score >= MATCH_CONFIDENCE_THRESHOLD:
+        log.info("iTunes matched: %s", best_info)
+        return best
 
     debug = f"; best_candidate={best_info}" if best_info else ""
-    raise ValueError(f"No iTunes preview URL for {label}{debug}")
+    raise ValueError(f"No verified iTunes match for {label}{debug}")
 
 
-def fetch_audio(artist: str, title: str, track_key: str) -> Path:
+def fetch_audio(artist: str, title: str, track_key: str) -> tuple[Path, dict[str, Any] | None]:
+    """Return (audio_path, itunes_match | None).
+
+    Match provenance is None on a cache hit — the audio predates verification
+    and its origin is unknown.
+    """
     path = AUDIO_CACHE / f"{track_key}.m4a"
     if path.exists() and path.stat().st_size > 0:
         log.info("audio cache hit: %s - %s", artist, title)
-        return path
+        return path, None
     log.info("fetching audio: %s - %s", artist, title)
-    url = search_itunes_preview(artist, title)
-    resp = requests.get(url, timeout=45)
+    match = search_itunes_preview(artist, title)
+    resp = requests.get(match["preview_url"], timeout=45)
     resp.raise_for_status()
     path.write_bytes(resp.content)
-    return path
+    return path, match
 
 
 def load_audio_librosa(path: Path, sr: int) -> np.ndarray:
@@ -372,6 +450,9 @@ _muq_model_cache: dict[str, Any] = {}
 def get_muq_model(device: str) -> Any:
     if device not in _muq_model_cache:
         import torch
+        # Imported lazily: muq pulls in torch._dynamo, which takes minutes to
+        # import on some setups — scripts that never embed shouldn't pay that.
+        from muq import MuQMuLan
         log.info("loading MuQ-MuLan-large on %s", device)
         model = MuQMuLan.from_pretrained("OpenMuQ/MuQ-MuLan-large")
         # MPS can be unreliable for some ops; fall back to CPU
@@ -773,7 +854,7 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
 
     # 1. Fetch audio
     _t0 = time.perf_counter()
-    audio_path = fetch_audio(artist, title, track_key)
+    audio_path, itunes_match = fetch_audio(artist, title, track_key)
     print(f"[timing] audio_fetch: {time.perf_counter() - _t0:.1f}s")
 
     # 2. Load full mix at 44.1 kHz
@@ -825,6 +906,9 @@ def ingest_one_track(artist: str, title: str) -> dict[str, Any]:
         "title": title,
         "track_key": track_key,
         "duration_s": duration,
+        # iTunes provenance (None on audio-cache hit)
+        "itunes_id": itunes_match.get("itunes_id") if itunes_match else None,
+        "itunes_preview_url": itunes_match.get("preview_url") if itunes_match else None,
         # Essentia core
         "bpm": core.get("bpm"),
         "key": core.get("key"),
@@ -1023,6 +1107,20 @@ def save_track_features(features: dict[str, Any]) -> int:
             (features["artist"], features["title"]),
         )
         track_id: int = cur.fetchone()[0]
+
+        if features.get("itunes_preview_url"):
+            cur.execute(
+                """
+                UPDATE tracks
+                SET itunes_id = %s, itunes_preview_url = %s, audio_fetched_at = NOW()
+                WHERE id = %s
+                """,
+                (
+                    str(features["itunes_id"]) if features.get("itunes_id") is not None else None,
+                    features["itunes_preview_url"],
+                    track_id,
+                ),
+            )
 
         mood_vals = [features.get(k) for k in _MOOD_KEYS]
         mood = mood_vals if any(v is not None for v in mood_vals) else None

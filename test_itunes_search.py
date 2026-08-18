@@ -4,8 +4,8 @@ test_itunes_search.py — verify the rebuilt search_itunes_preview.
 Usage:
     python test_itunes_search.py
 
-PART 1  Regression: 8 indexed tracks from DB must still resolve (strict path).
-PART 2  Recovery:   all failed tracks in DB — check which now resolve via fallback.
+PART 1  Regression: 8 indexed tracks from DB must still resolve (verified path).
+PART 2  Recovery:   all failed tracks in DB — check which now resolve.
 PART 2b Specific:   hardcoded spec test cases including the bootleg that must fail.
 """
 from __future__ import annotations
@@ -30,9 +30,12 @@ from track_ingestion import get_connection, search_itunes_preview  # noqa: E402
 
 def _run(label: str, artist: str, title: str) -> None:
     try:
-        url = search_itunes_preview(artist, title)
+        match = search_itunes_preview(artist, title)
         print(f"  OK    [{label}]  {artist} - {title}")
-        print(f"         {url[:100]}")
+        print(
+            f"         score={match['match_score']}  "
+            f"matched: {match['matched_artist']} - {match['matched_title']}"
+        )
     except ValueError as exc:
         print(f"  FAIL  [{label}]  {artist} - {title}")
         print(f"         {str(exc)[:220]}")
